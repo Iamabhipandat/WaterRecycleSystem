@@ -1,0 +1,4 @@
+﻿# Wokwi Library Manager
+# These libraries will be auto-installed by Wokwi
+
+ArduinoJson @ 6.21.5

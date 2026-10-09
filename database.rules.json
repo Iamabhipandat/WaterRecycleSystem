@@ -1,0 +1,32 @@
+{
+  "rules": {
+    "users": {
+      ".read": "auth != null",
+      "$uid": {
+        ".write": "auth != null && auth.uid === $uid"
+      }
+    },
+    "presence": {
+      ".read": "auth != null",
+      "$uid": {
+        ".write": "auth != null && auth.uid === $uid"
+      }
+    },
+    "sensorData": {
+      ".read": true,
+      ".write": true
+    },
+    "commands": {
+      ".read": true,
+      ".write": true
+    },
+    "hardware": {
+      ".read": true,
+      ".write": true
+    },
+    "device": {
+      ".read": true,
+      ".write": true
+    }
+  }
+}
