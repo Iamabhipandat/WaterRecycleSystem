@@ -1,5 +1,5 @@
-﻿import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
-import { TrendingDown } from "lucide-react";
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
+import { TrendingDown, Download } from "lucide-react";
 
 const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
@@ -40,16 +40,47 @@ export default function Analytics({ waterCollected, waterRecycled }) {
   const totalRecycled  = data.reduce((s, d) => s + d.recycled,  0);
   const pct = Math.round((totalRecycled / totalCollected) * 100);
 
+  const exportCSV = () => {
+    const headers = ["Day", "Collected (L)", "Recycled (L)", "Saved (L)", "Efficiency (%)"];
+    const rows = data.map(d => [
+      d.day,
+      d.collected,
+      d.recycled,
+      d.saved,
+      Math.round((d.recycled / (d.collected || 1)) * 100)
+    ]);
+    rows.push(["TOTAL / AVG", totalCollected, totalRecycled, data.reduce((s, d) => s + d.saved, 0), pct]);
+
+    const csvContent = "data:text/csv;charset=utf-8," + [headers.join(","), ...rows.map(r => r.join(","))].join("\n");
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", `jalloop_recycling_report_${new Date().toISOString().slice(0,10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   return (
     <div id="analytics" className="bg-white rounded-2xl border border-gray-200 shadow-sm p-5">
-      <div className="flex items-start justify-between mb-5">
+      <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 mb-5">
         <div>
           <h2 className="text-sm font-bold text-gray-700 uppercase tracking-wider">Water Recycling Trend</h2>
           <p className="text-xs text-gray-400 mt-0.5">Last 7 days — litres per day</p>
         </div>
-        <div className="flex items-center gap-1.5 bg-green-50 border border-green-200 px-3 py-1.5 rounded-full">
-          <TrendingDown size={13} className="text-green-600" />
-          <span className="text-xs font-semibold text-green-700">{pct}% recycling efficiency this week</span>
+        <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 bg-green-50 border border-green-200 px-3 py-1.5 rounded-full">
+            <TrendingDown size={13} className="text-green-600" />
+            <span className="text-xs font-semibold text-green-700">{pct}% recycling efficiency this week</span>
+          </div>
+          <button
+            onClick={exportCSV}
+            title="Export CSV Report"
+            className="flex items-center gap-1 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs px-3 py-1.5 rounded-full transition-colors"
+          >
+            <Download size={13} />
+            <span className="hidden sm:inline font-medium">Export CSV</span>
+          </button>
         </div>
       </div>
 

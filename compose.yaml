@@ -1,0 +1,45 @@
+# ==============================================================================
+# JalLoop Local Multi-Service Stack (Finch / Docker Compose)
+# Runs the full open-source suite locally with no AWS account or credit card needed!
+# Track: Containers and Kubernetes (Finch) + Serverless (LocalStack) + Search (OpenSearch)
+# ==============================================================================
+
+services:
+  # 1. JalLoop Web Dashboard
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: jalloop-web
+    ports:
+      - "8080:80"
+    environment:
+      - VITE_OPENSEARCH_URL=http://localhost:9200
+      - VITE_LOCALSTACK_URL=http://localhost:4566
+    depends_on:
+      - opensearch
+      - localstack
+
+  # 2. LocalStack (AWS Cloud Emulation for DynamoDB, S3, EventBridge, Lambda)
+  localstack:
+    image: localstack/localstack:latest
+    container_name: jalloop-localstack
+    ports:
+      - "4566:4566"
+    environment:
+      - SERVICES=dynamodb,s3,events,lambda,apigateway
+      - AWS_DEFAULT_REGION=us-east-1
+    volumes:
+      - "./localstack-data:/var/lib/localstack"
+
+  # 3. OpenSearch (AWS Open Source Search Engine 2.x)
+  opensearch:
+    image: opensearchproject/opensearch:2.14.0
+    container_name: jalloop-opensearch
+    environment:
+      - discovery.type=single-node
+      - plugins.security.disabled=true
+      - OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m
+    ports:
+      - "9200:9200"
+      - "9600:9600"

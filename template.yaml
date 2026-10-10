@@ -1,0 +1,129 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  JalLoop - Smart Water Recycling System (AWS Serverless Architecture)
+  Track: Serverless (SAM CLI, LocalStack, Lambda, API Gateway, DynamoDB, EventBridge)
+
+Globals:
+  Function:
+    Timeout: 10
+    MemorySize: 256
+    Runtime: nodejs20.x
+    Architectures:
+      - x86_64
+    Environment:
+      Variables:
+        TABLE_NAME: !Ref JalLoopMetricsTable
+        ARCHIVE_BUCKET: !Ref JalLoopArchiveBucket
+        EVENT_BUS_NAME: default
+
+Resources:
+  # ============================================================================
+  # 1. API GATEWAY
+  # ============================================================================
+  JalLoopApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: prod
+      Cors:
+        AllowMethods: "'GET,POST,OPTIONS'"
+        AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key'"
+        AllowOrigin: "'*'"
+
+  # ============================================================================
+  # 2. LAMBDA FUNCTIONS (Node.js 20.x on Amazon Linux / Corretto)
+  # ============================================================================
+  TelemetryIngestionFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: backend/
+      Handler: handlers/telemetryHandler.handler
+      Description: Ingests ESP32 telemetry, evaluates Cedar policies, and writes to DynamoDB.
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref JalLoopMetricsTable
+        - S3CrudPolicy:
+            BucketName: !Ref JalLoopArchiveBucket
+        - EventBridgePutEventsPolicy:
+            EventBusName: default
+      Events:
+        GetStatus:
+          Type: Api
+          Properties:
+            RestApiId: !Ref JalLoopApi
+            Path: /api/telemetry
+            Method: GET
+        PostTelemetry:
+          Type: Api
+          Properties:
+            RestApiId: !Ref JalLoopApi
+            Path: /api/telemetry
+            Method: POST
+
+  AuthAndPolicyFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: backend/
+      Handler: handlers/authHandler.handler
+      Description: Validates JWT tokens and evaluates Cedar authorization policies.
+      Events:
+        EvaluatePolicy:
+          Type: Api
+          Properties:
+            RestApiId: !Ref JalLoopApi
+            Path: /api/auth/cedar-eval
+            Method: POST
+
+  # ============================================================================
+  # 3. DYNAMODB TABLE (Data Storage)
+  # ============================================================================
+  JalLoopMetricsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: JalLoopWaterMetrics
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: deviceId
+          AttributeType: S
+        - AttributeName: timestamp
+          AttributeType: N
+      KeySchema:
+        - AttributeName: deviceId
+          KeyType: HASH
+        - AttributeName: timestamp
+          KeyType: RANGE
+
+  # ============================================================================
+  # 4. S3 BUCKET (Historical Archival & Firmware OTA)
+  # ============================================================================
+  JalLoopArchiveBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub "jalloop-water-archive-${AWS::AccountId}"
+      VersioningConfiguration:
+        Status: Enabled
+
+  # ============================================================================
+  # 5. EVENTBRIDGE RULE (The Plumbing - Event-Driven Alerts)
+  # ============================================================================
+  WaterAlertEventRule:
+    Type: AWS::Events::Rule
+    Properties:
+      Description: "Routes critical water tank alerts (High Turbidity / Full Tank) to notification targets"
+      EventPattern:
+        source:
+          - "jalloop.water.system"
+        detail-type:
+          - "WaterAlert"
+      State: ENABLED
+
+Outputs:
+  JalLoopApiUrl:
+    Description: "API Gateway endpoint URL for JalLoop"
+    Value: !Sub "https://${JalLoopApi}.execute-api.${AWS::Region}.amazonaws.com/prod/"
+  MetricsTableName:
+    Description: "DynamoDB Table Name"
+    Value: !Ref JalLoopMetricsTable
+  ArchiveBucketName:
+    Description: "S3 Archival Bucket"
+    Value: !Ref JalLoopArchiveBucket

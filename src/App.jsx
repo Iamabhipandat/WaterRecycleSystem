@@ -1,4 +1,4 @@
-﻿import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import Navbar from "./components/Navbar";
 import WaterFlowSystem from "./components/WaterFlowSystem";
 import SimulationControls from "./components/SimulationControls";
@@ -6,12 +6,22 @@ import WaterMetrics from "./components/WaterMetrics";
 import Analytics from "./components/Analytics";
 import SystemStatus from "./components/SystemStatus";
 import HardwareLeds from "./components/HardwareLeds";
+import VirtualHardwareWorkbench from "./components/VirtualHardwareWorkbench";
+import AwsCloudCenterModal from "./components/AwsCloudCenterModal";
 import AuthPage from "./pages/AuthPage";
 import AdminDashboard from "./pages/AdminDashboard";
-import { AlertTriangle, Leaf } from "lucide-react";
+import { AlertTriangle, Leaf, Cloud } from "lucide-react";
 import { useFirebaseData } from "./hooks/useFirebaseData";
 import { useAuth } from "./context/AuthContext";
 import { ledsFromState } from "./utils/hardware";
+import {
+  COLLECTION_INTERVAL_MS,
+  RO_INFLOW_RATE,
+  WASHING_INFLOW_RATE,
+  RAIN_INFLOW_RATE,
+  PUMP_INTERVAL_MS,
+  PUMP_FLOW_RATE_PER_TICK,
+} from "./config/appConfig";
 
 const INITIAL = {
   roLiters:           15,
@@ -48,6 +58,7 @@ export default function App() {
   const [state, setState]         = useState(INITIAL);
   const [warning, setWarning]     = useState(null);
   const [liveMode, setLiveMode]   = useState(false);
+  const [showAwsModal, setShowAwsModal] = useState(false);
 
   const { liveData, connected, error, sendCommand, syncLeds } = useFirebaseData(liveMode);
 
@@ -92,13 +103,7 @@ export default function App() {
     if (!liveMode) return undefined;
     syncLeds(leds);
     return undefined;
-  }, [
-    liveMode,
-    leds.ro, leds.washing, leds.rain, leds.collection,
-    leds.filter1, leds.filter2, leds.filter3, leds.pump,
-    leds.recycled, leds.reuse, leds.reuseToilet, leds.reuseGarden, leds.reuseCleaning,
-    syncLeds,
-  ]);
+  }, [liveMode, leds, syncLeds]);
 
   useEffect(() => {
     if (isLive) return undefined;
@@ -108,13 +113,15 @@ export default function App() {
         if (!anyActive) return s;
         if (s.collectionLiters >= s.collectionCapacity) return s;
 
-        const drip = (s.roActive ? 0.5 : 0) + (s.washingActive ? 0.5 : 0) + (s.rainActive ? 0.3 : 0);
+        const drip = (s.roActive ? RO_INFLOW_RATE : 0) + 
+                     (s.washingActive ? WASHING_INFLOW_RATE : 0) + 
+                     (s.rainActive ? RAIN_INFLOW_RATE : 0);
         const newColl      = Math.min(s.collectionCapacity, s.collectionLiters + drip);
         const newCollected = s.waterCollected + drip;
 
-        return { ...s, collectionLiters: Math.round(newColl * 10) / 10, waterCollected: Math.round(newCollected * 10) / 10 };
+        return { ...s, collectionLiters: Math.round(newColl * 100) / 100, waterCollected: Math.round(newCollected * 100) / 100 };
       });
-    }, 3000);
+    }, COLLECTION_INTERVAL_MS);
     return () => clearInterval(sourceInterval.current);
   }, [isLive]);
 
@@ -123,8 +130,9 @@ export default function App() {
     if (state.pumpRunning) {
       pumpInterval.current = setInterval(() => {
         setState(s => {
-          const newColl   = Math.max(0, s.collectionLiters - 5);
-          const newRecL   = Math.min(s.recycledCapacity, s.recycledLiters + 5);
+          const flow = PUMP_FLOW_RATE_PER_TICK;
+          const newColl   = Math.max(0, s.collectionLiters - flow);
+          const newRecL   = Math.min(s.recycledCapacity, s.recycledLiters + flow);
           const newRecPct = (newRecL / s.recycledCapacity) * 100;
           const shouldStop = newRecPct >= 90 || newColl <= 0;
           if (shouldStop) {
@@ -133,16 +141,16 @@ export default function App() {
           }
           return {
             ...s,
-            collectionLiters: newColl,
-            recycledLiters:   newRecL,
-            recycledPct:      newRecPct,
-            freshWaterSaved:  s.freshWaterSaved + 5,
-            waterRecycled:    s.waterRecycled   + 5,
+            collectionLiters: Math.round(newColl * 100) / 100,
+            recycledLiters:   Math.round(newRecL * 100) / 100,
+            recycledPct:      Math.round(newRecPct * 10) / 10,
+            freshWaterSaved:  Math.round((s.freshWaterSaved + flow) * 100) / 100,
+            waterRecycled:    Math.round((s.waterRecycled + flow) * 100) / 100,
             pumpRunning:      shouldStop ? false : s.pumpRunning,
             filtrationStage:  shouldStop ? 0     : s.filtrationStage,
           };
         });
-      }, 900);
+      }, PUMP_INTERVAL_MS);
     } else {
       clearInterval(pumpInterval.current);
     }
@@ -254,6 +262,50 @@ export default function App() {
     }
   }
 
+  function handleEmergencyStop() {
+    filtrationTimers.current.forEach(t => clearTimeout(t));
+    filtrationTimers.current = [];
+    clearInterval(pumpInterval.current);
+    clearInterval(reuseInterval.current);
+    setState(s => ({
+      ...s,
+      pumpRunning: false,
+      reuseActive: false,
+      roActive: false,
+      washingActive: false,
+      rainActive: false,
+      filtrationStage: 0,
+    }));
+    showWarning("🚨 EMERGENCY STOP TRIGGERED: All water pumps, sources, and valves halted immediately.");
+    addActivity("🚨 EMERGENCY SHUTOFF: System halted safely");
+    if (liveMode) {
+      sendCommand({
+        pump: "OFF",
+        reuse: "OFF",
+        ro: "OFF",
+        washing: "OFF",
+        rain: "OFF",
+        filtration: "STOP",
+        emergencyStop: true,
+      });
+    }
+  }
+
+  const handleUpdateTurbidity = useCallback((turbidity) => {
+    setState(s => ({ ...s, turbidity }));
+  }, []);
+
+  const handleUpdateCollection = useCallback((collectionLiters) => {
+    setState(s => ({ ...s, collectionLiters }));
+  }, []);
+
+  const handleUpdateRecycled = useCallback((recycledLiters) => {
+    setState(s => {
+      const recycledPct = Math.round((recycledLiters / s.recycledCapacity) * 100);
+      return { ...s, recycledLiters, recycledPct };
+    });
+  }, []);
+
   const savingPercent = Math.round((displayState.freshWaterSaved / (displayState.freshWaterSaved + 280)) * 100);
 
   if (loading) {
@@ -274,6 +326,7 @@ export default function App() {
         connected={connected}
         error={error}
         onOpenAdmin={() => setView(view === "admin" ? "dashboard" : "admin")}
+        onOpenAwsCenter={() => setShowAwsModal(true)}
         onToggleMode={() => {
           setLiveMode(!liveMode);
           addActivity(liveMode ? "Switched to Demo Mode" : "Switched to Live Mode — syncing LEDs to hardware");
@@ -291,15 +344,25 @@ export default function App() {
           </div>
         )}
 
-        <div className="flex items-center gap-3 bg-green-700 text-white rounded-2xl px-6 py-4 shadow-sm">
-          <Leaf size={20} className="shrink-0 opacity-80" />
-          <div>
-            <p className="text-xs font-semibold opacity-70 uppercase tracking-widest">JalLoop — Smart Water Recycling</p>
-            <p className="text-base font-semibold mt-0.5">
-              RO &amp; washing-machine wastewater is collected, filtered, and reused — saving
-              <span className="text-green-200 font-bold ml-1">{savingPercent}% fresh water</span> every day.
-            </p>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-green-700 text-white rounded-2xl px-6 py-4 shadow-sm">
+          <div className="flex items-center gap-3">
+            <Leaf size={20} className="shrink-0 opacity-80" />
+            <div>
+              <p className="text-xs font-semibold opacity-70 uppercase tracking-widest">JalLoop — Smart Water Recycling</p>
+              <p className="text-base font-semibold mt-0.5">
+                RO &amp; washing-machine wastewater is collected, filtered, and reused — saving
+                <span className="text-green-200 font-bold ml-1">{savingPercent}% fresh water</span> every day.
+              </p>
+            </div>
           </div>
+          <button
+            type="button"
+            onClick={() => setShowAwsModal(true)}
+            className="self-start sm:self-auto flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold bg-amber-400 hover:bg-amber-300 text-amber-950 transition-all shadow-xs shrink-0 cursor-pointer"
+          >
+            <Cloud size={14} className="text-amber-900" />
+            <span>AWS Open Source Center</span>
+          </button>
         </div>
 
         <WaterFlowSystem
@@ -321,6 +384,16 @@ export default function App() {
 
         <HardwareLeds liveMode={liveMode} connected={connected} leds={leds} />
 
+        <VirtualHardwareWorkbench
+          displayState={displayState}
+          leds={leds}
+          onTogglePump={handleStartRecycling}
+          onUpdateTurbidity={handleUpdateTurbidity}
+          onUpdateCollection={handleUpdateCollection}
+          onUpdateRecycled={handleUpdateRecycled}
+          onToggleReuse={handleUseRecycled}
+        />
+
         <SimulationControls
           pumpRunning={displayState.pumpRunning}
           reuseActive={displayState.reuseActive}
@@ -333,6 +406,7 @@ export default function App() {
           onStartRecycling={handleStartRecycling}
           onUseRecycled={handleUseRecycled}
           onReset={handleReset}
+          onEmergencyStop={handleEmergencyStop}
         />
 
         <WaterMetrics
@@ -360,6 +434,12 @@ export default function App() {
 
       </main>
       )}
+
+      <AwsCloudCenterModal
+        isOpen={showAwsModal}
+        onClose={() => setShowAwsModal(false)}
+        systemState={displayState}
+      />
     </div>
   );
 }

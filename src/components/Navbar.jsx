@@ -1,11 +1,19 @@
-﻿import { Droplets, LayoutDashboard, LogOut, Settings } from "lucide-react";
+import { Cloud, Droplets, LayoutDashboard, LogOut, Settings } from "lucide-react";
 import ModeToggle from "./ModeToggle";
 import { useAuth } from "../context/AuthContext";
 
-export default function Navbar({ liveMode, connected, error, onToggleMode, onOpenAdmin, view }) {
+export default function Navbar({
+  liveMode,
+  connected,
+  error,
+  onToggleMode,
+  onOpenAdmin,
+  onOpenAwsCenter,
+  view,
+}) {
   const { profile, isAdmin, logout } = useAuth();
-  const links = ["Water Flow", "System Status", "Analytics"];
-  const ids = ["flow", "status", "analytics"];
+  const links = ["Water Flow", "Virtual Hardware", "System Status", "Analytics"];
+  const ids = ["flow", "virtual-hardware", "status", "analytics"];
 
   return (
     <nav className="bg-white border-b border-gray-200 px-5 py-3 flex items-center justify-between sticky top-0 z-40 shadow-sm">
@@ -36,6 +44,18 @@ export default function Navbar({ liveMode, connected, error, onToggleMode, onOpe
             ))}
           </div>
         )}
+
+        {/* AWS Open Source & Cloud Center Trigger */}
+        <button
+          type="button"
+          onClick={onOpenAwsCenter}
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-300 transition-all shadow-2xs hover:scale-102"
+          title="Open AWS Open Source & Cloud Architecture Center"
+        >
+          <Cloud size={13} className="text-amber-600" />
+          <span className="hidden sm:inline">AWS Cloud Center</span>
+          <span className="sm:hidden">AWS</span>
+        </button>
 
         <ModeToggle
           liveMode={liveMode}

@@ -1,4 +1,4 @@
-﻿import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { onValue, ref, set, update } from "firebase/database";
 import { db, isFirebaseReady } from "../services/firebase";
 
@@ -12,9 +12,6 @@ export function useFirebaseData(liveMode) {
 
   useEffect(() => {
     if (!liveMode || !isFirebaseReady) {
-      setConnected(false);
-      setLiveData(null);
-      setError(null);
       lastHeard.current = 0;
       return undefined;
     }

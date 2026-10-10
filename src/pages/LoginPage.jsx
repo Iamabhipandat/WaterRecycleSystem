@@ -1,4 +1,4 @@
-﻿import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect } from "react";
 import {
   GoogleAuthProvider, signInWithPopup,
   RecaptchaVerifier, signInWithPhoneNumber,
@@ -54,7 +54,8 @@ export default function LoginPage() {
       const result = await signInWithPhoneNumber(auth, cleaned, recaptchaVerifier.current);
       setConfirmResult(result);
       setStep("otp");
-    } catch (e) {
+    } catch (err) {
+      console.error("[Login] OTP send error:", err);
       setError("Could not send OTP. Make sure phone auth is enabled in Firebase and the number is valid.");
       recaptchaVerifier.current = null; // reset reCAPTCHA on error
     } finally {
@@ -68,7 +69,8 @@ export default function LoginPage() {
     setLoading(true); setError("");
     try {
       await confirmResult.confirm(otp);
-    } catch (e) {
+    } catch (err) {
+      console.error("[Login] OTP verify error:", err);
       setError("Invalid OTP. Please try again.");
     } finally {
       setLoading(false);
