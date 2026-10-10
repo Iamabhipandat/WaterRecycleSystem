@@ -10,6 +10,7 @@ import { onValue, ref, set, update } from "firebase/database";
 import { auth, db, isFirebaseReady } from "../services/firebase";
 import { ADMIN_EMAILS, ADMIN_INVITE_CODE } from "../config/appConfig";
 import { createAccountVerificationToken, createSessionToken, verifyJwtToken, generateVerificationCode } from "../utils/jwt";
+import { sendVerificationEmail } from "../services/emailService";
 
 const AuthContext = createContext(null);
 const TOKEN_KEY = "jalloop_auth_token";
@@ -34,6 +35,16 @@ function savePendingVerification(email, data) {
 function getPendingVerification(email) {
   const store = getPendingVerifications();
   return store[email.toLowerCase()];
+}
+
+function removePendingVerification(email) {
+  try {
+    const store = getPendingVerifications();
+    delete store[email.toLowerCase()];
+    sessionStorage.setItem(PENDING_CODES_KEY, JSON.stringify(store));
+  } catch {
+    // Ignore session errors
+  }
 }
 
 /** Helper: Validate email format using regex */
@@ -289,7 +300,7 @@ export function AuthProvider({ children }) {
 
     const existingUsers = getLocalUsers();
     if (existingUsers.some(u => u.email === trimmedEmail)) {
-      throw new Error("An account already exists with this email. Please log in.");
+      throw new Error("An account already exists with this email. Please log in, or click 'Reset saved accounts' below to re-register.");
     }
 
     const code = generateVerificationCode();
@@ -302,10 +313,13 @@ export function AuthProvider({ children }) {
       createdAt: Date.now(),
     });
 
+    // Dispatch verification code to the recipient's real email
+    await sendVerificationEmail({ toEmail: trimmedEmail, code, name: name.trim() });
+
     return {
       email: trimmedEmail,
       code,
-      message: `A 6-digit verification code has been generated for ${trimmedEmail}`,
+      message: `A 6-digit verification code has been sent to ${trimmedEmail}`,
     };
   }, []);
 
@@ -346,6 +360,7 @@ export function AuthProvider({ children }) {
     setToken(sessionJwt);
     localStorage.setItem(TOKEN_KEY, sessionJwt);
     localStorage.setItem("jalloop_user_session", JSON.stringify(newUser));
+    removePendingVerification(trimmedEmail);
 
     return { success: true, user: newUser };
   }, []);
@@ -378,6 +393,9 @@ export function AuthProvider({ children }) {
       user: userMatch,
       createdAt: Date.now(),
     });
+
+    // Dispatch verification code to the recipient's real email
+    await sendVerificationEmail({ toEmail: trimmedEmail, code, name: userMatch.displayName || "User" });
 
     return {
       email: trimmedEmail,
@@ -412,6 +430,7 @@ export function AuthProvider({ children }) {
     setToken(sessionJwt);
     localStorage.setItem(TOKEN_KEY, sessionJwt);
     localStorage.setItem("jalloop_user_session", JSON.stringify(userMatch));
+    removePendingVerification(trimmedEmail);
 
     return { success: true, user: userMatch };
   }, []);
@@ -426,6 +445,10 @@ export function AuthProvider({ children }) {
     const newCode = generateVerificationCode();
     pending.code = newCode;
     savePendingVerification(trimmedEmail, pending);
+
+    // Dispatch new code to recipient's email
+    await sendVerificationEmail({ toEmail: trimmedEmail, code: newCode, name: pending.name || "User" });
+
     return newCode;
   }, []);
 
@@ -657,6 +680,45 @@ export function AuthProvider({ children }) {
     localStorage.removeItem("jalloop_user_session");
   }, [user]);
 
+  /** Reset all stored users, sessions, and pending verifications (allows fresh sign up with any email) */
+  const resetAllSavedAccounts = useCallback(async () => {
+    try {
+      if (auth && isFirebaseReady && auth.currentUser) {
+        try {
+          await signOut(auth);
+        } catch {
+          // ignore
+        }
+      }
+      localStorage.removeItem(USERS_STORAGE_KEY);
+      localStorage.removeItem(TOKEN_KEY);
+      localStorage.removeItem("jalloop_user_session");
+      sessionStorage.removeItem(PENDING_CODES_KEY);
+      sessionStorage.clear();
+      setUser(null);
+      setProfile(null);
+      setToken(null);
+      return true;
+    } catch (e) {
+      console.warn("Storage reset error:", e);
+      return false;
+    }
+  }, []);
+
+  /** Reset a single email from local storage so it can be registered again */
+  const resetEmailAccount = useCallback((targetEmail) => {
+    try {
+      const trimmed = String(targetEmail || "").trim().toLowerCase();
+      const users = getLocalUsers().filter((u) => u.email !== trimmed);
+      localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(users));
+      removePendingVerification(trimmed);
+      return true;
+    } catch (e) {
+      console.warn("Email reset error:", e);
+      return false;
+    }
+  }, []);
+
   const value = useMemo(
     () => ({
       user,
@@ -673,6 +735,8 @@ export function AuthProvider({ children }) {
       resendSignupCode,
       verifyAccount,
       resendVerificationToken,
+      resetAllSavedAccounts,
+      resetEmailAccount,
       login,
       loginWithGoogle,
       loginDemo,
@@ -691,6 +755,8 @@ export function AuthProvider({ children }) {
       resendSignupCode,
       verifyAccount,
       resendVerificationToken,
+      resetAllSavedAccounts,
+      resetEmailAccount,
       login,
       loginWithGoogle,
       loginDemo,

@@ -7,14 +7,12 @@ import {
   AlertCircle,
   Sparkles,
   Shield,
-  KeyRound,
   ArrowRight,
   Mail,
   ChevronLeft,
   RotateCcw,
   Lock,
   User,
-  Copy,
 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 
@@ -27,6 +25,7 @@ export default function AuthPage() {
     requestLoginVerification,
     confirmLoginVerification,
     resendSignupCode,
+    resetAllSavedAccounts,
     loginWithGoogle,
     loginDemo,
   } = useAuth();
@@ -49,7 +48,6 @@ export default function AuthPage() {
 
   // 6-digit verification code states
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
-  const [activeCode, setActiveCode] = useState("");
   const [resendTimer, setResendTimer] = useState(30);
   const [canResend, setCanResend] = useState(false);
 
@@ -57,7 +55,6 @@ export default function AuthPage() {
   const [error, setError] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
   const [busy, setBusy] = useState(false);
-  const [copiedCode, setCopiedCode] = useState(false);
 
   const otpInputsRef = useRef([]);
 
@@ -570,30 +567,13 @@ export default function AuthPage() {
                 </div>
               )}
 
-              {/* Live Email Notification Simulation Card */}
-              {activeCode && (
-                <div className="bg-blue-50/80 border border-blue-200 rounded-xl p-3.5 space-y-2">
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="font-bold text-blue-900 flex items-center gap-1.5">
-                      <Mail size={13} className="text-blue-600" />
-                      Verification Code Generated:
-                    </span>
-                    <button
-                      type="button"
-                      onClick={handleAutoFillCode}
-                      className="px-2 py-0.5 rounded-md bg-blue-600 hover:bg-blue-700 text-white text-[10px] font-bold transition-colors cursor-pointer"
-                    >
-                      ⚡ Auto-fill Code
-                    </button>
-                  </div>
-                  <div className="flex items-center justify-between bg-white px-3 py-1.5 rounded-lg border border-blue-100 font-mono">
-                    <span className="text-base font-black text-blue-700 tracking-widest">
-                      {activeCode}
-                    </span>
-                    <span className="text-[10px] text-gray-400">Valid for 10 minutes</span>
-                  </div>
-                </div>
-              )}
+              {/* Email Sent Notice (Code is NOT displayed on screen) */}
+              <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-3 text-xs text-emerald-900 flex items-center gap-2.5">
+                <Mail size={16} className="text-emerald-600 shrink-0" />
+                <p>
+                  A 6-digit code has been sent to <span className="font-bold">{email}</span>. Please check your inbox (and spam folder).
+                </p>
+              </div>
 
               {/* 6 Individual OTP Boxes */}
               <div>
