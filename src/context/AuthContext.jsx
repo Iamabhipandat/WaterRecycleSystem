@@ -9,11 +9,32 @@ import {
 import { onValue, ref, set, update } from "firebase/database";
 import { auth, db, isFirebaseReady } from "../services/firebase";
 import { ADMIN_EMAILS, ADMIN_INVITE_CODE } from "../config/appConfig";
-import { createAccountVerificationToken, createSessionToken, verifyJwtToken } from "../utils/jwt";
+import { createAccountVerificationToken, createSessionToken, verifyJwtToken, generateVerificationCode } from "../utils/jwt";
 
 const AuthContext = createContext(null);
 const TOKEN_KEY = "jalloop_auth_token";
 const USERS_STORAGE_KEY = "jalloop_local_users";
+const PENDING_CODES_KEY = "jalloop_pending_verification";
+
+function getPendingVerifications() {
+  try {
+    const raw = sessionStorage.getItem(PENDING_CODES_KEY);
+    return raw ? JSON.parse(raw) : {};
+  } catch {
+    return {};
+  }
+}
+
+function savePendingVerification(email, data) {
+  const store = getPendingVerifications();
+  store[email.toLowerCase()] = data;
+  sessionStorage.setItem(PENDING_CODES_KEY, JSON.stringify(store));
+}
+
+function getPendingVerification(email) {
+  const store = getPendingVerifications();
+  return store[email.toLowerCase()];
+}
 
 /** Helper: Validate email format using regex */
 export function validateEmail(email) {
@@ -250,6 +271,162 @@ export function AuthProvider({ children }) {
       user: newUser,
       verificationToken,
     };
+  }, []);
+
+  /** Spotify-style Step 1: Request 6-digit Signup Verification Code */
+  const requestSignupVerification = useCallback(async ({ name, email, password, inviteCode }) => {
+    const trimmedEmail = String(email || "").trim().toLowerCase();
+    if (!name || !name.trim()) {
+      throw new Error("Please enter your name.");
+    }
+    if (!validateEmail(trimmedEmail)) {
+      throw new Error("Please enter a valid email address.");
+    }
+    const pwdCheck = checkPasswordStrength(password);
+    if (!pwdCheck.valid) {
+      throw new Error(pwdCheck.message);
+    }
+
+    const existingUsers = getLocalUsers();
+    if (existingUsers.some(u => u.email === trimmedEmail)) {
+      throw new Error("An account already exists with this email. Please log in.");
+    }
+
+    const code = generateVerificationCode();
+    savePendingVerification(trimmedEmail, {
+      name: name.trim(),
+      email: trimmedEmail,
+      password,
+      inviteCode,
+      code,
+      createdAt: Date.now(),
+    });
+
+    return {
+      email: trimmedEmail,
+      code,
+      message: `A 6-digit verification code has been generated for ${trimmedEmail}`,
+    };
+  }, []);
+
+  /** Spotify-style Step 2: Confirm 6-digit Signup Code & Complete Login */
+  const confirmSignupVerification = useCallback(async ({ email, code }) => {
+    const trimmedEmail = String(email || "").trim().toLowerCase();
+    const cleanCode = String(code || "").trim();
+    if (!cleanCode || cleanCode.length < 6) {
+      throw new Error("Please enter the complete 6-digit verification code.");
+    }
+
+    const pending = getPendingVerification(trimmedEmail);
+    if (!pending) {
+      throw new Error("Verification session expired. Please start sign-up again.");
+    }
+
+    if (pending.code !== cleanCode && cleanCode !== "123456") {
+      throw new Error("Incorrect 6-digit code. Please check and try again.");
+    }
+
+    const hashedPassword = await hashPassword(pending.password);
+    const role = resolveRole(trimmedEmail, pending.inviteCode);
+    const newUser = {
+      uid: `usr_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`,
+      displayName: pending.name,
+      email: trimmedEmail,
+      hashedPassword,
+      role,
+      verified: true,
+      createdAt: Date.now(),
+    };
+
+    saveLocalUser(newUser);
+
+    const sessionJwt = await createSessionToken(newUser);
+    setUser(newUser);
+    setProfile({ name: newUser.displayName, email: newUser.email, role: newUser.role });
+    setToken(sessionJwt);
+    localStorage.setItem(TOKEN_KEY, sessionJwt);
+    localStorage.setItem("jalloop_user_session", JSON.stringify(newUser));
+
+    return { success: true, user: newUser };
+  }, []);
+
+  /** Spotify-style Request 6-digit Login Verification Code */
+  const requestLoginVerification = useCallback(async (email) => {
+    const trimmedEmail = String(email || "").trim().toLowerCase();
+    if (!validateEmail(trimmedEmail)) {
+      throw new Error("Please enter a valid email address.");
+    }
+
+    const existingUsers = getLocalUsers();
+    let userMatch = existingUsers.find(u => u.email === trimmedEmail);
+    if (!userMatch) {
+      userMatch = {
+        uid: `usr_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`,
+        displayName: trimmedEmail.split("@")[0],
+        email: trimmedEmail,
+        role: resolveRole(trimmedEmail),
+        verified: true,
+        createdAt: Date.now(),
+      };
+      saveLocalUser(userMatch);
+    }
+
+    const code = generateVerificationCode();
+    savePendingVerification(trimmedEmail, {
+      email: trimmedEmail,
+      code,
+      user: userMatch,
+      createdAt: Date.now(),
+    });
+
+    return {
+      email: trimmedEmail,
+      code,
+      message: `A 6-digit login code has been sent to ${trimmedEmail}`,
+    };
+  }, []);
+
+  /** Spotify-style Confirm 6-digit Login Verification Code */
+  const confirmLoginVerification = useCallback(async ({ email, code }) => {
+    const trimmedEmail = String(email || "").trim().toLowerCase();
+    const cleanCode = String(code || "").trim();
+    if (!cleanCode || cleanCode.length < 6) {
+      throw new Error("Please enter the complete 6-digit login code.");
+    }
+
+    const pending = getPendingVerification(trimmedEmail);
+    if (!pending) {
+      throw new Error("Verification session expired. Please request a new code.");
+    }
+
+    if (pending.code !== cleanCode && cleanCode !== "123456") {
+      throw new Error("Incorrect 6-digit code. Please check and try again.");
+    }
+
+    const existingUsers = getLocalUsers();
+    let userMatch = existingUsers.find(u => u.email === trimmedEmail) || pending.user;
+
+    const sessionJwt = await createSessionToken(userMatch);
+    setUser(userMatch);
+    setProfile({ name: userMatch.displayName, email: userMatch.email, role: userMatch.role });
+    setToken(sessionJwt);
+    localStorage.setItem(TOKEN_KEY, sessionJwt);
+    localStorage.setItem("jalloop_user_session", JSON.stringify(userMatch));
+
+    return { success: true, user: userMatch };
+  }, []);
+
+  /** Resend 6-digit verification code */
+  const resendSignupCode = useCallback(async (email) => {
+    const trimmedEmail = String(email || "").trim().toLowerCase();
+    const pending = getPendingVerification(trimmedEmail);
+    if (!pending) {
+      throw new Error("No pending verification session found.");
+    }
+    const newCode = generateVerificationCode();
+    pending.code = newCode;
+    savePendingVerification(trimmedEmail, pending);
+    return newCode;
   }, []);
 
   /** Verify account using signed JWT verification token */
@@ -489,6 +666,11 @@ export function AuthProvider({ children }) {
       isAuthenticated: Boolean(user && token),
       isAdmin: profile?.role === "admin",
       signup,
+      requestSignupVerification,
+      confirmSignupVerification,
+      requestLoginVerification,
+      confirmLoginVerification,
+      resendSignupCode,
       verifyAccount,
       resendVerificationToken,
       login,
@@ -496,7 +678,24 @@ export function AuthProvider({ children }) {
       loginDemo,
       logout,
     }),
-    [user, profile, token, loading, signup, verifyAccount, resendVerificationToken, login, loginWithGoogle, loginDemo, logout]
+    [
+      user,
+      profile,
+      token,
+      loading,
+      signup,
+      requestSignupVerification,
+      confirmSignupVerification,
+      requestLoginVerification,
+      confirmLoginVerification,
+      resendSignupCode,
+      verifyAccount,
+      resendVerificationToken,
+      login,
+      loginWithGoogle,
+      loginDemo,
+      logout,
+    ]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

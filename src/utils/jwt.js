@@ -114,3 +114,8 @@ export async function verifyJwtToken(token, secret = "jalloop-water-system-secre
 
   return payload;
 }
+
+/** Generate a clean random 6-digit verification code */
+export function generateVerificationCode() {
+  return String(Math.floor(100000 + Math.random() * 900000));
+}
