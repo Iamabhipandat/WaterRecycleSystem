@@ -3,118 +3,336 @@
   "author": "JalLoop - Smart Water Recycling",
   "editor": "wokwi",
   "parts": [
-    { "type": "wokwi-esp32-devkit-v1", "id": "esp", "top": 100, "left": 0, "attrs": {} },
-    { "type": "wokwi-hc-sr04", "id": "sonar_col", "top": -90, "left": -300, "rotate": 90, "attrs": { "distance": "15" } },
-    { "type": "wokwi-hc-sr04", "id": "sonar_rec", "top": -90, "left": -110, "rotate": 90, "attrs": { "distance": "34" } },
-    { "type": "wokwi-hc-sr04", "id": "sonar_fresh", "top": -90, "left": 80, "rotate": 90, "attrs": { "distance": "18" } },
-    { "type": "wokwi-potentiometer", "id": "pot_turbidity", "top": 340, "left": -200, "attrs": { "value": "0.85" } },
-    { "type": "wokwi-pushbutton", "id": "btn_pump", "top": 200, "left": -240, "attrs": {} },
+    {
+      "type": "wokwi-esp32-devkit-v1",
+      "id": "esp",
+      "top": 180,
+      "left": 0,
+      "attrs": {}
+    },
 
-    { "type": "wokwi-resistor", "id": "res_sys", "top": 80, "left": 196, "rotate": 90, "attrs": { "value": "220" } },
-    { "type": "wokwi-led", "id": "led_system", "top": 70, "left": 270, "attrs": { "color": "green" } },
+    {
+      "type": "wokwi-hc-sr04",
+      "id": "sonar_col",
+      "top": -80,
+      "left": -340,
+      "rotate": 90,
+      "attrs": { "distance": "15" }
+    },
+    {
+      "type": "wokwi-hc-sr04",
+      "id": "sonar_rec",
+      "top": -80,
+      "left": -120,
+      "rotate": 90,
+      "attrs": { "distance": "34" }
+    },
+    {
+      "type": "wokwi-hc-sr04",
+      "id": "sonar_fresh",
+      "top": -80,
+      "left": 100,
+      "rotate": 90,
+      "attrs": { "distance": "18" }
+    },
 
-    { "type": "wokwi-resistor", "id": "res_ro", "top": 120, "left": 196, "rotate": 90, "attrs": { "value": "220" } },
-    { "type": "wokwi-led", "id": "led_ro", "top": 110, "left": 270, "attrs": { "color": "blue" } },
-    { "type": "wokwi-resistor", "id": "res_wash", "top": 160, "left": 196, "rotate": 90, "attrs": { "value": "220" } },
-    { "type": "wokwi-led", "id": "led_wash", "top": 150, "left": 270, "attrs": { "color": "cyan" } },
-    { "type": "wokwi-resistor", "id": "res_rain", "top": 200, "left": 196, "rotate": 90, "attrs": { "value": "220" } },
-    { "type": "wokwi-led", "id": "led_rain", "top": 190, "left": 270, "attrs": { "color": "white" } },
-    { "type": "wokwi-resistor", "id": "res_col", "top": 240, "left": 196, "rotate": 90, "attrs": { "value": "220" } },
-    { "type": "wokwi-led", "id": "led_col", "top": 230, "left": 270, "attrs": { "color": "blue" } },
+    {
+      "type": "wokwi-potentiometer",
+      "id": "pot_turbidity",
+      "top": 460,
+      "left": -280,
+      "attrs": { "value": "0.85" }
+    },
+    {
+      "type": "wokwi-pushbutton",
+      "id": "btn_pump",
+      "top": 310,
+      "left": -300,
+      "attrs": { "label": "PUMP BTN", "color": "red" }
+    },
 
-    { "type": "wokwi-resistor", "id": "res_f1", "top": 280, "left": 196, "rotate": 90, "attrs": { "value": "220" } },
-    { "type": "wokwi-led", "id": "led_f1", "top": 270, "left": 270, "attrs": { "color": "limegreen" } },
-    { "type": "wokwi-resistor", "id": "res_f2", "top": 320, "left": 196, "rotate": 90, "attrs": { "value": "220" } },
-    { "type": "wokwi-led", "id": "led_f2", "top": 310, "left": 270, "attrs": { "color": "limegreen" } },
-    { "type": "wokwi-resistor", "id": "res_f3", "top": 360, "left": 196, "rotate": 90, "attrs": { "value": "220" } },
-    { "type": "wokwi-led", "id": "led_f3", "top": 350, "left": 270, "attrs": { "color": "limegreen" } },
+    {
+      "type": "wokwi-resistor",
+      "id": "res_sys",
+      "top": 140,
+      "left": 230,
+      "rotate": 90,
+      "attrs": { "value": "220" }
+    },
+    {
+      "type": "wokwi-led",
+      "id": "led_system",
+      "top": 126,
+      "left": 310,
+      "attrs": { "color": "green", "label": "SYSTEM" }
+    },
 
-    { "type": "wokwi-resistor", "id": "res_pump", "top": 400, "left": 196, "rotate": 90, "attrs": { "value": "220" } },
-    { "type": "wokwi-led", "id": "led_pump", "top": 390, "left": 270, "attrs": { "color": "red" } },
-    { "type": "wokwi-resistor", "id": "res_rec", "top": 440, "left": 196, "rotate": 90, "attrs": { "value": "220" } },
-    { "type": "wokwi-led", "id": "led_rec", "top": 430, "left": 270, "attrs": { "color": "green" } },
+    {
+      "type": "wokwi-resistor",
+      "id": "res_ro",
+      "top": 200,
+      "left": 230,
+      "rotate": 90,
+      "attrs": { "value": "220" }
+    },
+    {
+      "type": "wokwi-led",
+      "id": "led_ro",
+      "top": 186,
+      "left": 310,
+      "attrs": { "color": "blue", "label": "RO" }
+    },
 
-    { "type": "wokwi-resistor", "id": "res_rt", "top": 160, "left": 360, "rotate": 90, "attrs": { "value": "220" } },
-    { "type": "wokwi-led", "id": "led_rt", "top": 150, "left": 430, "attrs": { "color": "orange" } },
-    { "type": "wokwi-resistor", "id": "res_rg", "top": 200, "left": 360, "rotate": 90, "attrs": { "value": "220" } },
-    { "type": "wokwi-led", "id": "led_rg", "top": 190, "left": 430, "attrs": { "color": "green" } },
-    { "type": "wokwi-resistor", "id": "res_rc", "top": 240, "left": 360, "rotate": 90, "attrs": { "value": "220" } },
-    { "type": "wokwi-led", "id": "led_rc", "top": 230, "left": 430, "attrs": { "color": "yellow" } }
+    {
+      "type": "wokwi-resistor",
+      "id": "res_wash",
+      "top": 260,
+      "left": 230,
+      "rotate": 90,
+      "attrs": { "value": "220" }
+    },
+    {
+      "type": "wokwi-led",
+      "id": "led_wash",
+      "top": 246,
+      "left": 310,
+      "attrs": { "color": "cyan", "label": "WASHING" }
+    },
+
+    {
+      "type": "wokwi-resistor",
+      "id": "res_rain",
+      "top": 320,
+      "left": 230,
+      "rotate": 90,
+      "attrs": { "value": "220" }
+    },
+    {
+      "type": "wokwi-led",
+      "id": "led_rain",
+      "top": 306,
+      "left": 310,
+      "attrs": { "color": "white", "label": "RAIN" }
+    },
+
+    {
+      "type": "wokwi-resistor",
+      "id": "res_col",
+      "top": 380,
+      "left": 230,
+      "rotate": 90,
+      "attrs": { "value": "220" }
+    },
+    {
+      "type": "wokwi-led",
+      "id": "led_col",
+      "top": 366,
+      "left": 310,
+      "attrs": { "color": "blue", "label": "COLLECT" }
+    },
+
+    {
+      "type": "wokwi-resistor",
+      "id": "res_f1",
+      "top": 450,
+      "left": 230,
+      "rotate": 90,
+      "attrs": { "value": "220" }
+    },
+    {
+      "type": "wokwi-led",
+      "id": "led_f1",
+      "top": 436,
+      "left": 310,
+      "attrs": { "color": "limegreen", "label": "FILTER 1" }
+    },
+
+    {
+      "type": "wokwi-resistor",
+      "id": "res_f2",
+      "top": 510,
+      "left": 230,
+      "rotate": 90,
+      "attrs": { "value": "220" }
+    },
+    {
+      "type": "wokwi-led",
+      "id": "led_f2",
+      "top": 496,
+      "left": 310,
+      "attrs": { "color": "limegreen", "label": "FILTER 2" }
+    },
+
+    {
+      "type": "wokwi-resistor",
+      "id": "res_f3",
+      "top": 570,
+      "left": 230,
+      "rotate": 90,
+      "attrs": { "value": "220" }
+    },
+    {
+      "type": "wokwi-led",
+      "id": "led_f3",
+      "top": 556,
+      "left": 310,
+      "attrs": { "color": "limegreen", "label": "FILTER 3" }
+    },
+
+    {
+      "type": "wokwi-resistor",
+      "id": "res_pump",
+      "top": 640,
+      "left": 230,
+      "rotate": 90,
+      "attrs": { "value": "220" }
+    },
+    {
+      "type": "wokwi-led",
+      "id": "led_pump",
+      "top": 626,
+      "left": 310,
+      "attrs": { "color": "red", "label": "PUMP" }
+    },
+
+    {
+      "type": "wokwi-resistor",
+      "id": "res_rec",
+      "top": 700,
+      "left": 230,
+      "rotate": 90,
+      "attrs": { "value": "220" }
+    },
+    {
+      "type": "wokwi-led",
+      "id": "led_rec",
+      "top": 686,
+      "left": 310,
+      "attrs": { "color": "green", "label": "RECYCLED" }
+    },
+
+    {
+      "type": "wokwi-resistor",
+      "id": "res_rt",
+      "top": 200,
+      "left": 440,
+      "rotate": 90,
+      "attrs": { "value": "220" }
+    },
+    {
+      "type": "wokwi-led",
+      "id": "led_rt",
+      "top": 186,
+      "left": 520,
+      "attrs": { "color": "orange", "label": "TOILET" }
+    },
+
+    {
+      "type": "wokwi-resistor",
+      "id": "res_rg",
+      "top": 270,
+      "left": 440,
+      "rotate": 90,
+      "attrs": { "value": "220" }
+    },
+    {
+      "type": "wokwi-led",
+      "id": "led_rg",
+      "top": 256,
+      "left": 520,
+      "attrs": { "color": "green", "label": "GARDEN" }
+    },
+
+    {
+      "type": "wokwi-resistor",
+      "id": "res_rc",
+      "top": 340,
+      "left": 440,
+      "rotate": 90,
+      "attrs": { "value": "220" }
+    },
+    {
+      "type": "wokwi-led",
+      "id": "led_rc",
+      "top": 326,
+      "left": 520,
+      "attrs": { "color": "yellow", "label": "CLEANING" }
+    }
   ],
   "connections": [
-    ["sonar_col:VCC", "esp:3V3", "red", []],
-    ["sonar_col:GND", "esp:GND", "black", []],
-    ["sonar_col:TRIG", "esp:D5", "orange", []],
-    ["sonar_col:ECHO", "esp:D18", "yellow", []],
+    ["sonar_col:VCC",  "esp:3V3",  "red",    []],
+    ["sonar_col:GND",  "esp:GND.1","black",  []],
+    ["sonar_col:TRIG", "esp:D5",   "orange", []],
+    ["sonar_col:ECHO", "esp:D18",  "yellow", []],
 
-    ["sonar_rec:VCC", "esp:3V3", "red", []],
-    ["sonar_rec:GND", "esp:GND", "black", []],
-    ["sonar_rec:TRIG", "esp:D19", "orange", []],
-    ["sonar_rec:ECHO", "esp:D21", "yellow", []],
+    ["sonar_rec:VCC",  "esp:3V3",  "red",    []],
+    ["sonar_rec:GND",  "esp:GND.1","black",  []],
+    ["sonar_rec:TRIG", "esp:D19",  "orange", []],
+    ["sonar_rec:ECHO", "esp:D21",  "yellow", []],
 
-    ["sonar_fresh:VCC", "esp:3V3", "red", []],
-    ["sonar_fresh:GND", "esp:GND", "black", []],
-    ["sonar_fresh:TRIG", "esp:D22", "orange", []],
-    ["sonar_fresh:ECHO", "esp:D23", "yellow", []],
+    ["sonar_fresh:VCC",  "esp:3V3",  "red",    []],
+    ["sonar_fresh:GND",  "esp:GND.2","black",  []],
+    ["sonar_fresh:TRIG", "esp:D22",  "orange", []],
+    ["sonar_fresh:ECHO", "esp:D23",  "yellow", []],
 
-    ["pot_turbidity:VCC", "esp:3V3", "red", []],
-    ["pot_turbidity:GND", "esp:GND", "black", []],
-    ["pot_turbidity:SIG", "esp:D34", "purple", []],
+    ["pot_turbidity:VCC", "esp:3V3",  "red",    []],
+    ["pot_turbidity:GND", "esp:GND.1","black",  []],
+    ["pot_turbidity:SIG", "esp:D34",  "purple", []],
 
-    ["btn_pump:1.l", "esp:D0", "gray", []],
-    ["btn_pump:2.l", "esp:GND", "black", []],
+    ["btn_pump:1.l", "esp:D0",   "gray",  []],
+    ["btn_pump:2.l", "esp:GND.1","black", []],
 
-    ["esp:D25", "res_sys:1", "green", []],
-    ["res_sys:2", "led_system:A", "green", []],
-    ["led_system:K", "esp:GND", "black", []],
+    ["esp:D25",       "res_sys:1",    "green", []],
+    ["res_sys:2",     "led_system:A", "green", []],
+    ["led_system:C",  "esp:GND.2",   "black", []],
 
-    ["esp:D4", "res_ro:1", "blue", []],
-    ["res_ro:2", "led_ro:A", "blue", []],
-    ["led_ro:K", "esp:GND", "black", []],
+    ["esp:D4",     "res_ro:1",  "blue",  []],
+    ["res_ro:2",   "led_ro:A",  "blue",  []],
+    ["led_ro:C",   "esp:GND.2", "black", []],
 
-    ["esp:D12", "res_wash:1", "cyan", []],
-    ["res_wash:2", "led_wash:A", "cyan", []],
-    ["led_wash:K", "esp:GND", "black", []],
+    ["esp:D12",     "res_wash:1",  "cyan",  []],
+    ["res_wash:2",  "led_wash:A",  "cyan",  []],
+    ["led_wash:C",  "esp:GND.2",  "black", []],
 
-    ["esp:D14", "res_rain:1", "white", []],
-    ["res_rain:2", "led_rain:A", "white", []],
-    ["led_rain:K", "esp:GND", "black", []],
+    ["esp:D14",     "res_rain:1",  "white", []],
+    ["res_rain:2",  "led_rain:A",  "white", []],
+    ["led_rain:C",  "esp:GND.2",  "black", []],
 
-    ["esp:D27", "res_col:1", "blue", []],
-    ["res_col:2", "led_col:A", "blue", []],
-    ["led_col:K", "esp:GND", "black", []],
+    ["esp:D27",     "res_col:1",  "blue",  []],
+    ["res_col:2",   "led_col:A",  "blue",  []],
+    ["led_col:C",   "esp:GND.2", "black", []],
 
-    ["esp:D26", "res_f1:1", "limegreen", []],
-    ["res_f1:2", "led_f1:A", "limegreen", []],
-    ["led_f1:K", "esp:GND", "black", []],
+    ["esp:D26",    "res_f1:1",  "limegreen", []],
+    ["res_f1:2",   "led_f1:A",  "limegreen", []],
+    ["led_f1:C",   "esp:GND.2", "black",     []],
 
-    ["esp:D16", "res_f2:1", "limegreen", []],
-    ["res_f2:2", "led_f2:A", "limegreen", []],
-    ["led_f2:K", "esp:GND", "black", []],
+    ["esp:RX2",    "res_f2:1",  "limegreen", []],
+    ["res_f2:2",   "led_f2:A",  "limegreen", []],
+    ["led_f2:C",   "esp:GND.2", "black",     []],
 
-    ["esp:D33", "res_f3:1", "limegreen", []],
-    ["res_f3:2", "led_f3:A", "limegreen", []],
-    ["led_f3:K", "esp:GND", "black", []],
+    ["esp:D33",    "res_f3:1",  "limegreen", []],
+    ["res_f3:2",   "led_f3:A",  "limegreen", []],
+    ["led_f3:C",   "esp:GND.2", "black",     []],
 
-    ["esp:D32", "res_pump:1", "red", []],
-    ["res_pump:2", "led_pump:A", "red", []],
-    ["led_pump:K", "esp:GND", "black", []],
+    ["esp:D32",      "res_pump:1",  "red",   []],
+    ["res_pump:2",   "led_pump:A",  "red",   []],
+    ["led_pump:C",   "esp:GND.2",  "black", []],
 
-    ["esp:D15", "res_rec:1", "green", []],
-    ["res_rec:2", "led_rec:A", "green", []],
-    ["led_rec:K", "esp:GND", "black", []],
+    ["esp:D15",     "res_rec:1",  "green", []],
+    ["res_rec:2",   "led_rec:A",  "green", []],
+    ["led_rec:C",   "esp:GND.2", "black", []],
 
-    ["esp:D2", "res_rt:1", "orange", []],
-    ["res_rt:2", "led_rt:A", "orange", []],
-    ["led_rt:K", "esp:GND", "black", []],
+    ["esp:D2",     "res_rt:1",  "orange", []],
+    ["res_rt:2",   "led_rt:A",  "orange", []],
+    ["led_rt:C",   "esp:GND.2", "black",  []],
 
-    ["esp:D17", "res_rg:1", "green", []],
-    ["res_rg:2", "led_rg:A", "green", []],
-    ["led_rg:K", "esp:GND", "black", []],
+    ["esp:TX2",    "res_rg:1",  "green", []],
+    ["res_rg:2",   "led_rg:A",  "green", []],
+    ["led_rg:C",   "esp:GND.2", "black", []],
 
-    ["esp:D13", "res_rc:1", "yellow", []],
-    ["res_rc:2", "led_rc:A", "yellow", []],
-    ["led_rc:K", "esp:GND", "black", []]
+    ["esp:D13",    "res_rc:1",  "yellow", []],
+    ["res_rc:2",   "led_rc:A",  "yellow", []],
+    ["led_rc:C",   "esp:GND.2", "black",  []]
   ],
   "dependencies": {}
 }

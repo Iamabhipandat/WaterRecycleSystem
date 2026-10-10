@@ -1,6 +1,10 @@
-﻿import { initializeApp } from "firebase/app";
+import { initializeApp } from "firebase/app";
 import { getDatabase } from "firebase/database";
-import { getAuth } from "firebase/auth";
+
+/**
+ * Firebase is now used ONLY for Realtime Database (IoT sensor data, commands, LED states).
+ * Authentication has been migrated to Supabase — see src/services/supabase.js
+ */
 
 const firebaseConfig = {
   apiKey: "AIzaSyAB6Ud5S2jqlD3CVZ0N3djxTbm0SMOWzUQ",
@@ -13,17 +17,15 @@ const firebaseConfig = {
   measurementId: "G-01HBBZXR0X"
 };
 
-let app  = null;
-let db   = null;
-let auth = null;
+let app = null;
+let db  = null;
 
 try {
-  app  = initializeApp(firebaseConfig);
-  db   = getDatabase(app);
-  auth = getAuth(app);
+  app = initializeApp(firebaseConfig);
+  db  = getDatabase(app);
 } catch (e) {
-  console.warn("[JalLoop] Firebase init failed:", e.message);
+  console.warn("[JalLoop] Firebase RTDB init failed:", e.message);
 }
 
-export { db, auth };
+export { db };
 export const isFirebaseReady = !!db && firebaseConfig.apiKey !== "YOUR_API_KEY";
