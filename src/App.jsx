@@ -10,7 +10,21 @@ import VirtualHardwareWorkbench from "./components/VirtualHardwareWorkbench";
 import AwsCloudCenterModal from "./components/AwsCloudCenterModal";
 import AuthPage from "./pages/AuthPage";
 import AdminDashboard from "./pages/AdminDashboard";
-import { AlertTriangle, Leaf, Cloud } from "lucide-react";
+import {
+  AlertTriangle,
+  Leaf,
+  Cloud,
+  Cpu,
+  Activity,
+  BarChart3,
+  Droplets,
+  Zap,
+  CheckCircle2,
+  ShieldCheck,
+  Layers,
+  Power,
+  RotateCcw,
+} from "lucide-react";
 import { useFirebaseData } from "./hooks/useFirebaseData";
 import { useAuth } from "./context/AuthContext";
 import { ledsFromState } from "./utils/hardware";
@@ -54,7 +68,7 @@ function nowStr() {
 
 export default function App() {
   const { user, loading, isAdmin } = useAuth();
-  const [view, setView]           = useState("dashboard");
+  const [view, setView]           = useState("flow");
   const [state, setState]         = useState(INITIAL);
   const [warning, setWarning]     = useState(null);
   const [liveMode, setLiveMode]   = useState(false);
@@ -318,14 +332,24 @@ export default function App() {
 
   if (!user) return <AuthPage />;
 
+  const currentTab = view === "dashboard" ? "flow" : view;
+
+  const NAV_TABS = [
+    { id: "flow", label: "Water Flow", icon: Droplets, badge: "Glass Pipes" },
+    { id: "virtual-hardware", label: "Virtual Hardware", icon: Cpu, badge: "ESP32 Twin" },
+    { id: "status", label: "System Status", icon: Activity, badge: "Live Logs" },
+    { id: "analytics", label: "Analytics", icon: BarChart3, badge: "Charts & CSV" },
+  ];
+
   return (
     <div className="min-h-screen bg-gray-50">
       <Navbar
-        view={view}
+        view={currentTab}
         liveMode={liveMode}
         connected={connected}
         error={error}
-        onOpenAdmin={() => setView(view === "admin" ? "dashboard" : "admin")}
+        onNavigate={(pageId) => setView(pageId)}
+        onOpenAdmin={() => setView(view === "admin" ? "flow" : "admin")}
         onOpenAwsCenter={() => setShowAwsModal(true)}
         onToggleMode={() => {
           setLiveMode(!liveMode);
@@ -334,107 +358,391 @@ export default function App() {
       />
 
       {view === "admin" && isAdmin ? (
-        <AdminDashboard onBack={() => setView("dashboard")} hardwareConnected={connected} />
+        <AdminDashboard onBack={() => setView("flow")} hardwareConnected={connected} />
       ) : (
       <main className="max-w-screen-xl mx-auto px-4 sm:px-6 py-6 space-y-5">
 
+        {/* Global Warning Alert */}
         {warning && (
           <div className="flex items-center gap-3 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 text-sm text-amber-800 shadow-sm">
             <AlertTriangle size={16} className="text-amber-600 shrink-0" /> {warning}
           </div>
         )}
 
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-green-700 text-white rounded-2xl px-6 py-4 shadow-sm">
-          <div className="flex items-center gap-3">
-            <Leaf size={20} className="shrink-0 opacity-80" />
-            <div>
-              <p className="text-xs font-semibold opacity-70 uppercase tracking-widest">JalLoop — Smart Water Recycling</p>
-              <p className="text-base font-semibold mt-0.5">
-                RO &amp; washing-machine wastewater is collected, filtered, and reused — saving
-                <span className="text-green-200 font-bold ml-1">{savingPercent}% fresh water</span> every day.
-              </p>
-            </div>
-          </div>
-          <button
-            type="button"
-            onClick={() => setShowAwsModal(true)}
-            className="self-start sm:self-auto flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold bg-amber-400 hover:bg-amber-300 text-amber-950 transition-all shadow-xs shrink-0 cursor-pointer"
-          >
-            <Cloud size={14} className="text-amber-900" />
-            <span>AWS Open Source Center</span>
-          </button>
+        {/* Page Switcher Navigation Bar */}
+        <div className="bg-white rounded-2xl border border-gray-200 p-1.5 shadow-xs flex items-center gap-1.5 overflow-x-auto">
+          {NAV_TABS.map(({ id, label, icon: Icon, badge }) => {
+            const isActive = currentTab === id;
+            return (
+              <button
+                key={id}
+                type="button"
+                onClick={() => setView(id)}
+                className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap cursor-pointer ${
+                  isActive
+                    ? "bg-green-700 text-white shadow-xs"
+                    : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                }`}
+              >
+                <Icon size={14} className={isActive ? "text-white" : "text-green-700"} />
+                <span>{label}</span>
+                {badge && (
+                  <span
+                    className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${
+                      isActive ? "bg-green-800 text-green-100" : "bg-gray-100 text-gray-500"
+                    }`}
+                  >
+                    {badge}
+                  </span>
+                )}
+              </button>
+            );
+          })}
         </div>
 
-        <WaterFlowSystem
-          roLiters={displayState.roLiters}
-          washingLiters={displayState.washingLiters}
-          collectionLiters={displayState.collectionLiters}
-          collectionCapacity={displayState.collectionCapacity}
-          filtrationStage={displayState.filtrationStage}
-          pumpRunning={displayState.pumpRunning}
-          recycledPct={displayState.recycledPct}
-          recycledLiters={displayState.recycledLiters}
-          recycledCapacity={displayState.recycledCapacity}
-          freshWaterSaved={displayState.freshWaterSaved}
-          roActive={displayState.roActive}
-          washingActive={displayState.washingActive}
-          rainActive={displayState.rainActive}
-          reuseActive={displayState.reuseActive}
-        />
+        {/* =========================================================================
+            PAGE 1: WATER FLOW (Flow simulation, glass pipes, controls, tanks)
+        ========================================================================= */}
+        {currentTab === "flow" && (
+          <div className="space-y-5 animate-fadeIn">
+            {/* Header Banner */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-green-700 text-white rounded-2xl px-6 py-4 shadow-sm">
+              <div className="flex items-center gap-3">
+                <Leaf size={20} className="shrink-0 opacity-80" />
+                <div>
+                  <p className="text-xs font-semibold opacity-70 uppercase tracking-widest">JalLoop — Smart Water Recycling</p>
+                  <p className="text-base font-semibold mt-0.5">
+                    RO &amp; washing-machine wastewater is collected, filtered, and reused — saving
+                    <span className="text-green-200 font-bold ml-1">{savingPercent}% fresh water</span> every day.
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowAwsModal(true)}
+                className="self-start sm:self-auto flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold bg-amber-400 hover:bg-amber-300 text-amber-950 transition-all shadow-xs shrink-0 cursor-pointer"
+              >
+                <Cloud size={14} className="text-amber-900" />
+                <span>AWS Open Source Center</span>
+              </button>
+            </div>
 
-        <HardwareLeds liveMode={liveMode} connected={connected} leds={leds} />
-
-        <VirtualHardwareWorkbench
-          displayState={displayState}
-          leds={leds}
-          onTogglePump={handleStartRecycling}
-          onUpdateTurbidity={handleUpdateTurbidity}
-          onUpdateCollection={handleUpdateCollection}
-          onUpdateRecycled={handleUpdateRecycled}
-          onToggleReuse={handleUseRecycled}
-        />
-
-        <SimulationControls
-          pumpRunning={displayState.pumpRunning}
-          reuseActive={displayState.reuseActive}
-          roActive={displayState.roActive}
-          washingActive={displayState.washingActive}
-          rainActive={displayState.rainActive}
-          onToggleRO={handleToggleRO}
-          onToggleWashing={handleToggleWashing}
-          onToggleRain={handleToggleRain}
-          onStartRecycling={handleStartRecycling}
-          onUseRecycled={handleUseRecycled}
-          onReset={handleReset}
-          onEmergencyStop={handleEmergencyStop}
-        />
-
-        <WaterMetrics
-          waterCollected={displayState.waterCollected}
-          waterRecycled={displayState.waterRecycled}
-          freshWaterSaved={displayState.freshWaterSaved}
-          waterReused={displayState.waterReused}
-        />
-
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-5">
-          <div className="lg:col-span-3">
-            <Analytics waterCollected={displayState.waterCollected} waterRecycled={displayState.waterRecycled} />
-          </div>
-          <div className="lg:col-span-2">
-            <SystemStatus
-              pumpRunning={displayState.pumpRunning}
-              filtrationStage={displayState.filtrationStage}
-              recycledPct={displayState.recycledPct}
+            {/* Interactive Animated Flow System */}
+            <WaterFlowSystem
+              roLiters={displayState.roLiters}
+              washingLiters={displayState.washingLiters}
               collectionLiters={displayState.collectionLiters}
+              collectionCapacity={displayState.collectionCapacity}
+              filtrationStage={displayState.filtrationStage}
+              pumpRunning={displayState.pumpRunning}
+              recycledPct={displayState.recycledPct}
+              recycledLiters={displayState.recycledLiters}
+              recycledCapacity={displayState.recycledCapacity}
+              freshWaterSaved={displayState.freshWaterSaved}
+              roActive={displayState.roActive}
+              washingActive={displayState.washingActive}
+              rainActive={displayState.rainActive}
               reuseActive={displayState.reuseActive}
-              activity={displayState.activity}
+            />
+
+            {/* Hardware LEDs (LED 1 Sky Blue & LED 2 Emerald Green) */}
+            <HardwareLeds liveMode={liveMode} connected={connected} leds={leds} />
+
+            {/* Flow Simulation Controls */}
+            <SimulationControls
+              pumpRunning={displayState.pumpRunning}
+              reuseActive={displayState.reuseActive}
+              roActive={displayState.roActive}
+              washingActive={displayState.washingActive}
+              rainActive={displayState.rainActive}
+              onToggleRO={handleToggleRO}
+              onToggleWashing={handleToggleWashing}
+              onToggleRain={handleToggleRain}
+              onStartRecycling={handleStartRecycling}
+              onUseRecycled={handleUseRecycled}
+              onReset={handleReset}
+              onEmergencyStop={handleEmergencyStop}
+            />
+
+            {/* Water Metrics Summary */}
+            <WaterMetrics
+              waterCollected={displayState.waterCollected}
+              waterRecycled={displayState.waterRecycled}
+              freshWaterSaved={displayState.freshWaterSaved}
+              waterReused={displayState.waterReused}
             />
           </div>
-        </div>
+        )}
+
+        {/* =========================================================================
+            PAGE 2: VIRTUAL HARDWARE (ESP32 Twin, Sonars, Potentiometer, Breadboard)
+        ========================================================================= */}
+        {currentTab === "virtual-hardware" && (
+          <div className="space-y-5 animate-fadeIn">
+            {/* Header Banner */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-slate-900 text-white rounded-2xl px-6 py-4 shadow-sm border border-slate-800">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-blue-600/30 border border-blue-500/40 flex items-center justify-center shrink-0">
+                  <Cpu size={22} className="text-blue-400" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-semibold text-blue-400 uppercase tracking-widest">ESP32 Digital Twin Workbench</span>
+                    <span className="text-[10px] bg-blue-500/20 text-blue-300 border border-blue-500/30 px-2 py-0.5 rounded-full font-mono">115200 Baud</span>
+                  </div>
+                  <p className="text-sm font-medium text-slate-300 mt-0.5">
+                    Simulate physical microcontrollers, ultrasonic HC-SR04 sonars, analog turbidity inputs, and relay LEDs without physical hardware.
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowAwsModal(true)}
+                className="self-start sm:self-auto flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold bg-amber-400 hover:bg-amber-300 text-amber-950 transition-all shadow-xs shrink-0 cursor-pointer"
+              >
+                <Cloud size={14} className="text-amber-900" />
+                <span>AWS Cloud Architecture</span>
+              </button>
+            </div>
+
+            {/* Hardware LEDs status */}
+            <HardwareLeds liveMode={liveMode} connected={connected} leds={leds} />
+
+            {/* Virtual Hardware Workbench Interactive Breadboard */}
+            <VirtualHardwareWorkbench
+              displayState={displayState}
+              leds={leds}
+              onTogglePump={handleStartRecycling}
+              onUpdateTurbidity={handleUpdateTurbidity}
+              onUpdateCollection={handleUpdateCollection}
+              onUpdateRecycled={handleUpdateRecycled}
+              onToggleReuse={handleUseRecycled}
+            />
+
+            {/* Simulation Controls for testing */}
+            <SimulationControls
+              pumpRunning={displayState.pumpRunning}
+              reuseActive={displayState.reuseActive}
+              roActive={displayState.roActive}
+              washingActive={displayState.washingActive}
+              rainActive={displayState.rainActive}
+              onToggleRO={handleToggleRO}
+              onToggleWashing={handleToggleWashing}
+              onToggleRain={handleToggleRain}
+              onStartRecycling={handleStartRecycling}
+              onUseRecycled={handleUseRecycled}
+              onReset={handleReset}
+              onEmergencyStop={handleEmergencyStop}
+            />
+          </div>
+        )}
+
+        {/* =========================================================================
+            PAGE 3: SYSTEM STATUS (Diagnostics, Filtration Stages, Logs & Relays)
+        ========================================================================= */}
+        {currentTab === "status" && (
+          <div className="space-y-5 animate-fadeIn">
+            {/* Header Banner */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-teal-900 text-white rounded-2xl px-6 py-4 shadow-sm border border-teal-800">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-teal-600/30 border border-teal-500/40 flex items-center justify-center shrink-0">
+                  <Activity size={22} className="text-teal-300" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-semibold text-teal-300 uppercase tracking-widest">System Status &amp; Actuators</span>
+                    <span className="text-[10px] bg-teal-500/20 text-teal-200 border border-teal-500/30 px-2 py-0.5 rounded-full font-mono">Cedar Verified</span>
+                  </div>
+                  <p className="text-sm font-medium text-teal-100 mt-0.5">
+                    Real-time monitoring of dual-tank reservoirs, filtration stages 1/2/3, relay actuators, and event logs.
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowAwsModal(true)}
+                className="self-start sm:self-auto flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold bg-amber-400 hover:bg-amber-300 text-amber-950 transition-all shadow-xs shrink-0 cursor-pointer"
+              >
+                <Cloud size={14} className="text-amber-900" />
+                <span>AWS Cedar Invariants</span>
+              </button>
+            </div>
+
+            {/* Quick Metrics Bar */}
+            <WaterMetrics
+              waterCollected={displayState.waterCollected}
+              waterRecycled={displayState.waterRecycled}
+              freshWaterSaved={displayState.freshWaterSaved}
+              waterReused={displayState.waterReused}
+            />
+
+            {/* Diagnostics & Relay Grid */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+              {/* Relays & Actuators Card */}
+              <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-5 space-y-4">
+                <div className="flex items-center justify-between border-b border-gray-100 pb-3">
+                  <div className="flex items-center gap-2">
+                    <Zap size={16} className="text-amber-600" />
+                    <h3 className="text-sm font-bold text-gray-800 uppercase tracking-wider">Actuators &amp; Relay Matrix</h3>
+                  </div>
+                  <span className="text-[11px] font-mono bg-gray-100 text-gray-600 px-2 py-0.5 rounded-md">GPIO Control</span>
+                </div>
+
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between p-3 bg-gray-50 rounded-xl border border-gray-100">
+                    <div>
+                      <p className="text-xs font-bold text-gray-800">Submersible Filtration Pump (Relay 1)</p>
+                      <p className="text-[11px] text-gray-500">GPIO 26 • Active Low • 12V 2.5A</p>
+                    </div>
+                    <span className={`px-2.5 py-1 rounded-full text-xs font-bold ${
+                      displayState.pumpRunning ? "bg-green-100 text-green-700 animate-pulse" : "bg-gray-200 text-gray-600"
+                    }`}>
+                      {displayState.pumpRunning ? "ACTIVE / PUMPING" : "STANDBY"}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center justify-between p-3 bg-gray-50 rounded-xl border border-gray-100">
+                    <div>
+                      <p className="text-xs font-bold text-gray-800">Distribution Booster Pump (Relay 2)</p>
+                      <p className="text-[11px] text-gray-500">GPIO 27 • Toilet &amp; Irrigation lines</p>
+                    </div>
+                    <span className={`px-2.5 py-1 rounded-full text-xs font-bold ${
+                      displayState.reuseActive ? "bg-emerald-100 text-emerald-700 animate-pulse" : "bg-gray-200 text-gray-600"
+                    }`}>
+                      {displayState.reuseActive ? "ACTIVE / REUSING" : "IDLE"}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center justify-between p-3 bg-gray-50 rounded-xl border border-gray-100">
+                    <div>
+                      <p className="text-xs font-bold text-gray-800">Pre-Filter Inflow Valve (Solenoid 1)</p>
+                      <p className="text-[11px] text-gray-500">GPIO 25 • 100-mesh stainless screen</p>
+                    </div>
+                    <span className={`px-2.5 py-1 rounded-full text-xs font-bold ${
+                      displayState.filtrationStage >= 1 ? "bg-blue-100 text-blue-700" : "bg-gray-200 text-gray-600"
+                    }`}>
+                      {displayState.filtrationStage >= 1 ? "OPEN" : "CLOSED"}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center justify-between p-3 bg-gray-50 rounded-xl border border-gray-100">
+                    <div>
+                      <p className="text-xs font-bold text-gray-800">Sediment &amp; Carbon Valve (Solenoid 2)</p>
+                      <p className="text-[11px] text-gray-500">GPIO 33 • 5-micron activated carbon</p>
+                    </div>
+                    <span className={`px-2.5 py-1 rounded-full text-xs font-bold ${
+                      displayState.filtrationStage >= 2 ? "bg-blue-100 text-blue-700" : "bg-gray-200 text-gray-600"
+                    }`}>
+                      {displayState.filtrationStage >= 2 ? "OPEN" : "CLOSED"}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="pt-2 border-t border-gray-100 flex items-center justify-between text-xs text-gray-500">
+                  <div className="flex items-center gap-1.5">
+                    <ShieldCheck size={14} className="text-green-600" />
+                    <span>Cedar Safety Invariant: Safe (Overflow lockout armed)</span>
+                  </div>
+                  <span className="font-mono text-green-700 font-bold">100% HEALTH</span>
+                </div>
+              </div>
+
+              {/* SystemStatus Component (Filtration stage progression & Live Activity stream) */}
+              <SystemStatus
+                pumpRunning={displayState.pumpRunning}
+                filtrationStage={displayState.filtrationStage}
+                recycledPct={displayState.recycledPct}
+                collectionLiters={displayState.collectionLiters}
+                reuseActive={displayState.reuseActive}
+                activity={displayState.activity}
+              />
+            </div>
+          </div>
+        )}
+
+        {/* =========================================================================
+            PAGE 4: ANALYTICS (Charts, Savings, Efficiency, OpenSearch, CSV Export)
+        ========================================================================= */}
+        {currentTab === "analytics" && (
+          <div className="space-y-5 animate-fadeIn">
+            {/* Header Banner */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-indigo-950 text-white rounded-2xl px-6 py-4 shadow-sm border border-indigo-900">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-indigo-600/30 border border-indigo-500/40 flex items-center justify-center shrink-0">
+                  <BarChart3 size={22} className="text-indigo-300" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-semibold text-indigo-300 uppercase tracking-widest">Water Analytics &amp; Conservation</span>
+                    <span className="text-[10px] bg-indigo-500/20 text-indigo-200 border border-indigo-500/30 px-2 py-0.5 rounded-full font-mono">OpenSearch Index</span>
+                  </div>
+                  <p className="text-sm font-medium text-indigo-200 mt-0.5">
+                    7-day recycling trend, telemetry aggregations, cost savings analysis, and exportable reports.
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowAwsModal(true)}
+                className="self-start sm:self-auto flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold bg-amber-400 hover:bg-amber-300 text-amber-950 transition-all shadow-xs shrink-0 cursor-pointer"
+              >
+                <Cloud size={14} className="text-amber-900" />
+                <span>OpenSearch DSL</span>
+              </button>
+            </div>
+
+            {/* Quick Metrics Bar */}
+            <WaterMetrics
+              waterCollected={displayState.waterCollected}
+              waterRecycled={displayState.waterRecycled}
+              freshWaterSaved={displayState.freshWaterSaved}
+              waterReused={displayState.waterReused}
+            />
+
+            {/* 7-Day Line Chart & CSV Exporter */}
+            <Analytics waterCollected={displayState.waterCollected} waterRecycled={displayState.waterRecycled} />
+
+            {/* Environmental & Financial Impact Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="bg-white rounded-2xl border border-gray-200 p-4 shadow-xs">
+                <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Est. Monthly Savings</span>
+                <p className="text-2xl font-black text-gray-900 mt-1">
+                  ₹{Math.round(displayState.freshWaterSaved * 3.2 * 30).toLocaleString("en-IN")}
+                </p>
+                <p className="text-xs text-green-600 font-semibold mt-1">Based on commercial water tariff</p>
+              </div>
+
+              <div className="bg-white rounded-2xl border border-gray-200 p-4 shadow-xs">
+                <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Recycling Efficiency</span>
+                <p className="text-2xl font-black text-green-700 mt-1">
+                  {savingPercent}%
+                </p>
+                <p className="text-xs text-gray-500 font-medium mt-1">Fresh water offset ratio</p>
+              </div>
+
+              <div className="bg-white rounded-2xl border border-gray-200 p-4 shadow-xs">
+                <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Groundwater Preserved</span>
+                <p className="text-2xl font-black text-blue-600 mt-1">
+                  {Math.round(displayState.freshWaterSaved * 1.25)} L
+                </p>
+                <p className="text-xs text-gray-500 font-medium mt-1">Aquifer depletion reduction</p>
+              </div>
+
+              <div className="bg-white rounded-2xl border border-gray-200 p-4 shadow-xs">
+                <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Energy Efficiency</span>
+                <p className="text-2xl font-black text-amber-600 mt-1">
+                  0.035 kWh
+                </p>
+                <p className="text-xs text-gray-500 font-medium mt-1">Per 100 litres recycled</p>
+              </div>
+            </div>
+          </div>
+        )}
 
       </main>
       )}
 
+      {/* AWS Cloud Architecture & Open Source Modal */}
       <AwsCloudCenterModal
         isOpen={showAwsModal}
         onClose={() => setShowAwsModal(false)}
