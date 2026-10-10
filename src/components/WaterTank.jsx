@@ -1,4 +1,4 @@
-﻿export default function WaterTank({ label, percent, capacity, maxCapacity, status, color = "blue" }) {
+export default function WaterTank({ label, percent, capacity, maxCapacity, status, color = "blue" }) {
   const clampedPct = Math.min(100, Math.max(0, percent));
   const colorMap = {
     blue:  { water: "#64B5F6", wave: "#42A5F5", border: "#BBDEFB", text: "#1565C0", bg: "#E3F2FD" },
@@ -65,9 +65,14 @@
       {/* Capacity */}
       <div className="text-center">
         <p className="text-lg font-bold text-gray-900">{capacity} <span className="text-sm font-medium text-gray-400">/ {maxCapacity} L</span></p>
-        <span className={`mt-1 inline-block text-xs font-medium px-2 py-0.5 rounded border ${statusStyles[status] || "bg-gray-50 text-gray-600 border-gray-200"}`}>
-          {status}
-        </span>
+        <div className="flex flex-col items-center gap-1 mt-1">
+          <span className={`inline-block text-xs font-medium px-2 py-0.5 rounded border ${statusStyles[status] || "bg-gray-50 text-gray-600 border-gray-200"}`}>
+            {status}
+          </span>
+          <span className="text-[10px] font-mono text-gray-400 bg-gray-50 px-2 py-0.5 rounded border border-gray-100">
+            ⚡ AWS: DynamoDB &bull; OpenSearch
+          </span>
+        </div>
       </div>
     </div>
   );

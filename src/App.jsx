@@ -8,6 +8,8 @@ import SystemStatus from "./components/SystemStatus";
 import HardwareLeds from "./components/HardwareLeds";
 import VirtualHardwareWorkbench from "./components/VirtualHardwareWorkbench";
 import AwsCloudCenterModal from "./components/AwsCloudCenterModal";
+import WaterStorageAwsMapping from "./components/WaterStorageAwsMapping";
+import AwsStorageInspectorModal from "./components/AwsStorageInspectorModal";
 import AuthPage from "./pages/AuthPage";
 import AdminDashboard from "./pages/AdminDashboard";
 import {
@@ -73,6 +75,13 @@ export default function App() {
   const [warning, setWarning]     = useState(null);
   const [liveMode, setLiveMode]   = useState(false);
   const [showAwsModal, setShowAwsModal] = useState(false);
+  const [showStorageModal, setShowStorageModal] = useState(false);
+  const [storageModalTank, setStorageModalTank] = useState("collection");
+
+  const handleInspectStorageTank = useCallback((tankId) => {
+    setStorageModalTank(tankId || "collection");
+    setShowStorageModal(true);
+  }, []);
 
   const { liveData, connected, error, sendCommand, syncLeds } = useFirebaseData(liveMode);
 
@@ -443,6 +452,13 @@ export default function App() {
               washingActive={displayState.washingActive}
               rainActive={displayState.rainActive}
               reuseActive={displayState.reuseActive}
+              onInspectTank={handleInspectStorageTank}
+            />
+
+            {/* AWS Open Source Water Storage Mapping & Telemetry Inspector Card */}
+            <WaterStorageAwsMapping
+              systemState={displayState}
+              onInspectTank={handleInspectStorageTank}
             />
 
             {/* Hardware LEDs (LED 1 Sky Blue & LED 2 Emerald Green) */}
@@ -657,6 +673,12 @@ export default function App() {
                 activity={displayState.activity}
               />
             </div>
+
+            {/* AWS Open Source Water Storage Mapping & Telemetry Inspector */}
+            <WaterStorageAwsMapping
+              systemState={displayState}
+              onInspectTank={handleInspectStorageTank}
+            />
           </div>
         )}
 
@@ -747,6 +769,14 @@ export default function App() {
         isOpen={showAwsModal}
         onClose={() => setShowAwsModal(false)}
         systemState={displayState}
+      />
+
+      {/* AWS Open Source Water Storage Inspector Modal */}
+      <AwsStorageInspectorModal
+        isOpen={showStorageModal}
+        onClose={() => setShowStorageModal(false)}
+        systemState={displayState}
+        initialTank={storageModalTank}
       />
     </div>
   );

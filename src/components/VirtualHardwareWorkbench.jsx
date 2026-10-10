@@ -219,6 +219,14 @@ export default function VirtualHardwareWorkbench({
                     <span>Distance to water surface</span>
                     <span>30 cm (Tank Empty)</span>
                   </div>
+                  <div className="pt-1.5 border-t border-gray-100 flex items-center justify-between text-[10px] font-mono text-gray-500">
+                    <span className="flex items-center gap-1 text-blue-700 font-bold">
+                      <span>⚡ AWS DynamoDB:</span> JalLoopWaterMetrics
+                    </span>
+                    <span className="text-amber-700 font-bold">
+                      <span>🔍 OpenSearch:</span> jalloop-water-telemetry
+                    </span>
+                  </div>
                 </div>
 
                 {/* Sensor 2: HC-SR04 Recycled Tank */}
@@ -245,6 +253,14 @@ export default function VirtualHardwareWorkbench({
                     <span>2 cm (Tank 100% Full)</span>
                     <span>Distance to water surface</span>
                     <span>60 cm (Tank Empty)</span>
+                  </div>
+                  <div className="pt-1.5 border-t border-gray-100 flex items-center justify-between text-[10px] font-mono text-gray-500">
+                    <span className="flex items-center gap-1 text-emerald-700 font-bold">
+                      <span>⚡ AWS DynamoDB:</span> JalLoopWaterMetrics
+                    </span>
+                    <span className="text-green-700 font-bold">
+                      <span>🪣 S3:</span> jalloop-water-archive
+                    </span>
                   </div>
                 </div>
 

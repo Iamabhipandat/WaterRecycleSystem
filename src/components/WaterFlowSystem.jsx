@@ -241,6 +241,7 @@ export default function WaterFlowSystem({
   recycledPct, recycledLiters, recycledCapacity,
   freshWaterSaved,
   roActive, washingActive, rainActive, reuseActive,
+  onInspectTank,
 }) {
   const mergeActive = roActive || washingActive || rainActive;
   const fActive     = filtrationStage > 0;
@@ -356,6 +357,34 @@ export default function WaterFlowSystem({
           <text x={255} y={344} textAnchor="middle" fontSize="8" fill="#3B82F6" fontWeight="600" fontFamily="Inter,sans-serif">Collecting…</text>
         )}
 
+        {/* Collection Tank AWS Storage Pill */}
+        <g
+          className="cursor-pointer"
+          onClick={() => onInspectTank && onInspectTank("collection")}
+        >
+          <rect
+            x={184}
+            y={356}
+            width={142}
+            height={22}
+            rx={11}
+            fill="#EFF6FF"
+            stroke="#93C5FD"
+            strokeWidth="1.2"
+          />
+          <circle cx={196} cy={367} r={4} fill="#2563EB" />
+          <text
+            x={208}
+            y={370.5}
+            fontSize="7.5"
+            fontWeight="700"
+            fill="#1E40AF"
+            fontFamily="Inter,sans-serif"
+          >
+            AWS: DynamoDB • Search
+          </text>
+        </g>
+
         {/* ── FILTRATION ── */}
         <FilterBox x={340} y={145} stage={filtrationStage} />
 
@@ -420,6 +449,34 @@ export default function WaterFlowSystem({
         <text x={765} y={359} textAnchor="middle" fontSize="7.5" fontWeight="700" fill="#D97706" fontFamily="Inter,sans-serif">
           NON-POTABLE WATER
         </text>
+
+        {/* Recycled Tank AWS Storage Pill */}
+        <g
+          className="cursor-pointer"
+          onClick={() => onInspectTank && onInspectTank("recycled")}
+        >
+          <rect
+            x={694}
+            y={372}
+            width={142}
+            height={22}
+            rx={11}
+            fill="#ECFDF5"
+            stroke="#6EE7B7"
+            strokeWidth="1.2"
+          />
+          <circle cx={706} cy={383} r={4} fill="#059669" />
+          <text
+            x={718}
+            y={386.5}
+            fontSize="7.5"
+            fontWeight="700"
+            fill="#065F46"
+            fontFamily="Inter,sans-serif"
+          >
+            ⚡ AWS: DynamoDB &amp; S3
+          </text>
+        </g>
 
         {/* Reuse junction */}
         <circle cx={855} cy={200} r={8} fill={reuseActive ? "#34D399" : "#E5E7EB"} style={{ transition: "fill 0.5s" }} />
