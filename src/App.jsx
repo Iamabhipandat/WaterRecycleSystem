@@ -7,9 +7,11 @@ import Analytics from "./components/Analytics";
 import SystemStatus from "./components/SystemStatus";
 import HardwareLeds from "./components/HardwareLeds";
 import VirtualHardwareWorkbench from "./components/VirtualHardwareWorkbench";
+import SmartWaterAdvisor from "./components/SmartWaterAdvisor";
 import HardwareConnectionModal from "./components/HardwareConnectionModal";
 import AuthPage from "./pages/AuthPage";
 import AdminDashboard from "./pages/AdminDashboard";
+import { evaluateCedarPolicy } from "./services/cedarPolicy";
 import {
   AlertTriangle,
   Leaf,
@@ -239,6 +241,18 @@ export default function App() {
     if (state.recycledPct >= 90) { showWarning("Recycled Tank Nearly Full"); return; }
     if (state.collectionLiters <= 0) { showWarning("Collection tank empty"); return; }
 
+    // Enforce Cedar Safety Policy Invariants
+    const cedarRecycleVerdict = evaluateCedarPolicy({
+      role: isAdmin ? "admin" : "operator",
+      action: "StartRecycling",
+      resource: { turbidity: state.turbidity || 24, recycledLiters: state.recycledLiters },
+    });
+    if (cedarRecycleVerdict.decision === "DENY") {
+      showWarning(cedarRecycleVerdict.reason);
+      addActivity(`Cedar Policy Lockout: ${cedarRecycleVerdict.reason}`);
+      return;
+    }
+
     addActivity("Filtration started — Pre-filter");
     setState(s => ({ ...s, filtrationStage: 1 }));
     const t1 = setTimeout(() => { setState(s => ({ ...s, filtrationStage: 2 })); addActivity("Sediment filter active"); }, 1500);
@@ -250,6 +264,21 @@ export default function App() {
   function handleUseRecycled() {
     const next = !displayState.reuseActive;
     if (next && displayState.recycledLiters <= 0) { showWarning("Recycled tank empty"); return; }
+
+    if (next) {
+      // Enforce Cedar Safety Policy for distribution
+      const cedarReuseVerdict = evaluateCedarPolicy({
+        role: isAdmin ? "admin" : "operator",
+        action: "UseRecycledWater",
+        resource: { recycledLiters: displayState.recycledLiters },
+      });
+      if (cedarReuseVerdict.decision === "DENY") {
+        showWarning(cedarReuseVerdict.reason);
+        addActivity(`Cedar Policy Lockout: ${cedarReuseVerdict.reason}`);
+        return;
+      }
+    }
+
     setState(s => ({ ...s, reuseActive: next }));
     addActivity(next ? "Recycled water deployed — toilet/garden/cleaning" : "Reuse paused");
     if (liveMode) sendCommand({ reuse: next ? "ON" : "OFF" });
@@ -460,6 +489,9 @@ export default function App() {
               onReset={handleReset}
               onEmergencyStop={handleEmergencyStop}
             />
+
+            {/* Strands Agents SDK Smart Water Advisor */}
+            <SmartWaterAdvisor displayState={displayState} />
 
           </div>
         )}

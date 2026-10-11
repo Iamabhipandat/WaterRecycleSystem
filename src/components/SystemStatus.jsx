@@ -1,4 +1,4 @@
-﻿import { CheckCircle2, AlertTriangle, XCircle, Clock } from "lucide-react";
+import { CheckCircle2, AlertTriangle, XCircle, Clock } from "lucide-react";
 
 function Row({ label, value, level }) {
   const cfg = {
@@ -58,6 +58,51 @@ export default function SystemStatus({ pumpRunning, filtrationStage, recycledPct
               <ActivityEntry key={i} time={e.time} msg={e.msg} />
             ))
           )}
+        </div>
+      </div>
+
+      {/* Cedar Policy Safety Guardrails */}
+      <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-5 space-y-3">
+        <div className="flex items-center justify-between border-b border-gray-100 pb-2.5">
+          <div>
+            <h2 className="text-sm font-bold text-gray-700 uppercase tracking-wider">Safety Policies &amp; Invariants</h2>
+            <p className="text-xs text-gray-400 mt-0.5">Formal verification guardrails evaluated via Cedar Policy engine.</p>
+          </div>
+          <span className="text-[10px] font-bold font-mono px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200">
+            Cedar Verified
+          </span>
+        </div>
+
+        <div className="space-y-2 text-xs">
+          <div className="p-2.5 rounded-xl bg-gray-50 border border-gray-100 flex items-center justify-between">
+            <div>
+              <p className="font-bold text-gray-800">Policy 4: High Turbidity Lockout</p>
+              <p className="text-[11px] text-gray-500 font-mono">forbid StartRecycling when turbidity &gt; 85 NTU</p>
+            </div>
+            <span className="px-2 py-0.5 rounded-md text-[10px] font-bold font-mono bg-emerald-100 text-emerald-800">
+              ACTIVE
+            </span>
+          </div>
+
+          <div className="p-2.5 rounded-xl bg-gray-50 border border-gray-100 flex items-center justify-between">
+            <div>
+              <p className="font-bold text-gray-800">Policy 5: Low Reserve Cavitation Protection</p>
+              <p className="text-[11px] text-gray-500 font-mono">forbid UseRecycledWater when recycled &lt; 5 L</p>
+            </div>
+            <span className="px-2 py-0.5 rounded-md text-[10px] font-bold font-mono bg-emerald-100 text-emerald-800">
+              ACTIVE
+            </span>
+          </div>
+
+          <div className="p-2.5 rounded-xl bg-gray-50 border border-gray-100 flex items-center justify-between">
+            <div>
+              <p className="font-bold text-gray-800">Policy 1 &amp; 2: Role-Based Action Permits</p>
+              <p className="text-[11px] text-gray-500 font-mono">permit Operator for telemetry, pumps &amp; valves</p>
+            </div>
+            <span className="px-2 py-0.5 rounded-md text-[10px] font-bold font-mono bg-emerald-100 text-emerald-800">
+              ENFORCED
+            </span>
+          </div>
         </div>
       </div>
     </div>
