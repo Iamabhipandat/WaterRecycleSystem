@@ -417,26 +417,16 @@ export default function App() {
         ========================================================================= */}
         {currentTab === "flow" && (
           <div className="space-y-5 animate-fadeIn">
-            {/* Header Banner */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-green-700 text-white rounded-2xl px-6 py-4 shadow-sm">
-              <div className="flex items-center gap-3">
-                <Leaf size={20} className="shrink-0 opacity-80" />
-                <div>
-                  <p className="text-xs font-semibold opacity-70 uppercase tracking-widest">JalLoop — Smart Water Recycling</p>
-                  <p className="text-base font-semibold mt-0.5">
-                    RO &amp; washing-machine wastewater is collected, filtered, and reused — saving
-                    <span className="text-green-200 font-bold ml-1">{savingPercent}% fresh water</span> every day.
-                  </p>
-                </div>
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <p className="text-xs font-bold uppercase tracking-widest text-green-700">JalLoop</p>
+                <h1 className="text-xl sm:text-2xl font-black text-gray-900">Water flow</h1>
+                <p className="text-xs text-gray-500 mt-1">Start a source to collect water, then filter and reuse it.</p>
               </div>
-              <button
-                type="button"
-                onClick={() => setShowAwsModal(true)}
-                className="self-start sm:self-auto flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold bg-amber-400 hover:bg-amber-300 text-amber-950 transition-all shadow-xs shrink-0 cursor-pointer"
-              >
-                <Cloud size={14} className="text-amber-900" />
-                <span>AWS Open Source Center</span>
-              </button>
+              <div className="text-right rounded-xl bg-white border border-gray-200 px-3 py-2 shadow-sm">
+                <p className="text-[10px] font-bold uppercase tracking-wider text-gray-400">Fresh water saved</p>
+                <p className="text-lg font-black text-green-700">{savingPercent}%</p>
+              </div>
             </div>
 
             {/* Interactive Animated Flow System */}
@@ -458,15 +448,6 @@ export default function App() {
               onInspectTank={handleInspectStorageTank}
             />
 
-            {/* AWS Open Source Water Storage Mapping & Telemetry Inspector Card */}
-            <WaterStorageAwsMapping
-              systemState={displayState}
-              onInspectTank={handleInspectStorageTank}
-            />
-
-            {/* Hardware LEDs (LED 1 Sky Blue & LED 2 Emerald Green) */}
-            <HardwareLeds liveMode={liveMode} connected={connected} leds={leds} />
-
             {/* Flow Simulation Controls */}
             <SimulationControls
               pumpRunning={displayState.pumpRunning}
@@ -483,13 +464,6 @@ export default function App() {
               onEmergencyStop={handleEmergencyStop}
             />
 
-            {/* Water Metrics Summary */}
-            <WaterMetrics
-              waterCollected={displayState.waterCollected}
-              waterRecycled={displayState.waterRecycled}
-              freshWaterSaved={displayState.freshWaterSaved}
-              waterReused={displayState.waterReused}
-            />
           </div>
         )}
 
