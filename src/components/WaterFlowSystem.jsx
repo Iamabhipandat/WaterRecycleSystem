@@ -291,22 +291,27 @@ export default function WaterFlowSystem({
         </div>
         <div className="rounded-xl border border-gray-200 bg-gray-50 p-3">
           <div className="flex items-center justify-between text-[10px] font-bold uppercase tracking-wider text-gray-400">
-            <span>Water flow</span>
-            <span className={mergeActive ? "text-blue-600" : "text-gray-400"}>{mergeActive ? "Active" : "Standby"}</span>
+            <span>Architecture flow</span>
+            <span className={mergeActive || fActive || pumpRunning || reuseActive ? "text-blue-600" : "text-gray-400"}>{mergeActive || fActive || pumpRunning || reuseActive ? "Active" : "Standby"}</span>
           </div>
-          <div className="mt-2 flex items-center justify-between gap-1 text-center">
+          <div className="mt-2 space-y-1">
             {[
-              { label: "Source", active: mergeActive },
-              { label: "Collect", active: mergeActive },
-              { label: "Filter", active: fActive },
-              { label: "Store", active: pumpRunning },
-            ].map((stage, index) => (
-              <div key={stage.label} className="flex flex-1 items-center gap-1">
-                <div className={`min-w-0 flex-1 rounded-lg border px-1 py-2 ${stage.active ? "border-blue-200 bg-blue-50 text-blue-700" : "border-gray-200 bg-white text-gray-400"}`}>
-                  <div className={`mx-auto mb-1 h-2 w-2 rounded-full ${stage.active ? "bg-blue-500 animate-pulse" : "bg-gray-300"}`} />
-                  <span className="text-[10px] font-bold">{stage.label}</span>
+              { label: "Water sources", detail: mergeActive ? "RO / washing / rainwater flowing" : "Waiting for a source", active: mergeActive, color: "blue" },
+              { label: "Collection tank", detail: `${Math.round(collectionLiters * 10) / 10} / ${collectionCapacity} L`, active: mergeActive, color: "blue" },
+              { label: "Filtration unit", detail: filtrationStage > 0 ? `Stage ${filtrationStage} active` : "Standby", active: fActive, color: "cyan" },
+              { label: "Pump transfer", detail: pumpRunning ? "Moving water to storage" : "Standby", active: pumpRunning, color: "cyan" },
+              { label: "Recycled tank", detail: `${Math.round(recycledLiters)} / ${recycledCapacity} L`, active: pumpRunning, color: "green" },
+              { label: "Reuse outlets", detail: reuseActive ? "Toilet / garden / cleaning active" : "Standby", active: reuseActive, color: "green" },
+            ].map((stage, index, stages) => (
+              <div key={stage.label}>
+                <div className={`flex items-center justify-between gap-3 rounded-lg border px-3 py-2 ${stage.active ? stage.color === "green" ? "border-emerald-200 bg-emerald-50" : stage.color === "cyan" ? "border-cyan-200 bg-cyan-50" : "border-blue-200 bg-blue-50" : "border-gray-200 bg-white"}`}>
+                  <div className="flex min-w-0 items-center gap-2">
+                    <span className={`h-2.5 w-2.5 shrink-0 rounded-full ${stage.active ? stage.color === "green" ? "bg-emerald-500 animate-pulse" : stage.color === "cyan" ? "bg-cyan-500 animate-pulse" : "bg-blue-500 animate-pulse" : "bg-gray-300"}`} />
+                    <span className={`text-[11px] font-bold ${stage.active ? "text-gray-800" : "text-gray-400"}`}>{stage.label}</span>
+                  </div>
+                  <span className={`truncate text-[10px] ${stage.active ? "text-gray-600" : "text-gray-400"}`}>{stage.detail}</span>
                 </div>
-                {index < 3 && <span className={`text-xs ${stage.active ? "text-blue-400" : "text-gray-300"}`}>›</span>}
+                {index < stages.length - 1 && <div className={`mx-auto h-2 w-px ${stage.active ? "bg-blue-300" : "bg-gray-300"}`} />}
               </div>
             ))}
           </div>
