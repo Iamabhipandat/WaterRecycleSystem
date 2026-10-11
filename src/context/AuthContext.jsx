@@ -54,17 +54,14 @@ export function AuthProvider({ children }) {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((event, s) => {
-      const pendingEmail = window.localStorage.getItem("jalloop.pendingVerificationEmail");
       const isSignupCallback = window.location.hash.includes("type=signup");
-      if (event === "SIGNED_IN" && isSignupCallback && pendingEmail && s?.user?.email_confirmed_at) {
-        if (pendingEmail === String(s.user.email || "").toLowerCase()) {
-          setVerificationNotice("Your email is verified. Please log in to continue.");
-          window.localStorage.removeItem("jalloop.pendingVerificationEmail");
-          window.history.replaceState({}, document.title, window.location.pathname + window.location.search);
-          void supabase.auth.signOut();
-          setLoading(false);
-          return;
-        }
+      if (event === "SIGNED_IN" && isSignupCallback && s?.user?.email_confirmed_at) {
+        setVerificationNotice("Your email is verified. Please log in to continue.");
+        window.localStorage.removeItem("jalloop.pendingVerificationEmail");
+        window.history.replaceState({}, document.title, window.location.pathname + window.location.search);
+        void supabase.auth.signOut();
+        setLoading(false);
+        return;
       }
       setSession(s);
       setUser(s?.user ?? null);
