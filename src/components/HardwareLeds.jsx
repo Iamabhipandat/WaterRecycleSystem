@@ -13,7 +13,7 @@ const LED_PHASE_CONFIG = {
   reuse: { phase: "DISTRIBUTION", bgOn: "bg-emerald-50 border-emerald-300 ring-1 ring-emerald-300", dotOn: "bg-emerald-500 shadow-[0_0_10px_#10b981]", textOn: "text-emerald-950 font-semibold" },
 };
 
-export default function HardwareLeds({ liveMode, connected, leds }) {
+export default function HardwareLeds({ liveMode, connected, leds, onConnect }) {
   return (
     <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-5">
       <div className="flex items-start justify-between gap-3 mb-4">
@@ -24,7 +24,7 @@ export default function HardwareLeds({ liveMode, connected, leds }) {
               ? "Synced with ESP32 microcontroller pins via Firebase Realtime Database."
               : liveMode
               ? "Connecting to ESP32 hardware via Firebase..."
-              : "Live LED states mapped directly to the hardware schematic and ESP32 pins."}
+              : "Connect a physical ESP32 to see live LED and sensor states."}
           </p>
         </div>
         <span className={`text-xs font-semibold px-2.5 py-1 rounded-full border ${
@@ -32,11 +32,16 @@ export default function HardwareLeds({ liveMode, connected, leds }) {
             ? "bg-blue-50 text-blue-700 border-blue-200"
             : liveMode
             ? "bg-amber-50 text-amber-700 border-amber-200 animate-pulse"
-            : "bg-green-50 text-green-700 border-green-200"
+            : "bg-gray-50 text-gray-600 border-gray-200"
         }`}>
-          {connected ? "ESP32 Synced" : liveMode ? "Connecting ESP32…" : "Hardware Active"}
+          {connected ? "ESP32 Synced" : liveMode ? "Connecting ESP32…" : "Not connected"}
         </span>
       </div>
+      {!liveMode && onConnect && (
+        <button type="button" onClick={onConnect} className="mb-3 flex w-full items-center justify-center gap-2 rounded-xl border border-blue-200 bg-blue-50 px-3 py-2.5 text-xs font-bold text-blue-700 hover:bg-blue-100">
+          Connect physical hardware
+        </button>
+      )}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2">
         {LED_LABELS.map(({ key, label }) => {
           const on = !!leds?.[key];

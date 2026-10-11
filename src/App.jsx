@@ -10,6 +10,7 @@ import VirtualHardwareWorkbench from "./components/VirtualHardwareWorkbench";
 import AwsCloudCenterModal from "./components/AwsCloudCenterModal";
 import WaterStorageAwsMapping from "./components/WaterStorageAwsMapping";
 import AwsStorageInspectorModal from "./components/AwsStorageInspectorModal";
+import HardwareConnectionModal from "./components/HardwareConnectionModal";
 import AuthPage from "./pages/AuthPage";
 import AdminDashboard from "./pages/AdminDashboard";
 import {
@@ -73,6 +74,7 @@ export default function App() {
   const [showAwsModal, setShowAwsModal] = useState(false);
   const [showStorageModal, setShowStorageModal] = useState(false);
   const [storageModalTank, setStorageModalTank] = useState("collection");
+  const [showHardwareModal, setShowHardwareModal] = useState(false);
 
   useEffect(() => {
     if (user?.id) setState(INITIAL);
@@ -361,8 +363,12 @@ export default function App() {
         onOpenAdmin={() => setView(view === "admin" ? "flow" : "admin")}
         onOpenAwsCenter={() => setShowAwsModal(true)}
         onToggleMode={() => {
-          setLiveMode(!liveMode);
-          addActivity(liveMode ? "Switched to Demo Mode" : "Switched to Live Mode — syncing LEDs to hardware");
+          if (liveMode) {
+            setLiveMode(false);
+            addActivity("Disconnected from hardware");
+          } else {
+            setShowHardwareModal(true);
+          }
         }}
       />
 
@@ -503,7 +509,7 @@ export default function App() {
             </div>
 
             {/* Hardware LEDs status */}
-            <HardwareLeds liveMode={liveMode} connected={connected} leds={leds} />
+            <HardwareLeds liveMode={liveMode} connected={connected} leds={leds} onConnect={() => setShowHardwareModal(true)} />
 
             {/* Virtual Hardware Workbench Interactive Breadboard */}
             <VirtualHardwareWorkbench
@@ -758,6 +764,17 @@ export default function App() {
         onClose={() => setShowStorageModal(false)}
         systemState={displayState}
         initialTank={storageModalTank}
+      />
+
+      <HardwareConnectionModal
+        isOpen={showHardwareModal}
+        connected={connected}
+        onClose={() => setShowHardwareModal(false)}
+        onConnect={() => {
+          setShowHardwareModal(false);
+          setLiveMode(true);
+          addActivity("Hardware connection requested — waiting for ESP32 telemetry");
+        }}
       />
     </div>
   );
