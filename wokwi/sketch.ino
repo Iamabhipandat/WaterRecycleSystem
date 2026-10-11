@@ -1,4 +1,4 @@
-﻿/**
+/**
  * JalLoop — ESP32 firmware (Wokwi + real hardware)
  *
  * LEDs follow /hardware/leds written by the dashboard while Live Mode is on.
