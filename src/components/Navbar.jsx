@@ -17,8 +17,8 @@ export default function Navbar({
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const navItems = [
-    { id: "preview", label: "Frontpage & Mission", icon: Leaf },
-    { id: "flow", label: "Live Flow Simulator", icon: Droplets },
+    { id: "explore", label: "Explore & Mission", icon: Leaf },
+    { id: "flow", label: "Water Flow", icon: Droplets },
     { id: "virtual-hardware", label: "Virtual Hardware", icon: Cpu },
     { id: "status", label: "System Status", icon: Activity },
     { id: "analytics", label: "Analytics", icon: BarChart3 },
@@ -35,8 +35,8 @@ export default function Navbar({
         {/* Brand Logo */}
         <div
           className="flex items-center gap-3 cursor-pointer group"
-          onClick={() => handleSelectPage("preview")}
-          title="Go to Frontpage & Mission"
+          onClick={() => handleSelectPage("explore")}
+          title="Go to Explore & Mission"
         >
           <div className="w-9 h-9 rounded-xl bg-green-700 flex items-center justify-center shadow-xs group-hover:bg-green-800 transition-colors">
             <Droplets size={18} className="text-white" />

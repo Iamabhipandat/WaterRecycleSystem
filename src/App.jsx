@@ -9,7 +9,7 @@ import HardwareLeds from "./components/HardwareLeds";
 import VirtualHardwareWorkbench from "./components/VirtualHardwareWorkbench";
 import SmartWaterAdvisor from "./components/SmartWaterAdvisor";
 import HardwareConnectionModal from "./components/HardwareConnectionModal";
-import LandingPage from "./components/LandingPage";
+import WaterCrisisPreview from "./components/WaterCrisisPreview";
 import AuthPage from "./pages/AuthPage";
 import AdminDashboard from "./pages/AdminDashboard";
 import { evaluateCedarPolicy } from "./services/cedarPolicy";
@@ -67,7 +67,7 @@ function nowStr() {
 
 export default function App() {
   const { user, loading, isAdmin, verificationNotice } = useAuth();
-  const [view, setView]           = useState("preview");
+  const [view, setView]           = useState("explore");
   const [state, setState]         = useState(INITIAL);
   const [warning, setWarning]     = useState(null);
   const [liveMode, setLiveMode]   = useState(false);
@@ -361,22 +361,14 @@ export default function App() {
   }
 
   if (view === "auth") {
-    return <AuthPage onBackToHome={() => setView("preview")} />;
+    return <AuthPage onBackToHome={() => setView("explore")} />;
   }
 
-  if (view === "preview") {
-    return (
-      <LandingPage
-        onLaunchSimulator={() => setView("flow")}
-        onGoToAuth={() => setView("auth")}
-      />
-    );
-  }
-
-  const currentTab = view === "dashboard" ? "flow" : view;
+  const currentTab = view === "dashboard" ? "explore" : view;
 
   const NAV_TABS = [
-    { id: "flow", label: "Live Flow Simulator", icon: Droplets, badge: "Glass Pipes" },
+    { id: "explore", label: "Explore & Mission", icon: Leaf, badge: "Crisis & Science" },
+    { id: "flow", label: "Water Flow", icon: Droplets, badge: "Interactive Pipes" },
     { id: "virtual-hardware", label: "Virtual Hardware", icon: Cpu, badge: "ESP32 Twin" },
     { id: "status", label: "System Status", icon: Activity, badge: "Live Logs" },
     { id: "analytics", label: "Analytics", icon: BarChart3, badge: "Charts & CSV" },
@@ -406,39 +398,6 @@ export default function App() {
         <AdminDashboard onBack={() => setView("flow")} hardwareConnected={connected} />
       ) : (
       <main className="max-w-screen-xl mx-auto px-4 sm:px-6 py-6 space-y-5">
-
-        {/* Public Explorer Mode Banner for unauthenticated visitors */}
-        {!user && currentTab !== "preview" && (
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200 rounded-2xl p-4 text-xs text-emerald-950 shadow-xs">
-            <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-xs">
-                <Leaf size={17} />
-              </div>
-              <div>
-                <p className="font-bold text-sm text-emerald-900">Public Explorer Mode (No Login Required)</p>
-                <p className="text-emerald-700/90 mt-0.5">
-                  You are exploring the live JalLoop system without logging in. Run simulations, toggle pumps, or switch to the Frontpage story anytime.
-                </p>
-              </div>
-            </div>
-            <div className="flex items-center gap-2 self-end sm:self-auto shrink-0">
-              <button
-                type="button"
-                onClick={() => setView("preview")}
-                className="px-3 py-1.5 rounded-xl border border-emerald-300 bg-white hover:bg-emerald-50 text-emerald-800 font-bold text-xs transition-colors cursor-pointer"
-              >
-                Frontpage &amp; Crisis Story
-              </button>
-              <button
-                type="button"
-                onClick={() => setView("auth")}
-                className="px-3.5 py-1.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs transition-colors shadow-xs cursor-pointer"
-              >
-                Sign In / Sign Up
-              </button>
-            </div>
-          </div>
-        )}
 
         {/* Global Warning Alert */}
         {warning && (
@@ -780,6 +739,19 @@ export default function App() {
                 <p className="text-xs text-gray-500 font-medium mt-1">Per 100 litres recycled</p>
               </div>
             </div>
+          </div>
+        )}
+
+        {/* =========================================================================
+            EXPLORE & MISSION TAB (Water crisis in India, how water is recycled, quotes)
+        ========================================================================= */}
+        {currentTab === "explore" && (
+          <div className="space-y-5 animate-fadeIn">
+            <WaterCrisisPreview
+              onLaunchSimulator={() => setView("flow")}
+              onGoToAuth={() => setView("auth")}
+              isInsideApp={true}
+            />
           </div>
         )}
 

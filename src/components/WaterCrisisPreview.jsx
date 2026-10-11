@@ -28,18 +28,34 @@ import {
   Sun,
   ShieldAlert,
   HelpCircle,
+  MapPin,
+  Building2,
+  Compass,
+  BarChart3,
+  FileText,
+  Activity,
+  Workflow,
+  BookOpen,
 } from "lucide-react";
 
 export default function WaterCrisisPreview({ onLaunchSimulator, onGoToAuth, isInsideApp = false }) {
-  const [activeTab, setActiveTab] = useState("crisis"); // "crisis" | "recycling" | "solution" | "quotes"
+  const [activeTab, setActiveTab] = useState("country"); // "country" | "crisis" | "recycling" | "explore-app" | "solution" | "quotes"
   const [familyMembers, setFamilyMembers] = useState(4);
   const [roLitersDaily, setRoLitersDaily] = useState(15);
   const [laundryLoadsWeekly, setLaundryLoadsWeekly] = useState(4);
   const [purificationStage, setPurificationStage] = useState(0); // 0 to 4
+  const [selectedCity, setSelectedCity] = useState("bengaluru");
   const [hasPledged, setHasPledged] = useState(() => {
     return localStorage.getItem("jalloop.waterPledge") === "true";
   });
   const [pledgeCount, setPledgeCount] = useState(3842);
+
+  const scrollToSection = (sectionId) => {
+    const el = document.getElementById(sectionId);
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  };
 
   // Calculations for Household Wastage in India
   const monthlyRoWaste = roLitersDaily * 3 * 30; // 1L pure = 3L reject
@@ -56,6 +72,54 @@ export default function WaterCrisisPreview({ onLaunchSimulator, onGoToAuth, isIn
     }
   };
 
+  // Indian Cities Crisis Data
+  const CITY_CASE_STUDIES = {
+    bengaluru: {
+      name: "Bengaluru (Silicon Valley of India)",
+      hindiName: "बेंगलुरु - भारत की सिलिकॉन वैली",
+      severity: "Day Zero Threat (Critical)",
+      borewellDepth: "1,500+ feet deep (Over 14,000 dry borewells)",
+      tankerCost: "₹1,800 to ₹2,500 per tanker (400% price surge)",
+      crisisSummary:
+        "Rapid urbanization cemented 90% of Bengaluru's lakes. When monsoons fell short, over 6,900 borewells completely ran dry. High-rise apartment complexes were forced to ration water to 50 liters per flat and spend lakhs per month on emergency private water tankers.",
+      solutionImpact:
+        "A typical 200-apartment society in Bengaluru dumps 45,000 liters of RO reject and laundry water daily. With JalLoop closed-loop recycling, the society saves 1.35 Million liters each month, eliminating tanker dependency.",
+    },
+    chennai: {
+      name: "Chennai (The 2019 Day Zero Warning)",
+      hindiName: "चेन्नई - 2019 का डे-ज़ीरो संकट",
+      severity: "Severe Aquifer Exhaustion",
+      borewellDepth: "Saltwater intrusion within 20km of coast",
+      tankerCost: "Emergency Water Trains (Jaldoot carrying 2.5M liters/day)",
+      crisisSummary:
+        "In June 2019, Chennai became India's first mega-city to declare 'Day Zero' when its 4 main reservoirs (Poondi, Cholavaram, Redhills, Chembarambakkam) turned to dry cracked mud. Hotels, hospitals, and IT corridors in OMR had to shut down.",
+      solutionImpact:
+        "Chennai receives intense coastal monsoon rainfall. Capturing terrace rain and recycling residential greywater creates a distributed buffer that keeps buildings self-sufficient even during long rainless summers.",
+    },
+    delhi: {
+      name: "Delhi NCR (Yamuna & Ground Depletion)",
+      hindiName: "दिल्ली एनसीआर - भूजल संकट व यमुना",
+      severity: "Over-exploited Groundwater Blocks",
+      borewellDepth: "Water table falling by 1 to 2 meters annually",
+      tankerCost: "High municipal pipeline deficits in South/South-West Delhi",
+      crisisSummary:
+        "Delhi's peak summer water demand exceeds 1,250 MGD against a supply of barely 990 MGD. Heavy groundwater pumping in Gurgaon, Noida, and South Delhi has pushed water tables below 250 feet, while toxic ammonia surges in the Yamuna regularly shut down water treatment plants.",
+      solutionImpact:
+        "Decentralized micro-recycling in residential societies cuts fresh municipal draw by 65%, taking immense pressure off the besieged Yamuna river.",
+    },
+    bundelkhand: {
+      name: "Bundelkhand & Marathwada (Rural-Urban Drought)",
+      hindiName: "बुंदेलखंड व मराठवाड़ा - जल संकट की जमीनी सच्चाई",
+      severity: "Chronic Drought & Tanker Trains",
+      borewellDepth: "Hard rocky terrain with non-recharging aquifers",
+      tankerCost: "Women walking 4 to 6 kilometers daily for single pots",
+      crisisSummary:
+        "Recurring monsoon failures in semi-arid zones have led to distress migration and heavy water conflicts. Millions of hours of productive human life are lost solely to hauling water for basic survival.",
+      solutionImpact:
+        "Every liter of water saved in urban homes prevents water trains and tankers from being diverted from rural farming belts, establishing national water equity.",
+    },
+  };
+
   // Interactive Purification Stages Data
   const PURIFICATION_STAGES = [
     {
@@ -66,8 +130,6 @@ export default function WaterCrisisPreview({ onLaunchSimulator, onGoToAuth, isIn
       odor: "Noticeable soap & mineral scent",
       pathogens: "Trace household bacteria",
       clarityColor: "bg-amber-700/60 border-amber-800",
-      waterBg: "from-amber-200 via-stone-300 to-amber-100",
-      badgeColor: "bg-amber-100 text-amber-900 border-amber-300",
       description: "Segregated non-sewage wastewater collected from RO purifier reject pipe, washing machine rinse discharge, and terrace roof runoff.",
       technicalDetails: "Contains dissolved minerals (TDS 450-800 ppm), micro-fibers, lint from fabrics, and mild non-toxic surfactants. Totally separate from toilet blackwater, making it 100% recyclable on-site.",
     },
@@ -79,8 +141,6 @@ export default function WaterCrisisPreview({ onLaunchSimulator, onGoToAuth, isIn
       odor: "Reduced particulate smell",
       pathogens: "Suspended matter removed",
       clarityColor: "bg-amber-500/40 border-amber-600",
-      waterBg: "from-amber-100 via-emerald-100 to-teal-100",
-      badgeColor: "bg-amber-50 text-amber-800 border-amber-200",
       description: "Dense spun polypropylene melt-blown cartridge physically traps physical suspended solids, sand grit, fabric lint, hair, and rust flakes.",
       technicalDetails: "Pore size: 5 micrometers. Protects downstream carbon blocks from pore-clogging and protects booster pump impellers from abrasive mechanical wear.",
     },
@@ -92,8 +152,6 @@ export default function WaterCrisisPreview({ onLaunchSimulator, onGoToAuth, isIn
       odor: "Neutral / Completely odorless",
       pathogens: "Organic matter adsorbed",
       clarityColor: "bg-teal-400/30 border-teal-500",
-      waterBg: "from-teal-100 via-cyan-100 to-blue-50",
-      badgeColor: "bg-teal-50 text-teal-800 border-teal-200",
       description: "High-grade virgin coconut-shell activated carbon adsorbs dissolved detergents, optical brighteners, chlorine, pesticides, and residual organic surfactants.",
       technicalDetails: "Specific surface area > 1,000 m²/g. Chemical adsorption eliminates foam, yellow tint, and soapy feel, yielding transparent water with balanced surface tension.",
     },
@@ -105,8 +163,6 @@ export default function WaterCrisisPreview({ onLaunchSimulator, onGoToAuth, isIn
       odor: "Pure & Fresh",
       pathogens: "99.9% Bacteria & viruses destroyed",
       clarityColor: "bg-cyan-500/20 border-cyan-400",
-      waterBg: "from-cyan-100 via-sky-100 to-emerald-50",
-      badgeColor: "bg-cyan-50 text-cyan-800 border-cyan-200",
       description: "Stainless steel chamber with high-output 254nm germicidal ultraviolet lamp penetrates microbial cell walls and shatters cellular DNA/RNA.",
       technicalDetails: "UV dosage: > 30 mJ/cm². Eradicates E. coli, coliforms, and spore-forming microbes without introducing any harsh chemicals or chlorine residues into the water.",
     },
@@ -118,12 +174,12 @@ export default function WaterCrisisPreview({ onLaunchSimulator, onGoToAuth, isIn
       odor: "Crystal clear & fresh",
       pathogens: "Safe for human contact & secondary uses",
       clarityColor: "bg-emerald-500/20 border-emerald-500",
-      waterBg: "from-emerald-100 via-cyan-50 to-sky-100",
-      badgeColor: "bg-emerald-100 text-emerald-900 border-emerald-300",
       description: "Clean water is stored in the 200L sealed recycled reservoir and pressurized on-demand for dual-flush toilets, balcony gardens, and floor washing.",
       technicalDetails: "Continuously checked by ESP32 analog turbidity probes. Automatic Cedar Safety Policies prevent pump running if water quality ever deviates from safe standards.",
     },
   ];
+
+  const currentCityData = CITY_CASE_STUDIES[selectedCity] || CITY_CASE_STUDIES.bengaluru;
 
   return (
     <div className="w-full space-y-6">
@@ -135,7 +191,7 @@ export default function WaterCrisisPreview({ onLaunchSimulator, onGoToAuth, isIn
         <div className="relative z-10 max-w-3xl space-y-4">
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/20 border border-emerald-400/30 text-emerald-300 text-xs font-semibold backdrop-blur-md">
             <Sparkles size={14} className="text-emerald-400" />
-            <span>Smart Water Conservation Platform</span>
+            <span>National Water Conservation Mission &amp; Smart Architecture</span>
           </div>
 
           <h1 className="text-2xl sm:text-4xl font-extrabold tracking-tight leading-tight text-white">
@@ -143,7 +199,7 @@ export default function WaterCrisisPreview({ onLaunchSimulator, onGoToAuth, isIn
           </h1>
 
           <p className="text-sm sm:text-base text-emerald-100/90 leading-relaxed max-w-2xl">
-            Over <strong>600 million Indians</strong> face severe water stress, while typical urban households unknowingly flush thousands of liters of usable water down the drain every week. Discover the crisis, understand where the water goes, and see how our closed-loop smart system rescues it.
+            Over <strong>600 million Indians</strong> face severe water stress, while urban households unwittingly flush thousands of liters of usable water down the drain every week. Discover the crisis across our country, explore how our technology recycles it, and test every feature of our live system.
           </p>
 
           <div className="flex flex-wrap items-center gap-3 pt-2">
@@ -153,7 +209,7 @@ export default function WaterCrisisPreview({ onLaunchSimulator, onGoToAuth, isIn
               className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-bold text-xs sm:text-sm hover:from-emerald-600 hover:to-teal-600 shadow-lg shadow-emerald-950/40 transition-all cursor-pointer"
             >
               <Play size={15} fill="currentColor" />
-              <span>Launch Interactive Simulator (No Login Required)</span>
+              <span>Launch Live Interactive Simulator</span>
             </button>
 
             {onGoToAuth && !isInsideApp && (
@@ -170,113 +226,362 @@ export default function WaterCrisisPreview({ onLaunchSimulator, onGoToAuth, isIn
         </div>
       </div>
 
-      {/* 4-Section Environmental Navigation Tabs */}
-      <div className="flex bg-white rounded-2xl border border-gray-200 p-1.5 shadow-xs items-center gap-1.5 overflow-x-auto">
-        <button
-          type="button"
-          onClick={() => setActiveTab("crisis")}
-          className={`flex-1 min-w-[190px] flex items-center justify-center gap-2 py-3 px-3 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
-            activeTab === "crisis"
-              ? "bg-emerald-700 text-white shadow-xs"
-              : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
-          }`}
-        >
-          <AlertTriangle size={15} className={activeTab === "crisis" ? "text-amber-300" : "text-amber-500"} />
-          <span>1. India's Water Crisis (जल संकट)</span>
-        </button>
+      {/* Sticky / Floating Chapter Quick-Jump Anchor Bar */}
+      <div className="bg-white/95 backdrop-blur-md rounded-2xl border border-gray-200 p-2.5 shadow-sm sticky top-3 z-30 space-y-2">
+        <div className="flex items-center justify-between px-2">
+          <div className="flex items-center gap-2">
+            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
+            <span className="text-xs font-black uppercase tracking-wider text-gray-800">
+              Complete Water Guide &amp; Architecture (All 7 Chapters In One Flow)
+            </span>
+          </div>
+          <span className="text-[11px] font-semibold text-gray-500 hidden sm:inline">
+            Scroll down or click any chapter to jump directly ↓
+          </span>
+        </div>
 
-        <button
-          type="button"
-          onClick={() => setActiveTab("recycling")}
-          className={`flex-1 min-w-[210px] flex items-center justify-center gap-2 py-3 px-3 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
-            activeTab === "recycling"
-              ? "bg-emerald-700 text-white shadow-xs"
-              : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
-          }`}
-        >
-          <Beaker size={15} className={activeTab === "recycling" ? "text-cyan-300" : "text-cyan-600"} />
-          <span>2. How We Recycle (कदम-दर-कदम तकनीक)</span>
-        </button>
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-thin">
+          <button
+            type="button"
+            onClick={() => scrollToSection("chapter-1")}
+            className="shrink-0 flex items-center gap-1.5 py-2 px-3 rounded-xl text-xs font-bold bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 transition-colors cursor-pointer"
+          >
+            <Globe size={13} className="text-emerald-700" />
+            <span>1. India's Crisis</span>
+          </button>
 
-        <button
-          type="button"
-          onClick={() => setActiveTab("solution")}
-          className={`flex-1 min-w-[190px] flex items-center justify-center gap-2 py-3 px-3 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
-            activeTab === "solution"
-              ? "bg-emerald-700 text-white shadow-xs"
-              : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
-          }`}
-        >
-          <RefreshCw size={15} className={activeTab === "solution" ? "text-emerald-300" : "text-emerald-600"} />
-          <span>3. Home Blueprint &amp; Savings (बचत)</span>
-        </button>
+          <button
+            type="button"
+            onClick={() => scrollToSection("chapter-2")}
+            className="shrink-0 flex items-center gap-1.5 py-2 px-3 rounded-xl text-xs font-bold bg-cyan-50 hover:bg-cyan-100 text-cyan-800 border border-cyan-200 transition-colors cursor-pointer"
+          >
+            <Layers size={13} className="text-cyan-700" />
+            <span>2. Rivers &amp; History</span>
+          </button>
 
-        <button
-          type="button"
-          onClick={() => setActiveTab("quotes")}
-          className={`flex-1 min-w-[190px] flex items-center justify-center gap-2 py-3 px-3 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
-            activeTab === "quotes"
-              ? "bg-emerald-700 text-white shadow-xs"
-              : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
-          }`}
-        >
-          <Heart size={15} className={activeTab === "quotes" ? "text-rose-300" : "text-rose-500"} />
-          <span>4. Quotes &amp; Pledge (प्रेरणा व संकल्प)</span>
-        </button>
+          <button
+            type="button"
+            onClick={() => scrollToSection("chapter-3")}
+            className="shrink-0 flex items-center gap-1.5 py-2 px-3 rounded-xl text-xs font-bold bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 transition-colors cursor-pointer"
+          >
+            <AlertTriangle size={13} className="text-amber-700" />
+            <span>3. Household Loss</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => scrollToSection("chapter-4")}
+            className="shrink-0 flex items-center gap-1.5 py-2 px-3 rounded-xl text-xs font-bold bg-teal-50 hover:bg-teal-100 text-teal-800 border border-teal-200 transition-colors cursor-pointer"
+          >
+            <Beaker size={13} className="text-teal-700" />
+            <span>4. How We Recycle</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => scrollToSection("chapter-5")}
+            className="shrink-0 flex items-center gap-1.5 py-2 px-3 rounded-xl text-xs font-bold bg-indigo-50 hover:bg-indigo-100 text-indigo-800 border border-indigo-200 transition-colors cursor-pointer"
+          >
+            <Compass size={13} className="text-indigo-700" />
+            <span>5. Platform Tour</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => scrollToSection("chapter-6")}
+            className="shrink-0 flex items-center gap-1.5 py-2 px-3 rounded-xl text-xs font-bold bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 transition-colors cursor-pointer"
+          >
+            <RefreshCw size={13} className="text-emerald-700" />
+            <span>6. Home Blueprint</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => scrollToSection("chapter-7")}
+            className="shrink-0 flex items-center gap-1.5 py-2 px-3 rounded-xl text-xs font-bold bg-rose-50 hover:bg-rose-100 text-rose-800 border border-rose-200 transition-colors cursor-pointer"
+          >
+            <Heart size={13} className="text-rose-700" />
+            <span>7. Quotes &amp; Pledge</span>
+          </button>
+        </div>
       </div>
 
       {/* ─────────────────────────────────────────────────────────────
-          PAGE 1: THE CRISIS IN INDIA & HOUSEHOLD WASTAGE
+          CHAPTER 1: INDIA'S WATER REALITY & CITY CASE STUDIES
           ───────────────────────────────────────────────────────────── */}
-      {activeTab === "crisis" && (
-        <div className="space-y-6 animate-fadeIn">
-          {/* Key Facts Grid */}
+      <section id="chapter-1" className="space-y-6 scroll-mt-24">
+          {/* National Overview Headline */}
+          <div className="bg-white rounded-2xl border border-gray-200 p-6 sm:p-8 shadow-xs space-y-4">
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-800 text-xs font-bold">
+              <Globe size={13} />
+              <span>National Water Security Report — India</span>
+            </div>
+            <h2 className="text-xl sm:text-3xl font-black text-gray-950">
+              The Reality of Water in India: Why Our Country Faces a Historic Turning Point
+            </h2>
+            <p className="text-xs sm:text-sm text-gray-600 leading-relaxed max-w-4xl">
+              India supports <strong>18% of the world&rsquo;s human population</strong> with only <strong>4% of the world&rsquo;s fresh water resources</strong>. Historically reliant on monsoon rains, our country now extracts more groundwater each year than the United States and China combined. Centralized municipal treatment plants treat less than 30% of sewage, leaving decentralized recycling at home as the only viable shield for our cities.
+            </p>
+          </div>
+
+          {/* 4 Macro Pillars Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div className="bg-white rounded-2xl border border-rose-200/80 p-5 shadow-xs space-y-2">
-              <div className="w-10 h-10 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center font-bold">
-                <Globe size={20} />
+            <div className="bg-white rounded-2xl border border-rose-200 p-5 shadow-xs space-y-2">
+              <div className="w-9 h-9 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center font-bold">
+                <Globe size={18} />
               </div>
-              <div className="text-2xl font-black text-gray-900">600 Million</div>
+              <div className="text-2xl font-black text-gray-950">600 Million</div>
               <div className="text-xs font-bold text-rose-700 uppercase tracking-wider">High Water Stress</div>
               <p className="text-xs text-gray-500 leading-relaxed">
-                Nearly half of India's population faces extreme to severe water scarcity every single year (NITI Aayog Report).
+                Over 50% of our population faces severe water stress annually, with hundreds of districts declared drought-prone.
               </p>
             </div>
 
-            <div className="bg-white rounded-2xl border border-amber-200/80 p-5 shadow-xs space-y-2">
-              <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center font-bold">
-                <TrendingDown size={20} />
+            <div className="bg-white rounded-2xl border border-amber-200 p-5 shadow-xs space-y-2">
+              <div className="w-9 h-9 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center font-bold">
+                <TrendingDown size={18} />
               </div>
-              <div className="text-2xl font-black text-gray-900">21 Major Cities</div>
-              <div className="text-xs font-bold text-amber-700 uppercase tracking-wider">Groundwater Depleted</div>
+              <div className="text-2xl font-black text-gray-950">256 of 700</div>
+              <div className="text-xs font-bold text-amber-700 uppercase tracking-wider">Districts Critical</div>
               <p className="text-xs text-gray-500 leading-relaxed">
-                Bengaluru, Delhi, Hyderabad, and Chennai are rapidly exhausting their deeper non-replenishable aquifers.
+                Groundwater extraction exceeds natural rainfall replenishment in 256 districts across Rajasthan, Punjab, Tamil Nadu, and Karnataka.
               </p>
             </div>
 
-            <div className="bg-white rounded-2xl border border-teal-200/80 p-5 shadow-xs space-y-2">
-              <div className="w-10 h-10 rounded-xl bg-teal-50 text-teal-600 flex items-center justify-center font-bold">
-                <Filter size={20} />
+            <div className="bg-white rounded-2xl border border-teal-200 p-5 shadow-xs space-y-2">
+              <div className="w-9 h-9 rounded-xl bg-teal-50 text-teal-600 flex items-center justify-center font-bold">
+                <Building2 size={18} />
               </div>
-              <div className="text-2xl font-black text-gray-900">70% Water</div>
-              <div className="text-xs font-bold text-teal-700 uppercase tracking-wider">Contaminated Supply</div>
+              <div className="text-2xl font-black text-gray-950">₹2,000 / Tanker</div>
+              <div className="text-xs font-bold text-teal-700 uppercase tracking-wider">Urban Tanker Mafia</div>
               <p className="text-xs text-gray-500 leading-relaxed">
-                India ranks 120th out of 122 nations in the Global Water Quality Index due to untreated domestic discharge.
+                Urban families spend up to ₹4,000–₹8,000 per month just to buy unregulated groundwater tankers during dry summers.
               </p>
             </div>
 
-            <div className="bg-white rounded-2xl border border-blue-200/80 p-5 shadow-xs space-y-2">
-              <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center font-bold">
-                <Droplets size={20} />
+            <div className="bg-white rounded-2xl border border-blue-200 p-5 shadow-xs space-y-2">
+              <div className="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center font-bold">
+                <Droplets size={18} />
               </div>
-              <div className="text-2xl font-black text-gray-900">135+ Liters</div>
-              <div className="text-xs font-bold text-blue-700 uppercase tracking-wider">Per Person / Day</div>
+              <div className="text-2xl font-black text-gray-950">70% Discharge</div>
+              <div className="text-xs font-bold text-blue-700 uppercase tracking-wider">Recyclable Greywater</div>
               <p className="text-xs text-gray-500 leading-relaxed">
-                Average urban daily consumption, of which up to 70% is drained as lightly soiled greywater suitable for secondary reuse.
+                70% of fresh drinking water supplied to apartments is flushed out as non-sewage wash water that could be saved on-site.
               </p>
             </div>
           </div>
 
+          {/* City Case Studies Interactive Tabs */}
+          <div className="bg-white rounded-2xl border border-gray-200 p-6 sm:p-8 shadow-xs space-y-6">
+            <div className="border-b border-gray-100 pb-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div>
+                <span className="text-xs font-bold uppercase tracking-wider text-emerald-700">Indian City Spotlight</span>
+                <h3 className="text-xl font-bold text-gray-950 mt-0.5">Explore How The Water Crisis Affects Our Major Cities</h3>
+              </div>
+              <span className="text-xs font-semibold text-gray-400">Click a city to see the on-ground impact</span>
+            </div>
+
+            {/* City Selector Buttons */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+              {Object.keys(CITY_CASE_STUDIES).map((cityKey) => {
+                const isSelected = selectedCity === cityKey;
+                const city = CITY_CASE_STUDIES[cityKey];
+                return (
+                  <button
+                    key={cityKey}
+                    type="button"
+                    onClick={() => setSelectedCity(cityKey)}
+                    className={`p-3.5 rounded-xl border text-left transition-all cursor-pointer ${
+                      isSelected
+                        ? "bg-emerald-700 text-white border-emerald-700 shadow-md font-bold"
+                        : "bg-gray-50 hover:bg-gray-100 border-gray-200 text-gray-700"
+                    }`}
+                  >
+                    <div className="flex items-center gap-1.5 text-xs font-bold">
+                      <MapPin size={13} className={isSelected ? "text-emerald-300" : "text-emerald-700"} />
+                      <span>{city.name.split(" ")[0]}</span>
+                    </div>
+                    <div className={`text-[11px] mt-1 line-clamp-1 ${isSelected ? "text-emerald-100" : "text-gray-500"}`}>
+                      {city.severity}
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* City Deep-Dive Card */}
+            <div className="bg-gradient-to-br from-emerald-50/50 via-teal-50/30 to-blue-50/30 rounded-2xl border border-emerald-200 p-6 space-y-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-emerald-200/60 pb-3">
+                <div>
+                  <span className="text-xs font-bold text-emerald-800">{currentCityData.hindiName}</span>
+                  <h4 className="text-lg font-black text-gray-950 mt-0.5">{currentCityData.name}</h4>
+                </div>
+                <span className="self-start sm:self-auto px-3 py-1 rounded-full bg-rose-100 border border-rose-200 text-rose-800 text-xs font-bold">
+                  {currentCityData.severity}
+                </span>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+                <div className="bg-white rounded-xl p-4 border border-emerald-200 space-y-1.5">
+                  <span className="font-bold text-gray-500 uppercase tracking-wider text-[10px]">Aquifer &amp; Borewell Reality:</span>
+                  <p className="font-bold text-gray-900 text-sm">{currentCityData.borewellDepth}</p>
+                  <p className="text-gray-600 mt-1">{currentCityData.crisisSummary}</p>
+                </div>
+
+                <div className="bg-white rounded-xl p-4 border border-emerald-200 space-y-1.5">
+                  <span className="font-bold text-gray-500 uppercase tracking-wider text-[10px]">Financial Impact &amp; JalLoop Solution:</span>
+                  <p className="font-bold text-emerald-800 text-sm">{currentCityData.tankerCost}</p>
+                  <p className="text-gray-600 mt-1">{currentCityData.solutionImpact}</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex justify-end pt-2">
+              <button
+                type="button"
+                onClick={() => scrollToSection("chapter-2")}
+                className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-700 text-white text-xs font-bold hover:bg-emerald-800 transition-colors cursor-pointer"
+              >
+                <span>Continue Down to Chapter 2: Rivers &amp; History ↓</span>
+                <ChevronRight size={14} />
+              </button>
+            </div>
+          </div>
+      </section>
+
+      {/* ─────────────────────────────────────────────────────────────
+          CHAPTER 2: INDIAN RIVERS, BASINS & ANCIENT WATER ARCHITECTURE
+          ───────────────────────────────────────────────────────────── */}
+      <section id="chapter-2" className="space-y-6 scroll-mt-24">
+          {/* River Basin Stress Overview */}
+          <div className="bg-white rounded-2xl border border-gray-200 p-6 sm:p-8 shadow-xs space-y-4">
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-cyan-50 text-cyan-800 text-xs font-bold">
+              <Layers size={13} />
+              <span>Hydrology of India — Rivers, Basins &amp; Ancient Engineering</span>
+            </div>
+            <h2 className="text-xl sm:text-3xl font-black text-gray-950">
+              India&rsquo;s Sacred Lifelines Under Stress &amp; Our Lost Water Wisdom
+            </h2>
+            <p className="text-xs sm:text-sm text-gray-600 leading-relaxed max-w-4xl">
+              India is crisscrossed by mighty river systems — the <strong>Ganga-Brahmaputra</strong>, <strong>Indus</strong>, <strong>Godavari</strong>, <strong>Krishna</strong>, <strong>Cauvery</strong>, <strong>Narmada</strong>, and <strong>Mahanadi</strong>. Yet due to climate shifts, massive agricultural diversion, and unchecked municipal discharge, even our perennial rivers face seasonal dry spells. Long before modern municipal grids, India survived for thousands of years through ingenious decentralized water harvesting.
+            </p>
+          </div>
+
+          {/* 3 Major River Systems Deep Dive */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+            <div className="bg-white rounded-2xl border border-blue-200 p-6 shadow-xs space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold text-blue-700 uppercase tracking-wider">Northern Basin</span>
+                <span className="text-[11px] font-mono px-2 py-0.5 rounded-full bg-blue-50 text-blue-800 font-bold">Yamuna &amp; Ganga</span>
+              </div>
+              <h3 className="text-base font-black text-gray-900">The Silt &amp; Ammonia Challenge</h3>
+              <p className="text-xs text-gray-600 leading-relaxed">
+                The Ganga basin accounts for <strong>28% of India&rsquo;s landmass</strong> and 43% of its population. In the Delhi-NCR stretch of the Yamuna, dissolved oxygen plummets to near zero while industrial ammonia levels frequently peak beyond 3.0 ppm, forcing municipal water treatment plants to shut down repeatedly.
+              </p>
+              <div className="p-3 bg-blue-50/60 rounded-xl border border-blue-100 text-[11px] text-blue-900 font-medium">
+                🌊 <strong>The JalLoop Impact:</strong> Reusing greywater at home reduces the fresh raw water extracted from these struggling riverbeds by up to 65%.
+              </div>
+            </div>
+
+            <div className="bg-white rounded-2xl border border-teal-200 p-6 shadow-xs space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold text-teal-700 uppercase tracking-wider">Southern Basin</span>
+                <span className="text-[11px] font-mono px-2 py-0.5 rounded-full bg-teal-50 text-teal-800 font-bold">Cauvery &amp; Krishna</span>
+              </div>
+              <h3 className="text-base font-black text-gray-900">Inter-State Riparian Water Conflicts</h3>
+              <p className="text-xs text-gray-600 leading-relaxed">
+                The Cauvery basin shared between Karnataka and Tamil Nadu experiences severe water allocation deficits during weak monsoon years. When reservoirs like KRS and Mettur drop below critical dead storage, urban drinking supply is locked in bitter legal disputes between states.
+              </p>
+              <div className="p-3 bg-teal-50/60 rounded-xl border border-teal-100 text-[11px] text-teal-900 font-medium">
+                🌊 <strong>The JalLoop Impact:</strong> Decentralized water circularity gives apartment complexes local autonomy, buffering them against inter-state allocation shocks.
+              </div>
+            </div>
+
+            <div className="bg-white rounded-2xl border border-amber-200 p-6 shadow-xs space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold text-amber-700 uppercase tracking-wider">Peninsular Basin</span>
+                <span className="text-[11px] font-mono px-2 py-0.5 rounded-full bg-amber-50 text-amber-800 font-bold">Godavari &amp; Narmada</span>
+              </div>
+              <h3 className="text-base font-black text-gray-900">Hard Rock Aquifers of the Deccan</h3>
+              <p className="text-xs text-gray-600 leading-relaxed">
+                The Deccan plateau is composed of impermeable basalt and granite rock. Unlike Gangetic alluvium, rainfall cannot easily seep deep underground. Borewells drilled into deep fissures take hundreds of years to naturally recharge once sucked dry.
+              </p>
+              <div className="p-3 bg-amber-50/60 rounded-xl border border-amber-100 text-[11px] text-amber-900 font-medium">
+                🌊 <strong>The JalLoop Impact:</strong> Every 1,000 liters recycled at home preserves fragile Deccan deep fissure water that cannot be replaced in our lifetime.
+              </div>
+            </div>
+          </div>
+
+          {/* Ancient Water Harvesting Systems of India */}
+          <div className="bg-gradient-to-br from-emerald-950 via-teal-950 to-slate-900 text-white rounded-2xl p-6 sm:p-8 shadow-md border border-emerald-800/40 space-y-6">
+            <div>
+              <span className="text-xs font-bold uppercase tracking-wider text-emerald-400">Centuries of Traditional Ingenuity</span>
+              <h3 className="text-xl font-bold mt-1">What Ancient Indian Civilizations Can Teach Modern Smart Homes</h3>
+              <p className="text-xs text-emerald-200/80 max-w-3xl">
+                India was historically the world&rsquo;s greatest rainwater harvesting civilization. Modern high-tech sensors and micro-filtration are simply the digital evolution of our ancestors&rsquo; brilliant water traditions:
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="bg-white/10 rounded-xl p-4 border border-white/15 space-y-2">
+                <div className="text-xs font-bold text-teal-300">1. Baolis &amp; Stepwells (बावड़ी)</div>
+                <div className="text-[10px] text-gray-300 font-mono">Rajasthan &amp; Gujarat</div>
+                <p className="text-xs text-emerald-100/90 leading-relaxed">
+                  Multi-story subterranean architectural wonders like Rani ki Vav and Chand Baori that captured every drop of seasonal rain and naturally cooled subterranean water for centuries.
+                </p>
+              </div>
+
+              <div className="bg-white/10 rounded-xl p-4 border border-white/15 space-y-2">
+                <div className="text-xs font-bold text-teal-300">2. Johads &amp; Kunds (जोहड़)</div>
+                <div className="text-[10px] text-gray-300 font-mono">Thar Desert &amp; Haryana</div>
+                <p className="text-xs text-emerald-100/90 leading-relaxed">
+                  Earthen check-dams that captured surface runoff during flash monsoon showers to slowly percolate water back into underground sand layers, keeping wells wet year-round.
+                </p>
+              </div>
+
+              <div className="bg-white/10 rounded-xl p-4 border border-white/15 space-y-2">
+                <div className="text-xs font-bold text-teal-300">3. Ahar Pynes (आहर-पाइन)</div>
+                <div className="text-[10px] text-gray-300 font-mono">Ancient Magadh (Bihar)</div>
+                <p className="text-xs text-emerald-100/90 leading-relaxed">
+                  Traditional floodwater harvesting channels linked to retention reservoirs that prevented soil erosion during floods while irrigating paddy crops throughout dry winter months.
+                </p>
+              </div>
+
+              <div className="bg-white/10 rounded-xl p-4 border border-white/15 space-y-2">
+                <div className="text-xs font-bold text-teal-300">4. Zing &amp; Kulh Channels (कुल)</div>
+                <div className="text-[10px] text-gray-300 font-mono">Ladakh &amp; Himachal</div>
+                <p className="text-xs text-emerald-100/90 leading-relaxed">
+                  Ingenious glacial meltwater diversion canals that directed freezing water into collection tanks during daytime warmth for regulated distribution to mountain terrace crops.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex justify-between items-center pt-2">
+            <button
+              type="button"
+              onClick={() => setActiveTab("country")}
+              className="flex items-center gap-1.5 text-xs font-bold text-gray-600 hover:text-gray-900 transition-colors cursor-pointer"
+            >
+              <ArrowLeft size={14} />
+              <span>Back to India's Crisis &amp; Cities</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => scrollToSection("chapter-3")}
+              className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-700 text-white text-xs font-bold hover:bg-emerald-800 transition-colors cursor-pointer"
+            >
+              <span>Continue Down to Chapter 3: Household Wastage ↓</span>
+              <ChevronRight size={14} />
+            </button>
+          </div>
+      </section>
+
+      {/* ─────────────────────────────────────────────────────────────
+          CHAPTER 3: HOUSEHOLD WASTAGE & INTERACTIVE CALCULATOR
+          ───────────────────────────────────────────────────────────── */}
+      <section id="chapter-3" className="space-y-6 scroll-mt-24">
           {/* Deep Dive: How Indian Homes Waste Water Everyday */}
           <div className="bg-white rounded-2xl border border-gray-200 p-6 sm:p-8 shadow-xs space-y-6">
             <div className="border-b border-gray-100 pb-4">
@@ -293,51 +598,42 @@ export default function WaterCrisisPreview({ onLaunchSimulator, onGoToAuth, isIn
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-              {/* Point 1: RO Purifiers */}
               <div className="rounded-2xl border border-amber-200 bg-amber-50/40 p-5 space-y-3">
                 <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-lg bg-amber-500 text-white flex items-center justify-center font-black text-sm">
-                    1
-                  </div>
+                  <span className="w-7 h-7 rounded-lg bg-amber-500 text-white flex items-center justify-center font-bold text-xs">1</span>
                   <h3 className="font-bold text-gray-900 text-sm">RO Purifier Reject (The 3:1 Ratio)</h3>
                 </div>
                 <p className="text-xs text-gray-600 leading-relaxed">
                   To give you <strong>1 liter of clean drinking water</strong>, standard RO purifiers discard <strong>3 liters of brine</strong> directly into the kitchen drain. An average 4-person family wastes <strong>35 to 50 Liters every single day</strong>.
                 </p>
-                <div className="bg-white rounded-xl p-3 border border-amber-200/60 text-[11px] text-amber-900 font-medium">
-                  💡 <strong>Reality:</strong> This reject water has zero bacteria and is mineral-rich. It is perfect for flushing, mopping, and garden plants.
+                <div className="bg-white rounded-xl p-3 border border-amber-200 text-[11px] text-amber-900 font-medium">
+                  💡 <strong>Reality:</strong> Zero bacteria. Perfect for toilet flushing, floor mopping, and garden plants.
                 </div>
               </div>
 
-              {/* Point 2: Washing Machines */}
               <div className="rounded-2xl border border-cyan-200 bg-cyan-50/40 p-5 space-y-3">
                 <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-lg bg-cyan-600 text-white flex items-center justify-center font-black text-sm">
-                    2
-                  </div>
+                  <span className="w-7 h-7 rounded-lg bg-cyan-600 text-white flex items-center justify-center font-bold text-xs">2</span>
                   <h3 className="font-bold text-gray-900 text-sm">Washing Machine Rinses</h3>
                 </div>
                 <p className="text-xs text-gray-600 leading-relaxed">
                   A single full laundry cycle expels <strong>60 to 100 liters of water</strong>. The final 2 rinse cycles carry almost no dirt and negligible detergent, yet they are flushed straight into the municipal sewer.
                 </p>
-                <div className="bg-white rounded-xl p-3 border border-cyan-200/60 text-[11px] text-cyan-900 font-medium">
-                  💡 <strong>Reality:</strong> After basic sediment and carbon filtering, this greywater can fulfill 100% of toilet flushing requirements.
+                <div className="bg-white rounded-xl p-3 border border-cyan-200 text-[11px] text-cyan-900 font-medium">
+                  💡 <strong>Reality:</strong> Sediment and carbon filtering prepares this greywater for 100% of flushing needs.
                 </div>
               </div>
 
-              {/* Point 3: Rainwater Loss */}
               <div className="rounded-2xl border border-emerald-200 bg-emerald-50/40 p-5 space-y-3">
                 <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-lg bg-emerald-600 text-white flex items-center justify-center font-black text-sm">
-                    3
-                  </div>
+                  <span className="w-7 h-7 rounded-lg bg-emerald-600 text-white flex items-center justify-center font-bold text-xs">3</span>
                   <h3 className="font-bold text-gray-900 text-sm">Lost Terrace Rainwater</h3>
                 </div>
                 <p className="text-xs text-gray-600 leading-relaxed">
-                  A typical 1,000 sq.ft terrace in India receives over <strong>1,00,000 liters of rainwater</strong> during monsoon season. Over 85% runs off into storm drains and floods roads instead of recharging groundwater.
+                  A typical 1,000 sq.ft terrace receives over <strong>1,00,000 liters of rainwater</strong> during monsoon season. Over 85% runs off into storm drains and floods roads instead of recharging tanks.
                 </p>
-                <div className="bg-white rounded-xl p-3 border border-emerald-200/60 text-[11px] text-emerald-900 font-medium">
-                  💡 <strong>Reality:</strong> Capturing terrace runoff into a buffer tank provides free, ultra-pure water for 3 to 4 months of dry summer.
+                <div className="bg-white rounded-xl p-3 border border-emerald-200 text-[11px] text-emerald-900 font-medium">
+                  💡 <strong>Reality:</strong> Capturing terrace runoff provides free water for 3 to 4 months of dry summer.
                 </div>
               </div>
             </div>
@@ -348,7 +644,7 @@ export default function WaterCrisisPreview({ onLaunchSimulator, onGoToAuth, isIn
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
                 <span className="text-xs font-bold uppercase tracking-wider text-emerald-800">Interactive Estimator</span>
-                <h3 className="text-xl font-bold text-gray-900 mt-0.5">Calculate Your Home's Water Wastage</h3>
+                <h3 className="text-xl font-bold text-gray-900 mt-0.5">Calculate Your Home&rsquo;s Water Wastage</h3>
                 <p className="text-xs text-gray-600">See how much usable water your family can save each month with JalLoop.</p>
               </div>
               <div className="bg-emerald-700 text-white px-4 py-2 rounded-xl text-center self-start sm:self-auto shadow-xs">
@@ -358,8 +654,7 @@ export default function WaterCrisisPreview({ onLaunchSimulator, onGoToAuth, isIn
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-              {/* Slider 1: Family Size */}
-              <div className="bg-white rounded-xl p-4 border border-emerald-200/80 shadow-xs space-y-2">
+              <div className="bg-white rounded-xl p-4 border border-emerald-200 shadow-xs space-y-2">
                 <div className="flex justify-between items-center text-xs font-bold text-gray-700">
                   <span>Family Members</span>
                   <span className="text-emerald-700 font-black text-sm">{familyMembers} People</span>
@@ -375,8 +670,7 @@ export default function WaterCrisisPreview({ onLaunchSimulator, onGoToAuth, isIn
                 <span className="text-[10px] text-gray-400 block">Urban Indian household average: 4 members</span>
               </div>
 
-              {/* Slider 2: RO Drinking Water */}
-              <div className="bg-white rounded-xl p-4 border border-emerald-200/80 shadow-xs space-y-2">
+              <div className="bg-white rounded-xl p-4 border border-emerald-200 shadow-xs space-y-2">
                 <div className="flex justify-between items-center text-xs font-bold text-gray-700">
                   <span>RO Drinking Water Daily</span>
                   <span className="text-emerald-700 font-black text-sm">{roLitersDaily} L / day</span>
@@ -393,8 +687,7 @@ export default function WaterCrisisPreview({ onLaunchSimulator, onGoToAuth, isIn
                 <span className="text-[10px] text-gray-400 block">Wastes ~{roLitersDaily * 3}L reject water each day</span>
               </div>
 
-              {/* Slider 3: Laundry Loads */}
-              <div className="bg-white rounded-xl p-4 border border-emerald-200/80 shadow-xs space-y-2">
+              <div className="bg-white rounded-xl p-4 border border-emerald-200 shadow-xs space-y-2">
                 <div className="flex justify-between items-center text-xs font-bold text-gray-700">
                   <span>Washing Machine Loads</span>
                   <span className="text-emerald-700 font-black text-sm">{laundryLoadsWeekly} Loads / week</span>
@@ -411,49 +704,54 @@ export default function WaterCrisisPreview({ onLaunchSimulator, onGoToAuth, isIn
               </div>
             </div>
 
-            {/* Impact Highlights */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2">
-              <div className="bg-white/80 backdrop-blur-xs rounded-xl p-3 border border-emerald-200 text-center">
+              <div className="bg-white rounded-xl p-3 border border-emerald-200 text-center">
                 <span className="text-[10px] font-bold uppercase text-gray-500 block">Annual Waste</span>
                 <span className="text-base font-black text-rose-700">{annualWasteLiters.toLocaleString()} L</span>
               </div>
 
-              <div className="bg-white/80 backdrop-blur-xs rounded-xl p-3 border border-emerald-200 text-center">
+              <div className="bg-white rounded-xl p-3 border border-emerald-200 text-center">
                 <span className="text-[10px] font-bold uppercase text-gray-500 block">Water Tankers</span>
                 <span className="text-base font-black text-amber-700">{tankerDeliveriesWasted} Tankers</span>
               </div>
 
-              <div className="bg-white/80 backdrop-blur-xs rounded-xl p-3 border border-emerald-200 text-center">
+              <div className="bg-white rounded-xl p-3 border border-emerald-200 text-center">
                 <span className="text-[10px] font-bold uppercase text-gray-500 block">Flushes Powered</span>
                 <span className="text-base font-black text-emerald-700">{Math.round(totalMonthlyWaste / 6)} Flushes/mo</span>
               </div>
 
-              <div className="bg-white/80 backdrop-blur-xs rounded-xl p-3 border border-emerald-200 text-center">
+              <div className="bg-white rounded-xl p-3 border border-emerald-200 text-center">
                 <span className="text-[10px] font-bold uppercase text-gray-500 block">Water Bill Cut</span>
                 <span className="text-base font-black text-teal-700">~65% Monthly</span>
               </div>
             </div>
 
-            <div className="flex justify-end pt-2">
+            <div className="flex justify-between items-center pt-2">
               <button
                 type="button"
-                onClick={() => setActiveTab("recycling")}
+                onClick={() => setActiveTab("rivers")}
+                className="flex items-center gap-1.5 text-xs font-bold text-gray-600 hover:text-gray-900 transition-colors cursor-pointer"
+              >
+                <ArrowLeft size={14} />
+                <span>Back to Rivers &amp; Ancient Wisdom</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => scrollToSection("chapter-4")}
                 className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-700 text-white text-xs font-bold hover:bg-emerald-800 transition-colors cursor-pointer"
               >
-                <span>Step 2: Understand How We Recycle This Water</span>
+                <span>Continue Down to Chapter 4: How We Recycle ↓</span>
                 <ChevronRight size={14} />
               </button>
             </div>
           </div>
-        </div>
-      )}
+      </section>
 
       {/* ─────────────────────────────────────────────────────────────
-          PAGE 2: DETAILED RECYCLING PROCESS (KESE RECYCLE HOTA HAI)
+          CHAPTER 4: HOW WE RECYCLE (5-PHASE ENGINEERING & VISUAL PURIFIER)
           ───────────────────────────────────────────────────────────── */}
-      {activeTab === "recycling" && (
-        <div className="space-y-6 animate-fadeIn">
-          {/* Detailed Intro Header */}
+      <section id="chapter-4" className="space-y-6 scroll-mt-24">
           <div className="bg-white rounded-2xl border border-gray-200 p-6 sm:p-8 shadow-xs space-y-4">
             <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-cyan-50 text-cyan-800 text-xs font-bold">
               <Beaker size={13} />
@@ -467,12 +765,12 @@ export default function WaterCrisisPreview({ onLaunchSimulator, onGoToAuth, isIn
             </p>
           </div>
 
-          {/* Interactive Purification Stage Explorer */}
+          {/* Interactive Purifier Stage Explorer */}
           <div className="bg-gradient-to-br from-slate-900 via-teal-950 to-emerald-950 text-white rounded-2xl p-6 sm:p-8 shadow-md border border-teal-800/40 space-y-6">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
-                <span className="text-xs font-bold uppercase tracking-wider text-teal-400">Interactive Purifier Explorer</span>
-                <h3 className="text-lg sm:text-xl font-bold mt-0.5">Click Any Stage To See The Water Purify</h3>
+                <span className="text-xs font-bold uppercase tracking-wider text-teal-400">Interactive Visual Purifier</span>
+                <h3 className="text-lg sm:text-xl font-bold mt-0.5">Click Any Stage To Watch Water Clarify</h3>
               </div>
               <span className="text-xs font-mono px-3 py-1 bg-white/10 rounded-full border border-white/20 text-teal-200">
                 Stage {purificationStage + 1} of 5
@@ -514,7 +812,6 @@ export default function WaterCrisisPreview({ onLaunchSimulator, onGoToAuth, isIn
                       <h4 className="text-xl font-black text-white">{current.name}</h4>
                     </div>
 
-                    {/* Water Clarity Metric Pill */}
                     <div className="flex items-center gap-3 bg-black/30 px-4 py-2.5 rounded-xl border border-white/10 self-start md:self-auto">
                       <div>
                         <span className="text-[10px] uppercase font-bold text-gray-400 block">Turbidity Index</span>
@@ -536,7 +833,7 @@ export default function WaterCrisisPreview({ onLaunchSimulator, onGoToAuth, isIn
                       </div>
 
                       <div className="p-3.5 rounded-xl bg-white/5 border border-white/10 space-y-1">
-                        <span className="font-bold text-emerald-300 text-[11px] block">⚙️ Technical &amp; Hardware Details:</span>
+                        <span className="font-bold text-emerald-300 text-[11px] block">⚙️ Hardware &amp; Engineering Science:</span>
                         <p className="text-gray-300 leading-relaxed text-[11px]">{current.technicalDetails}</p>
                       </div>
                     </div>
@@ -564,84 +861,190 @@ export default function WaterCrisisPreview({ onLaunchSimulator, onGoToAuth, isIn
             })()}
           </div>
 
-          {/* End-to-End Diagram Grid */}
-          <div className="bg-white rounded-2xl border border-gray-200 p-6 sm:p-8 shadow-xs space-y-6">
-            <div className="border-b border-gray-100 pb-3">
-              <span className="text-xs font-bold uppercase tracking-wider text-emerald-700">The 4 Destination Networks</span>
-              <h3 className="text-xl font-bold text-gray-900 mt-0.5">Where Does Recycled Water Go in a House?</h3>
-              <p className="text-xs text-gray-500">Recycled water is pressurized into closed non-potable lines so clean municipal drinking water is never wasted on mundane tasks:</p>
+          <div className="flex justify-between items-center pt-2">
+            <button
+              type="button"
+              onClick={() => setActiveTab("crisis")}
+              className="flex items-center gap-1.5 text-xs font-bold text-gray-600 hover:text-gray-900 transition-colors cursor-pointer"
+            >
+              <ArrowLeft size={14} />
+              <span>Back to Household Wastage</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => scrollToSection("chapter-5")}
+              className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-700 text-white text-xs font-bold hover:bg-emerald-800 transition-colors cursor-pointer"
+            >
+              <span>Continue Down to Chapter 5: Platform Tour ↓</span>
+              <ChevronRight size={14} />
+            </button>
+          </div>
+      </section>
+
+      {/* ─────────────────────────────────────────────────────────────
+          CHAPTER 5: EXPLORE PLATFORM (HOW THE WEBSITE WORKS)
+          ───────────────────────────────────────────────────────────── */}
+      <section id="chapter-5" className="space-y-6 scroll-mt-24">
+          <div className="bg-white rounded-2xl border border-gray-200 p-6 sm:p-8 shadow-xs space-y-4">
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-indigo-50 text-indigo-800 text-xs font-bold">
+              <Compass size={13} />
+              <span>Interactive Platform Tour &amp; Architectural Guide</span>
             </div>
+            <h2 className="text-xl sm:text-2xl font-black text-gray-950">
+              How Does The JalLoop Platform Work? — Full Feature Explorer
+            </h2>
+            <p className="text-xs sm:text-sm text-gray-600 leading-relaxed max-w-3xl">
+              JalLoop combines real physical IoT hardware (ESP32) with a browser digital twin and AI safety engine. You can explore every single page and component right in your browser without logging in:
+            </p>
+          </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              <div className="p-4 rounded-xl border border-blue-200 bg-blue-50/50 space-y-2">
-                <div className="flex items-center gap-2">
-                  <div className="w-7 h-7 rounded-lg bg-blue-600 text-white flex items-center justify-center font-bold text-xs">40%</div>
-                  <h4 className="font-bold text-gray-900 text-xs">Toilet Flushing Cisterns</h4>
+          {/* 4 Core Features Walkthrough Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            {/* Feature 1: Water Flow Simulator */}
+            <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-xs space-y-4 flex flex-col justify-between hover:border-emerald-500 transition-colors">
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-700 flex items-center justify-center font-bold">
+                    <Droplets size={20} />
+                  </div>
+                  <span className="text-[11px] font-mono font-bold bg-blue-50 text-blue-700 px-2.5 py-1 rounded-full border border-blue-200">
+                    Tab: Water Flow
+                  </span>
                 </div>
+                <h3 className="text-base font-black text-gray-950">1. Animated Glass Pipe Simulator</h3>
                 <p className="text-xs text-gray-600 leading-relaxed">
-                  The single biggest water drain in any home. Dual-flush tanks need only clear, pathogen-free water — saving up to 40,000L of fresh tap water yearly.
+                  Interactive SVG schematic showing realistic water flow animation. Toggle the <strong>RO Purifier</strong>, <strong>Washing Machine</strong>, and <strong>Rainwater</strong> valves to collect greywater, watch the collection buffer fill, and start the booster pump to run 3-stage filtration in real time.
                 </p>
-              </div>
-
-              <div className="p-4 rounded-xl border border-emerald-200 bg-emerald-50/50 space-y-2">
-                <div className="flex items-center gap-2">
-                  <div className="w-7 h-7 rounded-lg bg-emerald-600 text-white flex items-center justify-center font-bold text-xs">30%</div>
-                  <h4 className="font-bold text-gray-900 text-xs">Balcony &amp; Terrace Plants</h4>
+                <div className="text-[11px] text-gray-500 bg-gray-50 rounded-xl p-3 border border-gray-100">
+                  ⚡ <strong>Try it:</strong> Click "Go to Water Flow" below to test the animated pumps and pipes!
                 </div>
-                <p className="text-xs text-gray-600 leading-relaxed">
-                  RO reject water contains natural dissolved calcium and magnesium ions that plants love. Drip irrigation keeps gardens green without guilt.
-                </p>
               </div>
-
-              <div className="p-4 rounded-xl border border-teal-200 bg-teal-50/50 space-y-2">
-                <div className="flex items-center gap-2">
-                  <div className="w-7 h-7 rounded-lg bg-teal-600 text-white flex items-center justify-center font-bold text-xs">20%</div>
-                  <h4 className="font-bold text-gray-900 text-xs">Daily Floor Mopping</h4>
-                </div>
-                <p className="text-xs text-gray-600 leading-relaxed">
-                  Carbon-filtered and UV-treated water leaves zero soap film or residue on marble or vitrified tiles, eliminating fresh bucket waste.
-                </p>
-              </div>
-
-              <div className="p-4 rounded-xl border border-cyan-200 bg-cyan-50/50 space-y-2">
-                <div className="flex items-center gap-2">
-                  <div className="w-7 h-7 rounded-lg bg-cyan-600 text-white flex items-center justify-center font-bold text-xs">10%</div>
-                  <h4 className="font-bold text-gray-900 text-xs">Vehicle &amp; Exterior Wash</h4>
-                </div>
-                <p className="text-xs text-gray-600 leading-relaxed">
-                  Supplies outdoor garden hose taps for washing cars and balconies. Zero waste of precious municipal potable water.
-                </p>
-              </div>
-            </div>
-
-            <div className="flex justify-between items-center pt-2">
               <button
                 type="button"
-                onClick={() => setActiveTab("crisis")}
-                className="flex items-center gap-1.5 text-xs font-bold text-gray-600 hover:text-gray-900 transition-colors cursor-pointer"
+                onClick={onLaunchSimulator}
+                className="w-full flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs transition-colors cursor-pointer"
               >
-                <ArrowLeft size={14} />
-                <span>Back to Crisis Facts</span>
+                <Play size={14} fill="currentColor" />
+                <span>Open Water Flow Simulator</span>
               </button>
+            </div>
 
+            {/* Feature 2: Virtual Hardware Workbench */}
+            <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-xs space-y-4 flex flex-col justify-between hover:border-emerald-500 transition-colors">
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center font-bold">
+                    <Cpu size={20} />
+                  </div>
+                  <span className="text-[11px] font-mono font-bold bg-emerald-50 text-emerald-700 px-2.5 py-1 rounded-full border border-emerald-200">
+                    Tab: Virtual Hardware
+                  </span>
+                </div>
+                <h3 className="text-base font-black text-gray-950">2. ESP32 Digital Twin &amp; Circuit</h3>
+                <p className="text-xs text-gray-600 leading-relaxed">
+                  A complete digital twin of the physical microcontroller. Drag sliders for ultrasonic distance sensors and analog turbidity potentiometers to simulate murky water or full tanks. Includes a clean Wokwi circuit simulation diagram with minimal orthogonal wiring!
+                </p>
+                <div className="text-[11px] text-gray-500 bg-gray-50 rounded-xl p-3 border border-gray-100">
+                  ⚡ <strong>Try it:</strong> View pin-by-pin mapping (GPIO 34, 18, 19, 23) and copy the Wokwi diagram.json with 1 click.
+                </div>
+              </div>
               <button
                 type="button"
-                onClick={() => setActiveTab("solution")}
-                className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-700 text-white text-xs font-bold hover:bg-emerald-800 transition-colors cursor-pointer"
+                onClick={() => {
+                  if (onLaunchSimulator) onLaunchSimulator();
+                }}
+                className="w-full flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs transition-colors cursor-pointer"
               >
-                <span>Step 3: See Home Blueprint &amp; Savings</span>
-                <ChevronRight size={14} />
+                <Cpu size={14} />
+                <span>Explore ESP32 Twin</span>
+              </button>
+            </div>
+
+            {/* Feature 3: Safety Policies & Cedar Engine */}
+            <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-xs space-y-4 flex flex-col justify-between hover:border-emerald-500 transition-colors">
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-700 flex items-center justify-center font-bold">
+                    <ShieldCheck size={20} />
+                  </div>
+                  <span className="text-[11px] font-mono font-bold bg-amber-50 text-amber-700 px-2.5 py-1 rounded-full border border-amber-200">
+                    Tab: System Status
+                  </span>
+                </div>
+                <h3 className="text-base font-black text-gray-950">3. Cedar Policy Safety Engine</h3>
+                <p className="text-xs text-gray-600 leading-relaxed">
+                  Enforces automated safety invariants as code. If water turbidity exceeds 85 NTU, the Cedar policy locks the pump with a safety denial. If water drops below 5L, cavitation lockout prevents pump burnout.
+                </p>
+                <div className="text-[11px] text-gray-500 bg-gray-50 rounded-xl p-3 border border-gray-100">
+                  ⚡ <strong>Try it:</strong> Inspect live policy evaluations and operational audit logs.
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={onLaunchSimulator}
+                className="w-full flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-amber-700 hover:bg-amber-800 text-white font-bold text-xs transition-colors cursor-pointer"
+              >
+                <Activity size={14} />
+                <span>View System Status &amp; Logs</span>
+              </button>
+            </div>
+
+            {/* Feature 4: Telemetry Analytics & OpenSearch DSL */}
+            <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-xs space-y-4 flex flex-col justify-between hover:border-emerald-500 transition-colors">
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-700 flex items-center justify-center font-bold">
+                    <BarChart3 size={20} />
+                  </div>
+                  <span className="text-[11px] font-mono font-bold bg-indigo-50 text-indigo-700 px-2.5 py-1 rounded-full border border-indigo-200">
+                    Tab: Analytics
+                  </span>
+                </div>
+                <h3 className="text-base font-black text-gray-950">4. OpenSearch Query DSL &amp; Charts</h3>
+                <p className="text-xs text-gray-600 leading-relaxed">
+                  Historical telemetry visualization showing 7-day recycling trends, fresh water savings ratio, and groundwater preserved. Includes an interactive OpenSearch Query DSL explorer to query telemetry events in real time.
+                </p>
+                <div className="text-[11px] text-gray-500 bg-gray-50 rounded-xl p-3 border border-gray-100">
+                  ⚡ <strong>Try it:</strong> Run sample OpenSearch queries and export raw telemetry to CSV.
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={onLaunchSimulator}
+                className="w-full flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-indigo-700 hover:bg-indigo-800 text-white font-bold text-xs transition-colors cursor-pointer"
+              >
+                <BarChart3 size={14} />
+                <span>Open Analytics &amp; Reports</span>
               </button>
             </div>
           </div>
-        </div>
-      )}
+
+          <div className="flex justify-between items-center pt-2">
+            <button
+              type="button"
+              onClick={() => setActiveTab("recycling")}
+              className="flex items-center gap-1.5 text-xs font-bold text-gray-600 hover:text-gray-900 transition-colors cursor-pointer"
+            >
+              <ArrowLeft size={14} />
+              <span>Back to Recycling Stages</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => scrollToSection("chapter-6")}
+              className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-700 text-white text-xs font-bold hover:bg-emerald-800 transition-colors cursor-pointer"
+            >
+              <span>Continue Down to Chapter 6: Home Blueprint ↓</span>
+              <ChevronRight size={14} />
+            </button>
+          </div>
+      </section>
 
       {/* ─────────────────────────────────────────────────────────────
-          PAGE 3: BLUEPRINT & HOUSEHOLD WATER SAVINGS
+          CHAPTER 6: NATIONAL BLUEPRINT & EVERYDAY HABITS
           ───────────────────────────────────────────────────────────── */}
-      {activeTab === "solution" && (
-        <div className="space-y-6 animate-fadeIn">
+      <section id="chapter-6" className="space-y-6 scroll-mt-24">
           {/* Architecture Overview */}
           <div className="bg-white rounded-2xl border border-gray-200 p-6 sm:p-8 shadow-xs space-y-6">
             <div className="border-b border-gray-100 pb-4">
@@ -742,97 +1145,101 @@ export default function WaterCrisisPreview({ onLaunchSimulator, onGoToAuth, isIn
             <div className="flex justify-between items-center pt-2">
               <button
                 type="button"
-                onClick={() => setActiveTab("recycling")}
+                onClick={() => setActiveTab("explore-app")}
                 className="flex items-center gap-1.5 text-xs font-bold text-emerald-300 hover:text-white transition-colors cursor-pointer"
               >
                 <ArrowLeft size={14} />
-                <span>Back to Recycling Stages</span>
+                <span>Back to Platform Tour</span>
               </button>
 
               <button
                 type="button"
-                onClick={() => setActiveTab("quotes")}
+                onClick={() => scrollToSection("chapter-7")}
                 className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-gray-950 text-xs font-bold transition-colors cursor-pointer"
               >
-                <span>Step 4: Inspiring Quotes &amp; Water Pledge</span>
+                <span>Continue Down to Chapter 7: Quotes &amp; Pledge ↓</span>
                 <ArrowRight size={14} />
               </button>
             </div>
           </div>
-        </div>
-      )}
+      </section>
 
       {/* ─────────────────────────────────────────────────────────────
-          PAGE 4: INSPIRING QUOTES, PLEDGE & DEMO LAUNCH
+          CHAPTER 7: CULTURAL HERITAGE, QUOTES & PLEDGE
           ───────────────────────────────────────────────────────────── */}
-      {activeTab === "quotes" && (
-        <div className="space-y-6 animate-fadeIn">
+      <section id="chapter-7" className="space-y-6 scroll-mt-24">
           {/* Quotes Section */}
           <div className="space-y-4">
             <div className="text-center max-w-xl mx-auto space-y-1">
-              <span className="text-xs font-bold uppercase tracking-wider text-emerald-700">Words of Wisdom</span>
+              <span className="text-xs font-bold uppercase tracking-wider text-emerald-700">Words of Wisdom &amp; Cultural Heritage</span>
               <h2 className="text-2xl font-bold text-gray-900">Quotes That Touch The Conscience</h2>
-              <p className="text-xs text-gray-500">Every drop of water is a gift from nature. Let these thoughts guide our actions.</p>
+              <p className="text-xs text-gray-500">Every drop of water is a sacred trust. Let these thoughts guide our actions.</p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {/* Quote 1 */}
+              {/* Quote 1: Rigveda */}
               <div className="bg-white rounded-2xl border border-emerald-200 p-6 shadow-xs flex flex-col justify-between relative overflow-hidden group hover:border-emerald-400 transition-all">
                 <div className="space-y-3">
                   <Quote size={28} className="text-emerald-500/40" />
                   <p className="text-sm font-semibold text-gray-800 leading-relaxed italic">
-                    &ldquo;जल ही जीवन है, और जल का संरक्षण ही हमारा कल है।&rdquo;
+                    &ldquo;आपो हि ष्ठा मयोभुवस्ता न ऊर्जे दधातन। महे रणाय चक्षसे।&rdquo;
+                  </p>
+                  <p className="text-[11px] text-gray-500">
+                    (Waters are verily the bringers of life and strength, grant us nourishment so that we behold greatness.)
                   </p>
                 </div>
                 <div className="pt-4 border-t border-gray-100 mt-4 flex items-center justify-between text-xs text-emerald-700 font-bold">
-                  <span>भारतीय लोकोक्ति</span>
-                  <span className="text-[10px] text-gray-400 font-normal">Ancient Wisdom</span>
+                  <span>ऋग्वेद (Rigveda 10.9.1)</span>
+                  <span className="text-[10px] text-gray-400 font-normal">Ancient Heritage</span>
                 </div>
               </div>
 
-              {/* Quote 2 */}
+              {/* Quote 2: Indian Wisdom */}
               <div className="bg-white rounded-2xl border border-teal-200 p-6 shadow-xs flex flex-col justify-between relative overflow-hidden group hover:border-teal-400 transition-all">
                 <div className="space-y-3">
                   <Quote size={28} className="text-teal-500/40" />
                   <p className="text-sm font-semibold text-gray-800 leading-relaxed italic">
-                    &ldquo;Thousands have lived without love, not one without water.&rdquo;
+                    &ldquo;जल ही जीवन है, और जल का संरक्षण ही हमारा कल है।&rdquo;
+                  </p>
+                  <p className="text-[11px] text-gray-500">
+                    (Water is life itself, and its conservation is our only tomorrow.)
                   </p>
                 </div>
                 <div className="pt-4 border-t border-gray-100 mt-4 flex items-center justify-between text-xs text-teal-700 font-bold">
+                  <span>भारतीय लोकोक्ति</span>
+                  <span className="text-[10px] text-gray-400 font-normal">National Conscience</span>
+                </div>
+              </div>
+
+              {/* Quote 3: Auden */}
+              <div className="bg-white rounded-2xl border border-blue-200 p-6 shadow-xs flex flex-col justify-between relative overflow-hidden group hover:border-blue-400 transition-all">
+                <div className="space-y-3">
+                  <Quote size={28} className="text-blue-500/40" />
+                  <p className="text-sm font-semibold text-gray-800 leading-relaxed italic">
+                    &ldquo;Thousands have lived without love, not one without water.&rdquo;
+                  </p>
+                </div>
+                <div className="pt-4 border-t border-gray-100 mt-4 flex items-center justify-between text-xs text-blue-700 font-bold">
                   <span>W. H. Auden</span>
                   <span className="text-[10px] text-gray-400 font-normal">Poet &amp; Thinker</span>
                 </div>
               </div>
 
-              {/* Quote 3 */}
-              <div className="bg-white rounded-2xl border border-blue-200 p-6 shadow-xs flex flex-col justify-between relative overflow-hidden group hover:border-blue-400 transition-all">
+              {/* Quote 4: Franklin */}
+              <div className="bg-white rounded-2xl border border-cyan-200 p-6 shadow-xs flex flex-col justify-between relative overflow-hidden group hover:border-cyan-400 transition-all">
                 <div className="space-y-3">
-                  <Quote size={28} className="text-blue-500/40" />
+                  <Quote size={28} className="text-cyan-500/40" />
                   <p className="text-sm font-semibold text-gray-800 leading-relaxed italic">
                     &ldquo;When the well&rsquo;s dry, we know the worth of water.&rdquo;
                   </p>
                 </div>
-                <div className="pt-4 border-t border-gray-100 mt-4 flex items-center justify-between text-xs text-blue-700 font-bold">
+                <div className="pt-4 border-t border-gray-100 mt-4 flex items-center justify-between text-xs text-cyan-700 font-bold">
                   <span>Benjamin Franklin</span>
                   <span className="text-[10px] text-gray-400 font-normal">Statesman &amp; Scientist</span>
                 </div>
               </div>
 
-              {/* Quote 4 */}
-              <div className="bg-white rounded-2xl border border-cyan-200 p-6 shadow-xs flex flex-col justify-between relative overflow-hidden group hover:border-cyan-400 transition-all">
-                <div className="space-y-3">
-                  <Quote size={28} className="text-cyan-500/40" />
-                  <p className="text-sm font-semibold text-gray-800 leading-relaxed italic">
-                    &ldquo;पानी की एक-एक बूँद बचाएं, आने वाली पीढ़ी को प्यास से बचाएं।&rdquo;
-                  </p>
-                </div>
-                <div className="pt-4 border-t border-gray-100 mt-4 flex items-center justify-between text-xs text-cyan-700 font-bold">
-                  <span>राष्ट्र संदेश</span>
-                  <span className="text-[10px] text-gray-400 font-normal">Conservation Movement</span>
-                </div>
-              </div>
-
-              {/* Quote 5 */}
+              {/* Quote 5: Global Conscience */}
               <div className="bg-white rounded-2xl border border-amber-200 p-6 shadow-xs flex flex-col justify-between relative overflow-hidden group hover:border-amber-400 transition-all">
                 <div className="space-y-3">
                   <Quote size={28} className="text-amber-500/40" />
@@ -846,7 +1253,7 @@ export default function WaterCrisisPreview({ onLaunchSimulator, onGoToAuth, isIn
                 </div>
               </div>
 
-              {/* Quote 6 */}
+              {/* Quote 6: Gandhi */}
               <div className="bg-white rounded-2xl border border-emerald-200 p-6 shadow-xs flex flex-col justify-between relative overflow-hidden group hover:border-emerald-400 transition-all">
                 <div className="space-y-3">
                   <Quote size={28} className="text-emerald-500/40" />
@@ -930,8 +1337,7 @@ export default function WaterCrisisPreview({ onLaunchSimulator, onGoToAuth, isIn
               )}
             </div>
           </div>
-        </div>
-      )}
+      </section>
     </div>
   );
 }
