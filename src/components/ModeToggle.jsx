@@ -16,7 +16,7 @@ export default function ModeToggle({ liveMode, connected, error, onToggle }) {
   return (
     <button
       onClick={onToggle}
-      title={liveMode ? "Switch to Demo Mode" : "Switch to Live Hardware Mode"}
+      title={liveMode ? "Disconnect hardware" : "Connect hardware"}
       className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs font-semibold border transition-all ${
         liveMode
           ? connected

@@ -40,19 +40,19 @@ import {
 } from "./config/appConfig";
 
 const INITIAL = {
-  roLiters:           15,
-  washingLiters:      40,
-  collectionLiters:   55,
+  roLiters:           0,
+  washingLiters:      0,
+  collectionLiters:   0,
   collectionCapacity: 100,
   filtrationStage:    0,
   pumpRunning:        false,
-  recycledPct:        72,
-  recycledLiters:     72,
+  recycledPct:        0,
+  recycledLiters:     0,
   recycledCapacity:   200,
-  waterCollected:     95,
-  waterRecycled:      72,
-  waterReused:        30,
-  freshWaterSaved:    72,
+  waterCollected:     0,
+  waterRecycled:      0,
+  waterReused:        0,
+  freshWaterSaved:    0,
   reuseActive:        false,
   roActive:           false,
   washingActive:      false,
@@ -73,6 +73,10 @@ export default function App() {
   const [showAwsModal, setShowAwsModal] = useState(false);
   const [showStorageModal, setShowStorageModal] = useState(false);
   const [storageModalTank, setStorageModalTank] = useState("collection");
+
+  useEffect(() => {
+    if (user?.id) setState(INITIAL);
+  }, [user?.id]);
 
   const handleInspectStorageTank = useCallback((tankId) => {
     setStorageModalTank(tankId || "collection");

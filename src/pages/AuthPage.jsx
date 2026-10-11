@@ -19,7 +19,7 @@ function mapAuthError(err) {
 }
 
 export default function AuthPage() {
-  const { login, signup, resendVerificationEmail } = useAuth();
+  const { login, signup, resendVerificationEmail, verificationNotice } = useAuth();
   const [mode, setMode] = useState("login"); // "login" | "signup"
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -127,6 +127,16 @@ export default function AuthPage() {
                 Success
               </p>
               <p>{successMsg}</p>
+            </div>
+          )}
+
+          {verificationNotice && (
+            <div className="mb-4 bg-emerald-50 border border-emerald-200 rounded-xl p-3 text-xs text-emerald-900 space-y-1">
+              <p className="font-bold flex items-center gap-1.5 text-emerald-800">
+                <Check size={14} className="text-emerald-600" />
+                Email verified
+              </p>
+              <p>{verificationNotice}</p>
             </div>
           )}
 

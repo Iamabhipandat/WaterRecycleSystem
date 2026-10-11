@@ -54,15 +54,20 @@ export function AuthProvider({ children }) {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((event, s) => {
-      setSession(s);
-      setUser(s?.user ?? null);
       const pendingEmail = window.localStorage.getItem("jalloop.pendingVerificationEmail");
-      if (event === "SIGNED_IN" && pendingEmail && s?.user?.email_confirmed_at) {
+      const isSignupCallback = window.location.hash.includes("type=signup");
+      if (event === "SIGNED_IN" && isSignupCallback && pendingEmail && s?.user?.email_confirmed_at) {
         if (pendingEmail === String(s.user.email || "").toLowerCase()) {
-          setVerificationNotice("Your email is verified. Registration complete.");
+          setVerificationNotice("Your email is verified. Please log in to continue.");
           window.localStorage.removeItem("jalloop.pendingVerificationEmail");
+          window.history.replaceState({}, document.title, window.location.pathname + window.location.search);
+          void supabase.auth.signOut();
+          setLoading(false);
+          return;
         }
       }
+      setSession(s);
+      setUser(s?.user ?? null);
       setLoading(false);
     });
 
