@@ -184,39 +184,39 @@ export default function WaterCrisisPreview({ onLaunchSimulator, onGoToAuth, isIn
   return (
     <div className="w-full space-y-6">
       {/* Hero Environmental Banner */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-emerald-950 via-teal-900 to-slate-900 text-white p-6 sm:p-10 shadow-xl border border-emerald-800/40">
+      <div className="relative overflow-hidden rounded-2xl sm:rounded-3xl bg-gradient-to-br from-emerald-950 via-teal-900 to-slate-900 text-white p-5 sm:p-10 shadow-lg border border-emerald-800/40">
         <div className="absolute -right-20 -bottom-20 w-80 h-80 rounded-full bg-emerald-500/10 blur-3xl pointer-events-none" />
         <div className="absolute -left-20 -top-20 w-80 h-80 rounded-full bg-teal-400/10 blur-3xl pointer-events-none" />
 
-        <div className="relative z-10 max-w-3xl space-y-4">
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/20 border border-emerald-400/30 text-emerald-300 text-xs font-semibold backdrop-blur-md">
-            <Sparkles size={14} className="text-emerald-400" />
-            <span>National Water Conservation Mission &amp; Smart Architecture</span>
+        <div className="relative z-10 max-w-3xl space-y-3 sm:space-y-4">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/20 border border-emerald-400/30 text-emerald-300 text-[11px] sm:text-xs font-semibold backdrop-blur-md">
+            <Sparkles size={13} className="text-emerald-400 shrink-0" />
+            <span>National Water Conservation Mission</span>
           </div>
 
-          <h1 className="text-2xl sm:text-4xl font-extrabold tracking-tight leading-tight text-white">
+          <h1 className="text-xl sm:text-4xl font-extrabold tracking-tight leading-tight text-white">
             जल ही जीवन है — <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-teal-300 to-cyan-300">Why India Needs JalLoop</span>
           </h1>
 
-          <p className="text-sm sm:text-base text-emerald-100/90 leading-relaxed max-w-2xl">
-            Over <strong>600 million Indians</strong> face severe water stress, while urban households unwittingly flush thousands of liters of usable water down the drain every week. Discover the crisis across our country, explore how our technology recycles it, and test every feature of our live system.
+          <p className="text-xs sm:text-base text-emerald-100/90 leading-relaxed max-w-2xl">
+            Over <strong>600 million Indians</strong> face severe water stress. Urban households flush thousands of liters of usable water down the drain every week. Discover our country's water crisis, learn how closed-loop recycling solves it, and explore our platform.
           </p>
 
-          <div className="flex flex-wrap items-center gap-3 pt-2">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 pt-1">
             <button
               type="button"
               onClick={onLaunchSimulator}
-              className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-bold text-xs sm:text-sm hover:from-emerald-600 hover:to-teal-600 shadow-lg shadow-emerald-950/40 transition-all cursor-pointer"
+              className="flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-bold text-xs sm:text-sm hover:from-emerald-600 hover:to-teal-600 shadow-md shadow-emerald-950/40 transition-all cursor-pointer"
             >
               <Play size={15} fill="currentColor" />
-              <span>Launch Live Interactive Simulator</span>
+              <span>Launch Live Simulator</span>
             </button>
 
             {onGoToAuth && !isInsideApp && (
               <button
                 type="button"
                 onClick={onGoToAuth}
-                className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 text-white font-semibold text-xs sm:text-sm backdrop-blur-md transition-all cursor-pointer"
+                className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 text-white font-semibold text-xs sm:text-sm backdrop-blur-md transition-all cursor-pointer"
               >
                 <span>Sign In / Create Account</span>
                 <ArrowRight size={14} />
@@ -227,81 +227,54 @@ export default function WaterCrisisPreview({ onLaunchSimulator, onGoToAuth, isIn
       </div>
 
       {/* Sticky / Floating Chapter Quick-Jump Anchor Bar */}
-      <div className="bg-white/95 backdrop-blur-md rounded-2xl border border-gray-200 p-2.5 shadow-sm sticky top-3 z-30 space-y-2">
-        <div className="flex items-center justify-between px-2">
+      <div className="bg-white/95 backdrop-blur-md rounded-2xl border border-gray-200 p-2 sm:p-2.5 shadow-xs sticky top-2 sm:top-3 z-30 space-y-1.5 sm:space-y-2">
+        <div className="flex items-center justify-between px-1 sm:px-2">
           <div className="flex items-center gap-2">
             <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
-            <span className="text-xs font-black uppercase tracking-wider text-gray-800">
-              Complete Water Guide &amp; Architecture (All 7 Chapters In One Flow)
+            <span className="text-[11px] sm:text-xs font-black uppercase tracking-wider text-gray-800">
+              Explore &amp; Mission Guidebook (4 Focused Chapters)
             </span>
           </div>
-          <span className="text-[11px] font-semibold text-gray-500 hidden sm:inline">
-            Scroll down or click any chapter to jump directly ↓
+          <span className="text-[10px] sm:text-[11px] font-semibold text-gray-400 hidden sm:inline">
+            Scroll down or tap to jump directly ↓
           </span>
         </div>
 
-        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-thin">
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
           <button
             type="button"
             onClick={() => scrollToSection("chapter-1")}
-            className="shrink-0 flex items-center gap-1.5 py-2 px-3 rounded-xl text-xs font-bold bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 transition-colors cursor-pointer"
+            className="shrink-0 flex items-center gap-1.5 py-1.5 sm:py-2 px-2.5 sm:px-3 rounded-xl text-[11px] sm:text-xs font-bold bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 transition-colors cursor-pointer"
           >
             <Globe size={13} className="text-emerald-700" />
-            <span>1. India's Crisis</span>
+            <span>1. India's Water Crisis</span>
           </button>
 
           <button
             type="button"
             onClick={() => scrollToSection("chapter-2")}
-            className="shrink-0 flex items-center gap-1.5 py-2 px-3 rounded-xl text-xs font-bold bg-cyan-50 hover:bg-cyan-100 text-cyan-800 border border-cyan-200 transition-colors cursor-pointer"
+            className="shrink-0 flex items-center gap-1.5 py-1.5 sm:py-2 px-2.5 sm:px-3 rounded-xl text-[11px] sm:text-xs font-bold bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 transition-colors cursor-pointer"
           >
-            <Layers size={13} className="text-cyan-700" />
-            <span>2. Rivers &amp; History</span>
+            <AlertTriangle size={13} className="text-amber-700" />
+            <span>2. Home Wastage &amp; Calculator</span>
           </button>
 
           <button
             type="button"
             onClick={() => scrollToSection("chapter-3")}
-            className="shrink-0 flex items-center gap-1.5 py-2 px-3 rounded-xl text-xs font-bold bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 transition-colors cursor-pointer"
+            className="shrink-0 flex items-center gap-1.5 py-1.5 sm:py-2 px-2.5 sm:px-3 rounded-xl text-[11px] sm:text-xs font-bold bg-teal-50 hover:bg-teal-100 text-teal-800 border border-teal-200 transition-colors cursor-pointer"
           >
-            <AlertTriangle size={13} className="text-amber-700" />
-            <span>3. Household Loss</span>
+            <Beaker size={13} className="text-teal-700" />
+            <span>3. How We Recycle</span>
           </button>
 
           <button
             type="button"
             onClick={() => scrollToSection("chapter-4")}
-            className="shrink-0 flex items-center gap-1.5 py-2 px-3 rounded-xl text-xs font-bold bg-teal-50 hover:bg-teal-100 text-teal-800 border border-teal-200 transition-colors cursor-pointer"
-          >
-            <Beaker size={13} className="text-teal-700" />
-            <span>4. How We Recycle</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => scrollToSection("chapter-5")}
-            className="shrink-0 flex items-center gap-1.5 py-2 px-3 rounded-xl text-xs font-bold bg-indigo-50 hover:bg-indigo-100 text-indigo-800 border border-indigo-200 transition-colors cursor-pointer"
+            className="shrink-0 flex items-center gap-1.5 py-1.5 sm:py-2 px-2.5 sm:px-3 rounded-xl text-[11px] sm:text-xs font-bold bg-indigo-50 hover:bg-indigo-100 text-indigo-800 border border-indigo-200 transition-colors cursor-pointer"
           >
             <Compass size={13} className="text-indigo-700" />
-            <span>5. Platform Tour</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => scrollToSection("chapter-6")}
-            className="shrink-0 flex items-center gap-1.5 py-2 px-3 rounded-xl text-xs font-bold bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 transition-colors cursor-pointer"
-          >
-            <RefreshCw size={13} className="text-emerald-700" />
-            <span>6. Home Blueprint</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => scrollToSection("chapter-7")}
-            className="shrink-0 flex items-center gap-1.5 py-2 px-3 rounded-xl text-xs font-bold bg-rose-50 hover:bg-rose-100 text-rose-800 border border-rose-200 transition-colors cursor-pointer"
-          >
-            <Heart size={13} className="text-rose-700" />
-            <span>7. Quotes &amp; Pledge</span>
+            <span>4. Platform Tour &amp; Pledge</span>
           </button>
         </div>
       </div>
@@ -309,7 +282,7 @@ export default function WaterCrisisPreview({ onLaunchSimulator, onGoToAuth, isIn
       {/* ─────────────────────────────────────────────────────────────
           CHAPTER 1: INDIA'S WATER REALITY & CITY CASE STUDIES
           ───────────────────────────────────────────────────────────── */}
-      <section id="chapter-1" className="space-y-6 scroll-mt-24">
+      <section id="chapter-1" className="space-y-4 sm:space-y-6 scroll-mt-24">
           {/* National Overview Headline */}
           <div className="bg-white rounded-2xl border border-gray-200 p-6 sm:p-8 shadow-xs space-y-4">
             <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-800 text-xs font-bold">
@@ -440,9 +413,9 @@ export default function WaterCrisisPreview({ onLaunchSimulator, onGoToAuth, isIn
               <button
                 type="button"
                 onClick={() => scrollToSection("chapter-2")}
-                className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-700 text-white text-xs font-bold hover:bg-emerald-800 transition-colors cursor-pointer"
+                className="w-full sm:w-auto flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl bg-emerald-700 text-white text-xs font-bold hover:bg-emerald-800 transition-colors cursor-pointer"
               >
-                <span>Continue Down to Chapter 2: Rivers &amp; History ↓</span>
+                <span>Continue Down to Chapter 2: Household Wastage ↓</span>
                 <ChevronRight size={14} />
               </button>
             </div>
@@ -450,138 +423,9 @@ export default function WaterCrisisPreview({ onLaunchSimulator, onGoToAuth, isIn
       </section>
 
       {/* ─────────────────────────────────────────────────────────────
-          CHAPTER 2: INDIAN RIVERS, BASINS & ANCIENT WATER ARCHITECTURE
+          CHAPTER 2: HOUSEHOLD WASTAGE & INTERACTIVE CALCULATOR
           ───────────────────────────────────────────────────────────── */}
-      <section id="chapter-2" className="space-y-6 scroll-mt-24">
-          {/* River Basin Stress Overview */}
-          <div className="bg-white rounded-2xl border border-gray-200 p-6 sm:p-8 shadow-xs space-y-4">
-            <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-cyan-50 text-cyan-800 text-xs font-bold">
-              <Layers size={13} />
-              <span>Hydrology of India — Rivers, Basins &amp; Ancient Engineering</span>
-            </div>
-            <h2 className="text-xl sm:text-3xl font-black text-gray-950">
-              India&rsquo;s Sacred Lifelines Under Stress &amp; Our Lost Water Wisdom
-            </h2>
-            <p className="text-xs sm:text-sm text-gray-600 leading-relaxed max-w-4xl">
-              India is crisscrossed by mighty river systems — the <strong>Ganga-Brahmaputra</strong>, <strong>Indus</strong>, <strong>Godavari</strong>, <strong>Krishna</strong>, <strong>Cauvery</strong>, <strong>Narmada</strong>, and <strong>Mahanadi</strong>. Yet due to climate shifts, massive agricultural diversion, and unchecked municipal discharge, even our perennial rivers face seasonal dry spells. Long before modern municipal grids, India survived for thousands of years through ingenious decentralized water harvesting.
-            </p>
-          </div>
-
-          {/* 3 Major River Systems Deep Dive */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-            <div className="bg-white rounded-2xl border border-blue-200 p-6 shadow-xs space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-blue-700 uppercase tracking-wider">Northern Basin</span>
-                <span className="text-[11px] font-mono px-2 py-0.5 rounded-full bg-blue-50 text-blue-800 font-bold">Yamuna &amp; Ganga</span>
-              </div>
-              <h3 className="text-base font-black text-gray-900">The Silt &amp; Ammonia Challenge</h3>
-              <p className="text-xs text-gray-600 leading-relaxed">
-                The Ganga basin accounts for <strong>28% of India&rsquo;s landmass</strong> and 43% of its population. In the Delhi-NCR stretch of the Yamuna, dissolved oxygen plummets to near zero while industrial ammonia levels frequently peak beyond 3.0 ppm, forcing municipal water treatment plants to shut down repeatedly.
-              </p>
-              <div className="p-3 bg-blue-50/60 rounded-xl border border-blue-100 text-[11px] text-blue-900 font-medium">
-                🌊 <strong>The JalLoop Impact:</strong> Reusing greywater at home reduces the fresh raw water extracted from these struggling riverbeds by up to 65%.
-              </div>
-            </div>
-
-            <div className="bg-white rounded-2xl border border-teal-200 p-6 shadow-xs space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-teal-700 uppercase tracking-wider">Southern Basin</span>
-                <span className="text-[11px] font-mono px-2 py-0.5 rounded-full bg-teal-50 text-teal-800 font-bold">Cauvery &amp; Krishna</span>
-              </div>
-              <h3 className="text-base font-black text-gray-900">Inter-State Riparian Water Conflicts</h3>
-              <p className="text-xs text-gray-600 leading-relaxed">
-                The Cauvery basin shared between Karnataka and Tamil Nadu experiences severe water allocation deficits during weak monsoon years. When reservoirs like KRS and Mettur drop below critical dead storage, urban drinking supply is locked in bitter legal disputes between states.
-              </p>
-              <div className="p-3 bg-teal-50/60 rounded-xl border border-teal-100 text-[11px] text-teal-900 font-medium">
-                🌊 <strong>The JalLoop Impact:</strong> Decentralized water circularity gives apartment complexes local autonomy, buffering them against inter-state allocation shocks.
-              </div>
-            </div>
-
-            <div className="bg-white rounded-2xl border border-amber-200 p-6 shadow-xs space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-amber-700 uppercase tracking-wider">Peninsular Basin</span>
-                <span className="text-[11px] font-mono px-2 py-0.5 rounded-full bg-amber-50 text-amber-800 font-bold">Godavari &amp; Narmada</span>
-              </div>
-              <h3 className="text-base font-black text-gray-900">Hard Rock Aquifers of the Deccan</h3>
-              <p className="text-xs text-gray-600 leading-relaxed">
-                The Deccan plateau is composed of impermeable basalt and granite rock. Unlike Gangetic alluvium, rainfall cannot easily seep deep underground. Borewells drilled into deep fissures take hundreds of years to naturally recharge once sucked dry.
-              </p>
-              <div className="p-3 bg-amber-50/60 rounded-xl border border-amber-100 text-[11px] text-amber-900 font-medium">
-                🌊 <strong>The JalLoop Impact:</strong> Every 1,000 liters recycled at home preserves fragile Deccan deep fissure water that cannot be replaced in our lifetime.
-              </div>
-            </div>
-          </div>
-
-          {/* Ancient Water Harvesting Systems of India */}
-          <div className="bg-gradient-to-br from-emerald-950 via-teal-950 to-slate-900 text-white rounded-2xl p-6 sm:p-8 shadow-md border border-emerald-800/40 space-y-6">
-            <div>
-              <span className="text-xs font-bold uppercase tracking-wider text-emerald-400">Centuries of Traditional Ingenuity</span>
-              <h3 className="text-xl font-bold mt-1">What Ancient Indian Civilizations Can Teach Modern Smart Homes</h3>
-              <p className="text-xs text-emerald-200/80 max-w-3xl">
-                India was historically the world&rsquo;s greatest rainwater harvesting civilization. Modern high-tech sensors and micro-filtration are simply the digital evolution of our ancestors&rsquo; brilliant water traditions:
-              </p>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              <div className="bg-white/10 rounded-xl p-4 border border-white/15 space-y-2">
-                <div className="text-xs font-bold text-teal-300">1. Baolis &amp; Stepwells (बावड़ी)</div>
-                <div className="text-[10px] text-gray-300 font-mono">Rajasthan &amp; Gujarat</div>
-                <p className="text-xs text-emerald-100/90 leading-relaxed">
-                  Multi-story subterranean architectural wonders like Rani ki Vav and Chand Baori that captured every drop of seasonal rain and naturally cooled subterranean water for centuries.
-                </p>
-              </div>
-
-              <div className="bg-white/10 rounded-xl p-4 border border-white/15 space-y-2">
-                <div className="text-xs font-bold text-teal-300">2. Johads &amp; Kunds (जोहड़)</div>
-                <div className="text-[10px] text-gray-300 font-mono">Thar Desert &amp; Haryana</div>
-                <p className="text-xs text-emerald-100/90 leading-relaxed">
-                  Earthen check-dams that captured surface runoff during flash monsoon showers to slowly percolate water back into underground sand layers, keeping wells wet year-round.
-                </p>
-              </div>
-
-              <div className="bg-white/10 rounded-xl p-4 border border-white/15 space-y-2">
-                <div className="text-xs font-bold text-teal-300">3. Ahar Pynes (आहर-पाइन)</div>
-                <div className="text-[10px] text-gray-300 font-mono">Ancient Magadh (Bihar)</div>
-                <p className="text-xs text-emerald-100/90 leading-relaxed">
-                  Traditional floodwater harvesting channels linked to retention reservoirs that prevented soil erosion during floods while irrigating paddy crops throughout dry winter months.
-                </p>
-              </div>
-
-              <div className="bg-white/10 rounded-xl p-4 border border-white/15 space-y-2">
-                <div className="text-xs font-bold text-teal-300">4. Zing &amp; Kulh Channels (कुल)</div>
-                <div className="text-[10px] text-gray-300 font-mono">Ladakh &amp; Himachal</div>
-                <p className="text-xs text-emerald-100/90 leading-relaxed">
-                  Ingenious glacial meltwater diversion canals that directed freezing water into collection tanks during daytime warmth for regulated distribution to mountain terrace crops.
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div className="flex justify-between items-center pt-2">
-            <button
-              type="button"
-              onClick={() => setActiveTab("country")}
-              className="flex items-center gap-1.5 text-xs font-bold text-gray-600 hover:text-gray-900 transition-colors cursor-pointer"
-            >
-              <ArrowLeft size={14} />
-              <span>Back to India's Crisis &amp; Cities</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => scrollToSection("chapter-3")}
-              className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-700 text-white text-xs font-bold hover:bg-emerald-800 transition-colors cursor-pointer"
-            >
-              <span>Continue Down to Chapter 3: Household Wastage ↓</span>
-              <ChevronRight size={14} />
-            </button>
-          </div>
-      </section>
-
-      {/* ─────────────────────────────────────────────────────────────
-          CHAPTER 3: HOUSEHOLD WASTAGE & INTERACTIVE CALCULATOR
-          ───────────────────────────────────────────────────────────── */}
-      <section id="chapter-3" className="space-y-6 scroll-mt-24">
+      <section id="chapter-2" className="space-y-4 sm:space-y-6 scroll-mt-20">
           {/* Deep Dive: How Indian Homes Waste Water Everyday */}
           <div className="bg-white rounded-2xl border border-gray-200 p-6 sm:p-8 shadow-xs space-y-6">
             <div className="border-b border-gray-100 pb-4">
@@ -729,19 +573,19 @@ export default function WaterCrisisPreview({ onLaunchSimulator, onGoToAuth, isIn
             <div className="flex justify-between items-center pt-2">
               <button
                 type="button"
-                onClick={() => setActiveTab("rivers")}
+                onClick={() => scrollToSection("chapter-1")}
                 className="flex items-center gap-1.5 text-xs font-bold text-gray-600 hover:text-gray-900 transition-colors cursor-pointer"
               >
                 <ArrowLeft size={14} />
-                <span>Back to Rivers &amp; Ancient Wisdom</span>
+                <span>Back to India's Crisis</span>
               </button>
 
               <button
                 type="button"
-                onClick={() => scrollToSection("chapter-4")}
-                className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-700 text-white text-xs font-bold hover:bg-emerald-800 transition-colors cursor-pointer"
+                onClick={() => scrollToSection("chapter-3")}
+                className="w-full sm:w-auto flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl bg-emerald-700 text-white text-xs font-bold hover:bg-emerald-800 transition-colors cursor-pointer"
               >
-                <span>Continue Down to Chapter 4: How We Recycle ↓</span>
+                <span>Continue Down to Chapter 3: How We Recycle ↓</span>
                 <ChevronRight size={14} />
               </button>
             </div>
@@ -749,9 +593,9 @@ export default function WaterCrisisPreview({ onLaunchSimulator, onGoToAuth, isIn
       </section>
 
       {/* ─────────────────────────────────────────────────────────────
-          CHAPTER 4: HOW WE RECYCLE (5-PHASE ENGINEERING & VISUAL PURIFIER)
+          CHAPTER 3: HOW WE RECYCLE (5-PHASE ENGINEERING & VISUAL PURIFIER)
           ───────────────────────────────────────────────────────────── */}
-      <section id="chapter-4" className="space-y-6 scroll-mt-24">
+      <section id="chapter-3" className="space-y-4 sm:space-y-6 scroll-mt-20">
           <div className="bg-white rounded-2xl border border-gray-200 p-6 sm:p-8 shadow-xs space-y-4">
             <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-cyan-50 text-cyan-800 text-xs font-bold">
               <Beaker size={13} />
@@ -873,19 +717,19 @@ export default function WaterCrisisPreview({ onLaunchSimulator, onGoToAuth, isIn
 
             <button
               type="button"
-              onClick={() => scrollToSection("chapter-5")}
-              className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-700 text-white text-xs font-bold hover:bg-emerald-800 transition-colors cursor-pointer"
+              onClick={() => scrollToSection("chapter-4")}
+              className="w-full sm:w-auto flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl bg-emerald-700 text-white text-xs font-bold hover:bg-emerald-800 transition-colors cursor-pointer"
             >
-              <span>Continue Down to Chapter 5: Platform Tour ↓</span>
+              <span>Continue Down to Chapter 4: Platform Tour &amp; Pledge ↓</span>
               <ChevronRight size={14} />
             </button>
           </div>
       </section>
 
       {/* ─────────────────────────────────────────────────────────────
-          CHAPTER 5: EXPLORE PLATFORM (HOW THE WEBSITE WORKS)
+          CHAPTER 4: EXPLORE PLATFORM, QUOTES & PLEDGE
           ───────────────────────────────────────────────────────────── */}
-      <section id="chapter-5" className="space-y-6 scroll-mt-24">
+      <section id="chapter-4" className="space-y-4 sm:space-y-6 scroll-mt-20">
           <div className="bg-white rounded-2xl border border-gray-200 p-6 sm:p-8 shadow-xs space-y-4">
             <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-indigo-50 text-indigo-800 text-xs font-bold">
               <Compass size={13} />
@@ -1030,145 +874,29 @@ export default function WaterCrisisPreview({ onLaunchSimulator, onGoToAuth, isIn
               <span>Back to Recycling Stages</span>
             </button>
 
-            <button
-              type="button"
-              onClick={() => scrollToSection("chapter-6")}
-              className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-700 text-white text-xs font-bold hover:bg-emerald-800 transition-colors cursor-pointer"
-            >
-              <span>Continue Down to Chapter 6: Home Blueprint ↓</span>
-              <ChevronRight size={14} />
-            </button>
-          </div>
-      </section>
-
-      {/* ─────────────────────────────────────────────────────────────
-          CHAPTER 6: NATIONAL BLUEPRINT & EVERYDAY HABITS
-          ───────────────────────────────────────────────────────────── */}
-      <section id="chapter-6" className="space-y-6 scroll-mt-24">
-          {/* Architecture Overview */}
-          <div className="bg-white rounded-2xl border border-gray-200 p-6 sm:p-8 shadow-xs space-y-6">
-            <div className="border-b border-gray-100 pb-4">
-              <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-bold mb-2">
-                <RefreshCw size={13} />
-                <span>The Closed-Loop Transformation</span>
-              </div>
-              <h2 className="text-xl sm:text-2xl font-bold text-gray-900">
-                The Financial &amp; Environmental Transformation
-              </h2>
-              <p className="text-xs sm:text-sm text-gray-500 mt-1">
-                How a home powered by JalLoop transforms daily routines, reduces tanker bills, and relieves groundwater strain:
-              </p>
-            </div>
-
-            {/* Before vs After Comparison */}
-            <div className="rounded-2xl border border-gray-200 overflow-hidden">
-              <div className="bg-gray-100/80 px-4 py-3 text-xs font-bold text-gray-700 uppercase tracking-wider">
-                Transformation: Traditional Indian Home vs. JalLoop Powered Home
-              </div>
-              <div className="divide-y divide-gray-100 text-xs">
-                <div className="grid grid-cols-1 sm:grid-cols-3 p-3.5 bg-white">
-                  <span className="font-bold text-gray-800">Fresh Water Dependency</span>
-                  <span className="text-rose-600 font-medium">100% reliant on municipal / borewell</span>
-                  <span className="text-emerald-700 font-bold">Reduced by 65–75% via closed loop</span>
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-3 p-3.5 bg-gray-50/50">
-                  <span className="font-bold text-gray-800">RO Reject Water</span>
-                  <span className="text-rose-600 font-medium">Flushed into sink (1,200L/mo wasted)</span>
-                  <span className="text-emerald-700 font-bold">100% recovered for secondary use</span>
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-3 p-3.5 bg-white">
-                  <span className="font-bold text-gray-800">Summer Tanker Crisis</span>
-                  <span className="text-rose-600 font-medium">Paying ₹1,500/tanker in peak summer</span>
-                  <span className="text-emerald-700 font-bold">Self-sustained recycled supply buffer</span>
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-3 p-3.5 bg-gray-50/50">
-                  <span className="font-bold text-gray-800">Microcontroller &amp; Safety</span>
-                  <span className="text-gray-500">Manual buckets, overflow spills</span>
-                  <span className="text-emerald-700 font-bold">Automated ESP32 relay with safety policies</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Practical Water Conservation Habits For Everyday Life */}
-          <div className="bg-emerald-900 text-white rounded-2xl p-6 sm:p-8 shadow-xs space-y-5">
-            <div>
-              <span className="text-xs font-bold uppercase tracking-wider text-emerald-300">Daily Conservation Blueprint</span>
-              <h3 className="text-xl font-bold mt-1">6 Everyday Habits Indian Families Can Adopt Right Now</h3>
-              <p className="text-xs text-emerald-200/80">Combine these with JalLoop to maximize freshwater preservation:</p>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              <div className="rounded-xl bg-emerald-800/60 border border-emerald-700 p-4 space-y-1.5">
-                <div className="text-xs font-bold text-emerald-300">1. Tap Aerators (₹80 fix)</div>
-                <p className="text-xs text-emerald-100/90 leading-relaxed">
-                  Screw aerators onto washbasin taps to mix air with water. Cuts tap flow rate by 50% without reducing water pressure.
-                </p>
-              </div>
-
-              <div className="rounded-xl bg-emerald-800/60 border border-emerald-700 p-4 space-y-1.5">
-                <div className="text-xs font-bold text-emerald-300">2. Bucket Bath vs Shower</div>
-                <p className="text-xs text-emerald-100/90 leading-relaxed">
-                  A 10-minute shower consumes ~100 to 120 liters. A single 18-liter bucket bath saves over 80 liters every morning.
-                </p>
-              </div>
-
-              <div className="rounded-xl bg-emerald-800/60 border border-emerald-700 p-4 space-y-1.5">
-                <div className="text-xs font-bold text-emerald-300">3. Stop Tap While Brushing</div>
-                <p className="text-xs text-emerald-100/90 leading-relaxed">
-                  Letting the tap run while brushing wastes 6 to 12 liters every session. Turn it on only when actively rinsing.
-                </p>
-              </div>
-
-              <div className="rounded-xl bg-emerald-800/60 border border-emerald-700 p-4 space-y-1.5">
-                <div className="text-xs font-bold text-emerald-300">4. Fix Cistern Leaks</div>
-                <p className="text-xs text-emerald-100/90 leading-relaxed">
-                  A silent trickle leak in a flush toilet wastes up to 200 liters every day. Put food coloring in the tank to detect leaks.
-                </p>
-              </div>
-
-              <div className="rounded-xl bg-emerald-800/60 border border-emerald-700 p-4 space-y-1.5">
-                <div className="text-xs font-bold text-emerald-300">5. Water Plants at Dusk</div>
-                <p className="text-xs text-emerald-100/90 leading-relaxed">
-                  Watering gardens in the morning or midday loses up to 40% to evaporation. Water at sunset so roots absorb every drop.
-                </p>
-              </div>
-
-              <div className="rounded-xl bg-emerald-800/60 border border-emerald-700 p-4 space-y-1.5">
-                <div className="text-xs font-bold text-emerald-300">6. Full Laundry Loads</div>
-                <p className="text-xs text-emerald-100/90 leading-relaxed">
-                  Run washing machines only when full. Washing two half-loads consumes double the water and double the electricity.
-                </p>
-              </div>
-            </div>
-
             <div className="flex justify-between items-center pt-2">
               <button
                 type="button"
-                onClick={() => setActiveTab("explore-app")}
-                className="flex items-center gap-1.5 text-xs font-bold text-emerald-300 hover:text-white transition-colors cursor-pointer"
+                onClick={() => scrollToSection("chapter-3")}
+                className="flex items-center gap-1.5 text-xs font-bold text-gray-600 hover:text-gray-900 transition-colors cursor-pointer"
               >
                 <ArrowLeft size={14} />
-                <span>Back to Platform Tour</span>
+                <span>Back to How We Recycle</span>
               </button>
 
               <button
                 type="button"
-                onClick={() => scrollToSection("chapter-7")}
-                className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-gray-950 text-xs font-bold transition-colors cursor-pointer"
+                onClick={() => scrollToSection("quotes-pledge")}
+                className="w-full sm:w-auto flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl bg-emerald-700 text-white text-xs font-bold hover:bg-emerald-800 transition-colors cursor-pointer"
               >
-                <span>Continue Down to Chapter 7: Quotes &amp; Pledge ↓</span>
-                <ArrowRight size={14} />
+                <span>Jump to Quotes &amp; Water Pledge ↓</span>
+                <ChevronRight size={14} />
               </button>
             </div>
           </div>
-      </section>
 
-      {/* ─────────────────────────────────────────────────────────────
-          CHAPTER 7: CULTURAL HERITAGE, QUOTES & PLEDGE
-          ───────────────────────────────────────────────────────────── */}
-      <section id="chapter-7" className="space-y-6 scroll-mt-24">
-          {/* Quotes Section */}
+          {/* Quotes Section Integrated into Chapter 4 */}
+          <div id="quotes-pledge" className="space-y-4 pt-4 border-t border-gray-100 scroll-mt-24">
           <div className="space-y-4">
             <div className="text-center max-w-xl mx-auto space-y-1">
               <span className="text-xs font-bold uppercase tracking-wider text-emerald-700">Words of Wisdom &amp; Cultural Heritage</span>
@@ -1336,6 +1064,7 @@ export default function WaterCrisisPreview({ onLaunchSimulator, onGoToAuth, isIn
                 </button>
               )}
             </div>
+          </div>
           </div>
       </section>
     </div>

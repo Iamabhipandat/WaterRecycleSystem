@@ -96,7 +96,7 @@ export default function Navbar({
             <button
               type="button"
               onClick={onOpenAuth}
-              className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-green-700 hover:bg-green-800 text-white text-xs font-bold transition-all shadow-xs cursor-pointer"
+              className="hidden sm:flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-green-700 hover:bg-green-800 text-white text-xs font-bold transition-all shadow-xs cursor-pointer"
             >
               <UserCheck size={14} />
               <span>Sign In / Sign Up</span>
@@ -111,21 +111,21 @@ export default function Navbar({
               <button
                 onClick={logout}
                 title="Log out"
-                className="p-1.5 sm:p-2 rounded-lg text-gray-400 hover:bg-gray-100 hover:text-gray-700 transition-colors cursor-pointer"
+                className="hidden sm:flex p-1.5 sm:p-2 rounded-lg text-gray-400 hover:bg-gray-100 hover:text-gray-700 transition-colors cursor-pointer"
               >
                 <LogOut size={16} />
               </button>
             </>
           )}
 
-          {/* Mobile Menu Toggle Button */}
+          {/* Mobile Menu Toggle Button (Three Icon / Hamburger) */}
           <button
             type="button"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="p-1.5 rounded-lg text-gray-600 hover:bg-gray-100 lg:hidden cursor-pointer"
+            className="p-2 rounded-xl text-gray-700 hover:bg-gray-100 border border-gray-200 lg:hidden cursor-pointer"
             title="Toggle Menu"
           >
-            {mobileMenuOpen ? <X size={18} /> : <Menu size={18} />}
+            {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
           </button>
         </div>
       </div>
@@ -162,8 +162,44 @@ export default function Navbar({
                   <span>Admin Dashboard</span>
                 </button>
               )}
+
+              {/* Mobile Auth / Profile in Drawer */}
+              <div className="pt-4 mt-4 border-t border-gray-100">
+                <p className="px-3 pb-2 text-[10px] font-bold uppercase tracking-[0.16em] text-gray-400">Account Access</p>
+                {!user ? (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (onOpenAuth) onOpenAuth();
+                      setMobileMenuOpen(false);
+                    }}
+                    className="flex w-full items-center justify-center gap-2 rounded-xl bg-green-700 px-4 py-3 text-sm font-bold text-white shadow-xs hover:bg-green-800 transition-colors cursor-pointer"
+                  >
+                    <UserCheck size={18} />
+                    <span>Sign In / Sign Up</span>
+                  </button>
+                ) : (
+                  <div className="space-y-2">
+                    <div className="px-3 py-2 bg-gray-50 rounded-xl border border-gray-100">
+                      <p className="text-xs font-bold text-gray-800">{profile?.name || "Logged In User"}</p>
+                      <p className="text-[11px] text-gray-400 capitalize">{profile?.role || "Citizen Member"}</p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        logout();
+                        setMobileMenuOpen(false);
+                      }}
+                      className="flex w-full items-center gap-2 rounded-xl border border-rose-200 bg-rose-50/50 px-3 py-2.5 text-xs font-bold text-rose-700 hover:bg-rose-100 transition-colors cursor-pointer"
+                    >
+                      <LogOut size={15} />
+                      <span>Log Out</span>
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
-            <div className="absolute bottom-0 left-0 right-0 border-t border-gray-100 bg-gray-50 p-4">
+            <div className="border-t border-gray-100 bg-gray-50 p-4">
               <p className="text-[10px] font-bold uppercase tracking-wider text-gray-400">Current workspace</p>
               <p className="mt-1 text-xs font-semibold text-gray-700">{liveMode ? "Hardware connection" : "Demo simulation"}</p>
             </div>
