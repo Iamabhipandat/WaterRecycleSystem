@@ -65,7 +65,7 @@ function nowStr() {
 }
 
 export default function App() {
-  const { user, loading, isAdmin } = useAuth();
+  const { user, loading, isAdmin, verificationNotice } = useAuth();
   const [view, setView]           = useState("flow");
   const [state, setState]         = useState(INITIAL);
   const [warning, setWarning]     = useState(null);
@@ -371,6 +371,13 @@ export default function App() {
         {warning && (
           <div className="flex items-center gap-3 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 text-sm text-amber-800 shadow-sm">
             <AlertTriangle size={16} className="text-amber-600 shrink-0" /> {warning}
+          </div>
+        )}
+
+        {verificationNotice && (
+          <div className="flex items-center gap-3 bg-emerald-50 border border-emerald-200 rounded-xl px-4 py-3 text-sm text-emerald-800 shadow-sm">
+            <CheckCircle2 size={16} className="text-emerald-600 shrink-0" />
+            <span>{verificationNotice}</span>
           </div>
         )}
 

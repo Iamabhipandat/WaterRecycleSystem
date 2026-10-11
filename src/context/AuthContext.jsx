@@ -34,6 +34,7 @@ export function AuthProvider({ children }) {
   const [profile, setProfile] = useState(null);
   const [session, setSession] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [verificationNotice, setVerificationNotice] = useState("");
 
   // ── Supabase Auth State Listener ──────────────────────────────────────────
   useEffect(() => {
@@ -52,9 +53,16 @@ export function AuthProvider({ children }) {
     // Listen for auth state changes (login, logout, token refresh)
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, s) => {
+    } = supabase.auth.onAuthStateChange((event, s) => {
       setSession(s);
       setUser(s?.user ?? null);
+      const pendingEmail = window.localStorage.getItem("jalloop.pendingVerificationEmail");
+      if (event === "SIGNED_IN" && pendingEmail && s?.user?.email_confirmed_at) {
+        if (pendingEmail === String(s.user.email || "").toLowerCase()) {
+          setVerificationNotice("Your email is verified. Registration complete.");
+          window.localStorage.removeItem("jalloop.pendingVerificationEmail");
+        }
+      }
       setLoading(false);
     });
 
@@ -128,6 +136,7 @@ export function AuthProvider({ children }) {
       email: trimmedEmail,
       password,
       options: {
+        emailRedirectTo: window.location.origin,
         data: { name: name.trim(), role },
       },
     });
@@ -141,6 +150,7 @@ export function AuthProvider({ children }) {
 
     // Supabase returns user but no session when email confirmation is required
     if (data.user && !data.session) {
+      window.localStorage.setItem("jalloop.pendingVerificationEmail", trimmedEmail);
       return {
         requireVerification: true,
         email: trimmedEmail,
@@ -243,6 +253,7 @@ export function AuthProvider({ children }) {
       session,
       token: session?.access_token ?? null,
       loading,
+      verificationNotice,
       isAuthenticated: Boolean(user && session),
       isAdmin: profile?.role === "admin" || isAdminEmail(user?.email),
       signup,
@@ -253,7 +264,7 @@ export function AuthProvider({ children }) {
       resendVerificationEmail,
       logout,
     }),
-    [user, profile, session, loading, signup, login, loginWithGoogle, loginWithPhone, verifyPhoneOtp, resendVerificationEmail, logout],
+    [user, profile, session, loading, verificationNotice, signup, login, loginWithGoogle, loginWithPhone, verifyPhoneOtp, resendVerificationEmail, logout],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

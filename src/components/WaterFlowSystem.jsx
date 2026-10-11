@@ -289,6 +289,28 @@ export default function WaterFlowSystem({
             </div>
           ))}
         </div>
+        <div className="rounded-xl border border-gray-200 bg-gray-50 p-3">
+          <div className="flex items-center justify-between text-[10px] font-bold uppercase tracking-wider text-gray-400">
+            <span>Water flow</span>
+            <span className={mergeActive ? "text-blue-600" : "text-gray-400"}>{mergeActive ? "Active" : "Standby"}</span>
+          </div>
+          <div className="mt-2 flex items-center justify-between gap-1 text-center">
+            {[
+              { label: "Source", active: mergeActive },
+              { label: "Collect", active: mergeActive },
+              { label: "Filter", active: fActive },
+              { label: "Store", active: pumpRunning },
+            ].map((stage, index) => (
+              <div key={stage.label} className="flex flex-1 items-center gap-1">
+                <div className={`min-w-0 flex-1 rounded-lg border px-1 py-2 ${stage.active ? "border-blue-200 bg-blue-50 text-blue-700" : "border-gray-200 bg-white text-gray-400"}`}>
+                  <div className={`mx-auto mb-1 h-2 w-2 rounded-full ${stage.active ? "bg-blue-500 animate-pulse" : "bg-gray-300"}`} />
+                  <span className="text-[10px] font-bold">{stage.label}</span>
+                </div>
+                {index < 3 && <span className={`text-xs ${stage.active ? "text-blue-400" : "text-gray-300"}`}>›</span>}
+              </div>
+            ))}
+          </div>
+        </div>
         <div className="rounded-xl border border-blue-200 bg-blue-50/70 p-3">
           <div className="flex items-center justify-between gap-3">
             <div>

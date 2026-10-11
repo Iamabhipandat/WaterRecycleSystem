@@ -139,7 +139,8 @@ export default function AuthPage() {
               </p>
               <p>
                 We sent a verification link to <strong>{email || "your email"}</strong>. Click
-                the link in the email to activate your account, then come back and log in.
+                the link in the email to activate your account, then come back and log in. If you
+                do not see it in your inbox, please check your spam or junk folder.
               </p>
               <button
                 type="button"
