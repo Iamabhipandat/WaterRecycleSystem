@@ -24,13 +24,13 @@ export default function SimulationControls({
       <div className="mb-4">
         <h2 className="text-sm font-bold text-gray-700 uppercase tracking-wider">Source Controls (ON / OFF)</h2>
       </div>
-      <div className="flex flex-wrap gap-2 mb-4 pb-4 border-b border-gray-100">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 mb-4 pb-4 border-b border-gray-100">
         <Btn onClick={onToggleRO}      icon={Power} label={roActive ? "RO Flowing" : "RO Stopped"} active={roActive} />
         <Btn onClick={onToggleWashing} icon={Power} label={washingActive ? "Washing Flowing" : "Washing Stopped"} active={washingActive} />
         <Btn onClick={onToggleRain}    icon={Cloud} label={rainActive ? "Raining" : "Rain Stopped"} active={rainActive} />
       </div>
       
-      <div className="flex flex-wrap gap-2">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:flex gap-2">
         <Btn onClick={onStartRecycling} icon={pumpRunning ? Pause : Play} label={pumpRunning ? "Stop Pump" : "Start Recycling"} variant="primary" active={pumpRunning} />
         <Btn onClick={onUseRecycled} icon={Droplets} label={reuseActive ? "Stop Reuse" : "Use Recycled Water"} active={reuseActive} />
         <Btn onClick={onReset} icon={RotateCcw} label="Reset All" variant="danger" />

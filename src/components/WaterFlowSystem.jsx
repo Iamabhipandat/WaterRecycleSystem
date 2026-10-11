@@ -251,8 +251,8 @@ export default function WaterFlowSystem({
   const activePhase = PHASE_COLORS[currentPhaseKey];
 
   return (
-    <div id="flow" className="bg-white rounded-2xl border border-gray-200 shadow-sm p-4 overflow-x-auto">
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-3 min-w-[900px]">
+    <div id="flow" className="bg-white rounded-2xl border border-gray-200 shadow-sm p-4 sm:p-5">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-3">
         <div>
           <p className="text-xs font-bold uppercase tracking-widest text-gray-400">Live Hardware Schematic</p>
           <h2 className="text-xl font-bold text-gray-900 mt-0.5">Wastewater → Collection → Treatment → Recycled Reuse</h2>
@@ -275,7 +275,49 @@ export default function WaterFlowSystem({
         </div>
       </div>
 
-      <svg viewBox="0 0 1060 460" xmlns="http://www.w3.org/2000/svg" className="w-full min-w-[900px]">
+      <div className="md:hidden space-y-3">
+        <div className="grid grid-cols-3 gap-2">
+          {[
+            { label: "RO", active: roActive, icon: "RO" },
+            { label: "Washing", active: washingActive, icon: "WM" },
+            { label: "Rain", active: rainActive, icon: "RAIN" },
+          ].map((source) => (
+            <div key={source.label} className={`rounded-xl border p-2.5 text-center ${source.active ? "bg-blue-50 border-blue-200" : "bg-gray-50 border-gray-200"}`}>
+              <span className={`text-[10px] font-black ${source.active ? "text-blue-700" : "text-gray-400"}`}>{source.icon}</span>
+              <p className={`mt-1 text-[11px] font-bold ${source.active ? "text-gray-800" : "text-gray-400"}`}>{source.label}</p>
+              <p className={`mt-0.5 text-[10px] font-semibold ${source.active ? "text-blue-600" : "text-gray-400"}`}>{source.active ? "Flowing" : "Stopped"}</p>
+            </div>
+          ))}
+        </div>
+        <div className="rounded-xl border border-blue-200 bg-blue-50/70 p-3">
+          <div className="flex items-center justify-between gap-3">
+            <div>
+              <p className="text-[10px] font-bold uppercase tracking-wider text-blue-700">Collection tank</p>
+              <p className="text-xs text-gray-600 mt-0.5">Water enters only when a source is started.</p>
+            </div>
+            <span className="text-lg font-black text-blue-700 whitespace-nowrap">{Math.round(collectionLiters * 10) / 10} L</span>
+          </div>
+          <div className="mt-2 h-2 rounded-full bg-white overflow-hidden">
+            <div className="h-full rounded-full bg-blue-600 transition-all" style={{ width: `${collPct}%` }} />
+          </div>
+          <div className="flex items-center justify-between mt-1 text-[10px] text-gray-500">
+            <span>{Math.round(collPct)}% full</span>
+            <span>{mergeActive ? "Collecting now" : "Waiting for source"}</span>
+          </div>
+        </div>
+        <div className="grid grid-cols-2 gap-2 text-center text-[11px]">
+          <div className={`rounded-xl border p-2.5 ${pumpRunning ? "bg-cyan-50 border-cyan-200 text-cyan-800" : "bg-gray-50 border-gray-200 text-gray-500"}`}>
+            <p className="font-bold">Filtration</p>
+            <p className="mt-0.5">{filtrationStage > 0 ? `Stage ${filtrationStage} active` : "Standby"}</p>
+          </div>
+          <div className={`rounded-xl border p-2.5 ${reuseActive ? "bg-emerald-50 border-emerald-200 text-emerald-800" : "bg-gray-50 border-gray-200 text-gray-500"}`}>
+            <p className="font-bold">Recycled water</p>
+            <p className="mt-0.5">{Math.round(recycledLiters)} L stored</p>
+          </div>
+        </div>
+      </div>
+
+      <svg viewBox="0 0 1060 460" xmlns="http://www.w3.org/2000/svg" className="hidden md:block w-full">
         <rect width="1060" height="460" fill="#F8FAFB" rx="14" />
 
         {/* Column headers */}

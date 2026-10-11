@@ -6,9 +6,9 @@ export default function ModeToggle({ liveMode, connected, error, onToggle }) {
     return (
       <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-amber-50 border border-amber-200 text-xs font-medium text-amber-700">
         <Cpu size={13} />
-        Demo Mode
-        <span className="text-amber-400 ml-1">·</span>
-        <span className="text-amber-500 text-[10px]">Add Firebase config to enable live</span>
+        <span className="hidden sm:inline">Demo Mode</span>
+        <span className="hidden sm:inline text-amber-400 ml-1">·</span>
+        <span className="hidden sm:inline text-amber-500 text-[10px]">Add Firebase config to enable live</span>
       </div>
     );
   }
@@ -36,14 +36,14 @@ export default function ModeToggle({ liveMode, connected, error, onToggle }) {
       ) : (
         <Cpu size={13} />
       )}
-      {liveMode
+      <span className="hidden sm:inline">{liveMode
         ? connected
           ? "Live · Hardware"
           : error
             ? "Connection Error"
             : "Connecting…"
         : "Demo Mode"
-      }
+      }</span>
     </button>
   );
 }

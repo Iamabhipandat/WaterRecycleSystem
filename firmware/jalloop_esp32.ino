@@ -47,9 +47,9 @@ const unsigned long LED_INTERVAL     = 400;
 bool pumpRunning = false;
 bool filterActive = false;
 int  filtrationStage = 0;
-bool roActive = true;
-bool washingActive = true;
-bool rainActive = true;
+bool roActive = false;
+bool washingActive = false;
+bool rainActive = false;
 bool reuseActive = false;
 bool btnLastState = HIGH;
 bool heartbeatState = false;
@@ -304,9 +304,9 @@ void loop() {
           filterActive = false;
           filtrationStage = 0;
           reuseActive = false;
-          roActive = true;
-          washingActive = true;
-          rainActive = true;
+          roActive = false;
+          washingActive = false;
+          rainActive = false;
           patchFirebase("/commands.json", "{\"reset\":false}");
         }
       }

@@ -83,7 +83,7 @@ export default function WaterStorageAwsMapping({ systemState, onInspectTank }) {
               Persistent Storage Destinations:
             </p>
 
-            <div className="flex items-center justify-between p-2 rounded-lg bg-white border border-gray-200 font-mono text-[11px]">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 p-2 rounded-lg bg-white border border-gray-200 font-mono text-[11px] break-all">
               <span className="text-gray-600 flex items-center gap-1.5">
                 <span className="text-blue-600 font-bold">⚡ DynamoDB</span>
               </span>
@@ -92,7 +92,7 @@ export default function WaterStorageAwsMapping({ systemState, onInspectTank }) {
               </span>
             </div>
 
-            <div className="flex items-center justify-between p-2 rounded-lg bg-white border border-gray-200 font-mono text-[11px]">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 p-2 rounded-lg bg-white border border-gray-200 font-mono text-[11px] break-all">
               <span className="text-gray-600 flex items-center gap-1.5">
                 <span className="text-amber-600 font-bold">🔍 OpenSearch</span>
               </span>
@@ -101,7 +101,7 @@ export default function WaterStorageAwsMapping({ systemState, onInspectTank }) {
               </span>
             </div>
 
-            <div className="flex items-center justify-between p-2 rounded-lg bg-white border border-gray-200 font-mono text-[11px]">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 p-2 rounded-lg bg-white border border-gray-200 font-mono text-[11px] break-all">
               <span className="text-gray-600 flex items-center gap-1.5">
                 <span className="text-green-600 font-bold">🪣 Amazon S3</span>
               </span>
@@ -110,7 +110,7 @@ export default function WaterStorageAwsMapping({ systemState, onInspectTank }) {
               </span>
             </div>
 
-            <div className="flex items-center justify-between p-2 rounded-lg bg-white border border-gray-200 font-mono text-[11px]">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 p-2 rounded-lg bg-white border border-gray-200 font-mono text-[11px] break-all">
               <span className="text-gray-600 flex items-center gap-1.5">
                 <span className="text-purple-600 font-bold">🛡️ Cedar Policy</span>
               </span>
@@ -164,7 +164,7 @@ export default function WaterStorageAwsMapping({ systemState, onInspectTank }) {
               Persistent Storage Destinations:
             </p>
 
-            <div className="flex items-center justify-between p-2 rounded-lg bg-white border border-gray-200 font-mono text-[11px]">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 p-2 rounded-lg bg-white border border-gray-200 font-mono text-[11px] break-all">
               <span className="text-gray-600 flex items-center gap-1.5">
                 <span className="text-blue-600 font-bold">⚡ DynamoDB</span>
               </span>
@@ -173,7 +173,7 @@ export default function WaterStorageAwsMapping({ systemState, onInspectTank }) {
               </span>
             </div>
 
-            <div className="flex items-center justify-between p-2 rounded-lg bg-white border border-gray-200 font-mono text-[11px]">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 p-2 rounded-lg bg-white border border-gray-200 font-mono text-[11px] break-all">
               <span className="text-gray-600 flex items-center gap-1.5">
                 <span className="text-amber-600 font-bold">🔍 OpenSearch</span>
               </span>
@@ -182,7 +182,7 @@ export default function WaterStorageAwsMapping({ systemState, onInspectTank }) {
               </span>
             </div>
 
-            <div className="flex items-center justify-between p-2 rounded-lg bg-white border border-gray-200 font-mono text-[11px]">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 p-2 rounded-lg bg-white border border-gray-200 font-mono text-[11px] break-all">
               <span className="text-gray-600 flex items-center gap-1.5">
                 <span className="text-green-600 font-bold">🪣 Amazon S3</span>
               </span>
@@ -191,7 +191,7 @@ export default function WaterStorageAwsMapping({ systemState, onInspectTank }) {
               </span>
             </div>
 
-            <div className="flex items-center justify-between p-2 rounded-lg bg-white border border-gray-200 font-mono text-[11px]">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 p-2 rounded-lg bg-white border border-gray-200 font-mono text-[11px] break-all">
               <span className="text-gray-600 flex items-center gap-1.5">
                 <span className="text-purple-600 font-bold">🛡️ Cedar Policy</span>
               </span>

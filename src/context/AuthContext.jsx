@@ -144,7 +144,7 @@ export function AuthProvider({ children }) {
       return {
         requireVerification: true,
         email: trimmedEmail,
-        message: "Account created! Check your email for a verification link.",
+        message: "Account created! Check your email for your one-time verification code.",
       };
     }
   }, []);
@@ -203,6 +203,22 @@ export function AuthProvider({ children }) {
     if (error) throw error;
   }, []);
 
+  // ── Verify signup email OTP ──────────────────────────────────────────────
+  const verifySignupOtp = useCallback(async (email, token) => {
+    const trimmedEmail = String(email || "").trim().toLowerCase();
+    const trimmedToken = String(token || "").trim();
+    if (!trimmedEmail || !trimmedToken) {
+      throw new Error("Enter the verification code sent to your email.");
+    }
+
+    const { error } = await supabase.auth.verifyOtp({
+      email: trimmedEmail,
+      token: trimmedToken,
+      type: "signup",
+    });
+    if (error) throw error;
+  }, []);
+
   // ── Resend verification email ─────────────────────────────────────────────
   const resendVerificationEmail = useCallback(async (email) => {
     const trimmed = String(email || "").trim().toLowerCase();
@@ -250,10 +266,11 @@ export function AuthProvider({ children }) {
       loginWithGoogle,
       loginWithPhone,
       verifyPhoneOtp,
+      verifySignupOtp,
       resendVerificationEmail,
       logout,
     }),
-    [user, profile, session, loading, signup, login, loginWithGoogle, loginWithPhone, verifyPhoneOtp, resendVerificationEmail, logout],
+    [user, profile, session, loading, signup, login, loginWithGoogle, loginWithPhone, verifyPhoneOtp, verifySignupOtp, resendVerificationEmail, logout],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

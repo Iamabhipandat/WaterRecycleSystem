@@ -54,14 +54,10 @@ const INITIAL = {
   waterReused:        30,
   freshWaterSaved:    72,
   reuseActive:        false,
-  roActive:           true,
-  washingActive:      true,
-  rainActive:         true,
-  activity: [
-    { time: "19:42", msg: "RO wastewater continuously flowing into collection tank" },
-    { time: "19:41", msg: "Washing machine water continuously flowing" },
-    { time: "19:40", msg: "Rainwater collection active" },
-  ],
+  roActive:           false,
+  washingActive:      false,
+  rainActive:         false,
+  activity: [],
 };
 
 function nowStr() {
@@ -276,9 +272,9 @@ export default function App() {
       sendCommand({
         pump: "OFF",
         reuse: "OFF",
-        ro: "ON",
-        washing: "ON",
-        rain: "ON",
+        ro: "OFF",
+        washing: "OFF",
+        rain: "OFF",
         filtration: "STOP",
         reset: true,
       });
@@ -397,7 +393,7 @@ export default function App() {
                 <span>{label}</span>
                 {badge && (
                   <span
-                    className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${
+                    className={`hidden sm:inline text-[10px] px-2 py-0.5 rounded-full font-medium ${
                       isActive ? "bg-green-800 text-green-100" : "bg-gray-100 text-gray-500"
                     }`}
                   >
