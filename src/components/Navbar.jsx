@@ -130,42 +130,43 @@ export default function Navbar({
 
       {/* Mobile Drawer Navigation */}
       {mobileMenuOpen && (
-        <div className="lg:hidden px-4 pt-2 pb-4 bg-gray-50 border-t border-gray-200 space-y-1.5 animate-fadeIn">
-          <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wider px-2 py-1">Pages</p>
-          <div className="grid grid-cols-2 gap-1.5">
-            {navItems.map(({ id, label, icon: Icon }) => {
-              const isActive = view === id || (view === "dashboard" && id === "flow");
-              return (
-                <button
-                  key={id}
-                  type="button"
-                  onClick={() => handleSelectPage(id)}
-                  className={`flex items-center gap-2 px-3 py-2.5 rounded-xl text-xs font-bold transition-all text-left cursor-pointer ${
-                    isActive
-                      ? "bg-green-700 text-white shadow-xs"
-                      : "bg-white text-gray-700 border border-gray-200 hover:bg-gray-100"
-                  }`}
-                >
-                  <Icon size={14} className={isActive ? "text-white" : "text-green-700"} />
-                  <span>{label}</span>
+        <>
+          <button type="button" aria-label="Close navigation" onClick={() => setMobileMenuOpen(false)} className="fixed inset-0 z-40 bg-gray-950/30 lg:hidden" />
+          <aside className="fixed inset-y-0 left-0 z-50 w-[min(84vw,320px)] bg-white border-r border-gray-200 shadow-2xl lg:hidden animate-fadeIn">
+            <div className="flex items-center justify-between border-b border-gray-100 px-5 py-4">
+              <div className="flex items-center gap-2.5">
+                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-green-700"><Droplets size={17} className="text-white" /></div>
+                <div>
+                  <p className="text-sm font-black text-gray-900">JalLoop</p>
+                  <p className="text-[10px] text-gray-400">Water management</p>
+                </div>
+              </div>
+              <button type="button" onClick={() => setMobileMenuOpen(false)} className="rounded-lg p-2 text-gray-400 hover:bg-gray-100" aria-label="Close menu"><X size={18} /></button>
+            </div>
+            <div className="space-y-1 px-3 py-5">
+              <p className="px-3 pb-2 text-[10px] font-bold uppercase tracking-[0.16em] text-gray-400">Workspace</p>
+              {navItems.map(({ id, label, icon: Icon }) => {
+                const isActive = view === id || (view === "dashboard" && id === "flow");
+                return (
+                  <button key={id} type="button" onClick={() => handleSelectPage(id)} className={`flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left text-sm font-bold transition-all cursor-pointer ${isActive ? "bg-green-700 text-white shadow-sm" : "text-gray-600 hover:bg-gray-50"}`}>
+                    <Icon size={17} className={isActive ? "text-white" : "text-gray-400"} />
+                    <span>{label}</span>
+                  </button>
+                );
+              })}
+              {isAdmin && (
+                <button onClick={() => { if (onOpenAdmin) onOpenAdmin(); setMobileMenuOpen(false); }} className="mt-4 flex w-full items-center gap-3 rounded-xl border border-gray-200 px-3 py-3 text-left text-sm font-bold text-gray-600 hover:bg-gray-50 cursor-pointer">
+                  <LayoutDashboard size={17} className="text-gray-400" />
+                  <span>Admin Dashboard</span>
                 </button>
-              );
-            })}
-          </div>
-
-          {isAdmin && (
-            <button
-              onClick={() => {
-                if (onOpenAdmin) onOpenAdmin();
-                setMobileMenuOpen(false);
-              }}
-              className="w-full mt-2 flex items-center justify-center gap-2 px-3 py-2 rounded-xl text-xs font-bold bg-white border border-gray-200 text-gray-700 hover:bg-gray-100 cursor-pointer"
-            >
-              <LayoutDashboard size={14} />
-              <span>Admin Dashboard</span>
-            </button>
-          )}
-        </div>
+              )}
+            </div>
+            <div className="absolute bottom-0 left-0 right-0 border-t border-gray-100 bg-gray-50 p-4">
+              <p className="text-[10px] font-bold uppercase tracking-wider text-gray-400">Current workspace</p>
+              <p className="mt-1 text-xs font-semibold text-gray-700">{liveMode ? "Hardware connection" : "Demo simulation"}</p>
+            </div>
+          </aside>
+        </>
       )}
     </nav>
   );

@@ -392,7 +392,7 @@ export default function App() {
         )}
 
         {/* Page Switcher Navigation Bar */}
-        <div className="bg-white rounded-2xl border border-gray-200 p-1.5 shadow-xs flex items-center gap-1.5 overflow-x-auto">
+        <div className="hidden lg:flex bg-white rounded-2xl border border-gray-200 p-1.5 shadow-xs items-center gap-1.5 overflow-x-auto">
           {NAV_TABS.map(({ id, label, icon: Icon, badge }) => {
             const isActive = currentTab === id;
             return (
