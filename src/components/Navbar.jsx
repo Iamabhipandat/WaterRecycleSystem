@@ -10,19 +10,18 @@ export default function Navbar({
   onToggleMode,
   onOpenAdmin,
   onNavigate,
+  onOpenAuth,
   view,
-  isGuest = false,
-  onExitGuest,
 }) {
-  const { profile, isAdmin, logout } = useAuth();
+  const { user, profile, isAdmin, logout } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const navItems = [
-    { id: "flow", label: "Water Flow", icon: Droplets },
+    { id: "preview", label: "Frontpage & Mission", icon: Leaf },
+    { id: "flow", label: "Live Flow Simulator", icon: Droplets },
     { id: "virtual-hardware", label: "Virtual Hardware", icon: Cpu },
     { id: "status", label: "System Status", icon: Activity },
     { id: "analytics", label: "Analytics", icon: BarChart3 },
-    { id: "preview", label: "Crisis & Mission", icon: Leaf },
   ];
 
   const handleSelectPage = (id) => {
@@ -36,8 +35,8 @@ export default function Navbar({
         {/* Brand Logo */}
         <div
           className="flex items-center gap-3 cursor-pointer group"
-          onClick={() => handleSelectPage("flow")}
-          title="Go to Water Flow"
+          onClick={() => handleSelectPage("preview")}
+          title="Go to Frontpage & Mission"
         >
           <div className="w-9 h-9 rounded-xl bg-green-700 flex items-center justify-center shadow-xs group-hover:bg-green-800 transition-colors">
             <Droplets size={18} className="text-white" />
@@ -93,20 +92,15 @@ export default function Navbar({
             </button>
           )}
 
-          {isGuest ? (
-            <div className="flex items-center gap-2">
-              <span className="hidden sm:inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 text-[11px] font-bold">
-                <Leaf size={11} /> Guest Explorer
-              </span>
-              <button
-                type="button"
-                onClick={onExitGuest}
-                className="px-2.5 py-1.5 rounded-lg border border-gray-200 hover:bg-gray-100 text-xs font-bold text-gray-700 transition-colors cursor-pointer"
-                title="Log In or Create Account"
-              >
-                Sign In
-              </button>
-            </div>
+          {!user ? (
+            <button
+              type="button"
+              onClick={onOpenAuth}
+              className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-green-700 hover:bg-green-800 text-white text-xs font-bold transition-all shadow-xs cursor-pointer"
+            >
+              <UserCheck size={14} />
+              <span>Sign In / Sign Up</span>
+            </button>
           ) : (
             <>
               <div className="hidden sm:flex flex-col items-end leading-tight pl-1 border-l border-gray-200">

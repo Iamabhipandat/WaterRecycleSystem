@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Check, Droplets, Lock, Mail, Shield, User, MailCheck, Sparkles, Play, ArrowRight, Leaf } from "lucide-react";
+import { Check, Droplets, Lock, Mail, Shield, User, MailCheck, Sparkles, Play, ArrowRight, ArrowLeft, Leaf } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 
 function mapAuthError(err) {
@@ -18,7 +18,7 @@ function mapAuthError(err) {
   return msg || "Something went wrong. Try again.";
 }
 
-export default function AuthPage({ onOpenPreview, onExploreAsGuest }) {
+export default function AuthPage({ onOpenPreview, onExploreAsGuest, onBackToHome }) {
   const { login, signup, resendVerificationEmail, verificationNotice } = useAuth();
   const [mode, setMode] = useState("login"); // "login" | "signup"
   const [name, setName] = useState("");
@@ -78,6 +78,17 @@ export default function AuthPage({ onOpenPreview, onExploreAsGuest }) {
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4 py-10">
       <div className="w-full max-w-md">
+        {onBackToHome && (
+          <button
+            type="button"
+            onClick={onBackToHome}
+            className="mb-5 inline-flex items-center gap-1.5 text-xs font-bold text-emerald-800 hover:text-emerald-950 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 px-3 py-1.5 rounded-xl transition-colors cursor-pointer"
+          >
+            <ArrowLeft size={14} />
+            <span>← Back to Website / Public Explorer</span>
+          </button>
+        )}
+
         <div className="flex items-center justify-center gap-3 mb-6">
           <div className="w-11 h-11 rounded-xl bg-green-700 flex items-center justify-center shadow-sm">
             <Droplets size={20} className="text-white" />

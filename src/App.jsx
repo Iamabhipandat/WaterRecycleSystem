@@ -67,13 +67,11 @@ function nowStr() {
 
 export default function App() {
   const { user, loading, isAdmin, verificationNotice } = useAuth();
-  const [view, setView]           = useState("flow");
+  const [view, setView]           = useState("preview");
   const [state, setState]         = useState(INITIAL);
   const [warning, setWarning]     = useState(null);
   const [liveMode, setLiveMode]   = useState(false);
   const [showHardwareModal, setShowHardwareModal] = useState(false);
-  const [showPublicPreview, setShowPublicPreview] = useState(false);
-  const [isGuest, setIsGuest]                     = useState(false);
 
   useEffect(() => {
     if (user?.id) setState(INITIAL);
@@ -362,77 +360,18 @@ export default function App() {
     );
   }
 
-  if (!user && !isGuest) {
-    if (showPublicPreview) {
-      return (
-        <div className="min-h-screen bg-gray-50">
-          <header className="bg-white border-b border-gray-200 sticky top-0 z-40 px-4 sm:px-6 py-3 flex items-center justify-between shadow-xs">
-            <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl bg-green-700 flex items-center justify-center text-white shadow-xs">
-                <Droplets size={18} />
-              </div>
-              <div>
-                <span className="text-base font-bold text-gray-900 tracking-tight">JalLoop</span>
-                <span className="ml-2 text-xs text-emerald-700 font-semibold hidden sm:inline">India Water Crisis &amp; Mission Preview</span>
-              </div>
-            </div>
-            <div className="flex items-center gap-2">
-              <button
-                type="button"
-                onClick={() => {
-                  setShowPublicPreview(false);
-                  setIsGuest(true);
-                  setView("flow");
-                }}
-                className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-green-700 text-white text-xs font-bold hover:bg-green-800 transition-colors shadow-xs cursor-pointer"
-              >
-                <Power size={13} />
-                <span>Launch Live Simulator</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => setShowPublicPreview(false)}
-                className="px-3 py-1.5 rounded-xl border border-gray-200 text-xs font-semibold text-gray-700 hover:bg-gray-100 transition-colors cursor-pointer"
-              >
-                Sign In
-              </button>
-            </div>
-          </header>
-
-          <main className="max-w-screen-xl mx-auto px-4 sm:px-6 py-6">
-            <WaterCrisisPreview
-              onLaunchSimulator={() => {
-                setShowPublicPreview(false);
-                setIsGuest(true);
-                setView("flow");
-              }}
-              onGoToAuth={() => setShowPublicPreview(false)}
-              isInsideApp={false}
-            />
-          </main>
-        </div>
-      );
-    }
-
-    return (
-      <AuthPage
-        onOpenPreview={() => setShowPublicPreview(true)}
-        onExploreAsGuest={() => {
-          setIsGuest(true);
-          setView("flow");
-        }}
-      />
-    );
+  if (view === "auth") {
+    return <AuthPage onBackToHome={() => setView("preview")} />;
   }
 
   const currentTab = view === "dashboard" ? "flow" : view;
 
   const NAV_TABS = [
-    { id: "flow", label: "Water Flow", icon: Droplets, badge: "Glass Pipes" },
+    { id: "preview", label: "Frontpage & Mission", icon: Leaf, badge: "Crisis & Tech" },
+    { id: "flow", label: "Live Flow Simulator", icon: Droplets, badge: "Glass Pipes" },
     { id: "virtual-hardware", label: "Virtual Hardware", icon: Cpu, badge: "ESP32 Twin" },
     { id: "status", label: "System Status", icon: Activity, badge: "Live Logs" },
     { id: "analytics", label: "Analytics", icon: BarChart3, badge: "Charts & CSV" },
-    { id: "preview", label: "Crisis & Mission", icon: Leaf, badge: "India Crisis" },
   ];
 
   return (
@@ -442,11 +381,7 @@ export default function App() {
         liveMode={liveMode}
         connected={connected}
         error={error}
-        isGuest={isGuest && !user}
-        onExitGuest={() => {
-          setIsGuest(false);
-          setShowPublicPreview(false);
-        }}
+        onOpenAuth={() => setView("auth")}
         onNavigate={(pageId) => setView(pageId)}
         onOpenAdmin={() => setView(view === "admin" ? "flow" : "admin")}
         onToggleMode={() => {
@@ -464,17 +399,17 @@ export default function App() {
       ) : (
       <main className="max-w-screen-xl mx-auto px-4 sm:px-6 py-6 space-y-5">
 
-        {/* Public Guest Explorer Mode Alert */}
-        {isGuest && !user && (
+        {/* Public Explorer Mode Banner for unauthenticated visitors */}
+        {!user && currentTab !== "preview" && (
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200 rounded-2xl p-4 text-xs text-emerald-950 shadow-xs">
             <div className="flex items-center gap-3">
               <div className="w-9 h-9 rounded-xl bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-xs">
                 <Leaf size={17} />
               </div>
               <div>
-                <p className="font-bold text-sm text-emerald-900">Guest Explorer Mode (No Login Required)</p>
+                <p className="font-bold text-sm text-emerald-900">Public Explorer Mode (No Login Required)</p>
                 <p className="text-emerald-700/90 mt-0.5">
-                  You are exploring the full JalLoop system: click pumps, run filtration stages, inspect sensor metrics or read about India's water crisis.
+                  You are exploring the live JalLoop system without logging in. Run simulations, toggle pumps, or switch to the Frontpage story anytime.
                 </p>
               </div>
             </div>
@@ -484,17 +419,14 @@ export default function App() {
                 onClick={() => setView("preview")}
                 className="px-3 py-1.5 rounded-xl border border-emerald-300 bg-white hover:bg-emerald-50 text-emerald-800 font-bold text-xs transition-colors cursor-pointer"
               >
-                Read Crisis Story
+                Frontpage &amp; Crisis Story
               </button>
               <button
                 type="button"
-                onClick={() => {
-                  setIsGuest(false);
-                  setShowPublicPreview(false);
-                }}
+                onClick={() => setView("auth")}
                 className="px-3.5 py-1.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs transition-colors shadow-xs cursor-pointer"
               >
-                Sign In / Register
+                Sign In / Sign Up
               </button>
             </div>
           </div>
@@ -850,12 +782,7 @@ export default function App() {
           <div className="space-y-5 animate-fadeIn">
             <WaterCrisisPreview
               onLaunchSimulator={() => setView("flow")}
-              onGoToAuth={() => {
-                if (isGuest) {
-                  setIsGuest(false);
-                  setShowPublicPreview(false);
-                }
-              }}
+              onGoToAuth={() => setView("auth")}
               isInsideApp={true}
             />
           </div>
