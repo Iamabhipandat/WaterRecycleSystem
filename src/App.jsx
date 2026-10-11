@@ -7,9 +7,6 @@ import Analytics from "./components/Analytics";
 import SystemStatus from "./components/SystemStatus";
 import HardwareLeds from "./components/HardwareLeds";
 import VirtualHardwareWorkbench from "./components/VirtualHardwareWorkbench";
-import AwsCloudCenterModal from "./components/AwsCloudCenterModal";
-import WaterStorageAwsMapping from "./components/WaterStorageAwsMapping";
-import AwsStorageInspectorModal from "./components/AwsStorageInspectorModal";
 import HardwareConnectionModal from "./components/HardwareConnectionModal";
 import AuthPage from "./pages/AuthPage";
 import AdminDashboard from "./pages/AdminDashboard";
@@ -71,19 +68,11 @@ export default function App() {
   const [state, setState]         = useState(INITIAL);
   const [warning, setWarning]     = useState(null);
   const [liveMode, setLiveMode]   = useState(false);
-  const [showAwsModal, setShowAwsModal] = useState(false);
-  const [showStorageModal, setShowStorageModal] = useState(false);
-  const [storageModalTank, setStorageModalTank] = useState("collection");
   const [showHardwareModal, setShowHardwareModal] = useState(false);
 
   useEffect(() => {
     if (user?.id) setState(INITIAL);
   }, [user?.id]);
-
-  const handleInspectStorageTank = useCallback((tankId) => {
-    setStorageModalTank(tankId || "collection");
-    setShowStorageModal(true);
-  }, []);
 
   const { liveData, connected, error, sendCommand, syncLeds } = useFirebaseData(liveMode);
 
@@ -361,7 +350,6 @@ export default function App() {
         error={error}
         onNavigate={(pageId) => setView(pageId)}
         onOpenAdmin={() => setView(view === "admin" ? "flow" : "admin")}
-        onOpenAwsCenter={() => setShowAwsModal(true)}
         onToggleMode={() => {
           if (liveMode) {
             setLiveMode(false);
@@ -455,7 +443,6 @@ export default function App() {
               washingActive={displayState.washingActive}
               rainActive={displayState.rainActive}
               reuseActive={displayState.reuseActive}
-              onInspectTank={handleInspectStorageTank}
             />
 
             {/* Flow Simulation Controls */}
@@ -498,14 +485,6 @@ export default function App() {
                   </p>
                 </div>
               </div>
-              <button
-                type="button"
-                onClick={() => setShowAwsModal(true)}
-                className="self-start sm:self-auto flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold bg-amber-400 hover:bg-amber-300 text-amber-950 transition-all shadow-xs shrink-0 cursor-pointer"
-              >
-                <Cloud size={14} className="text-amber-900" />
-                <span>AWS Cloud Architecture</span>
-              </button>
             </div>
 
             {/* Hardware LEDs status */}
@@ -554,21 +533,13 @@ export default function App() {
                 <div>
                   <div className="flex items-center gap-2">
                     <span className="text-xs font-semibold text-teal-300 uppercase tracking-widest">System Status &amp; Actuators</span>
-                    <span className="text-[10px] bg-teal-500/20 text-teal-200 border border-teal-500/30 px-2 py-0.5 rounded-full font-mono">Cedar Verified</span>
+                    <span className="text-[10px] bg-teal-500/20 text-teal-200 border border-teal-500/30 px-2 py-0.5 rounded-full font-mono">System Verified</span>
                   </div>
                   <p className="text-sm font-medium text-teal-100 mt-0.5">
                     Real-time monitoring of dual-tank reservoirs, filtration stages 1/2/3, relay actuators, and event logs.
                   </p>
                 </div>
               </div>
-              <button
-                type="button"
-                onClick={() => setShowAwsModal(true)}
-                className="self-start sm:self-auto flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold bg-amber-400 hover:bg-amber-300 text-amber-950 transition-all shadow-xs shrink-0 cursor-pointer"
-              >
-                <Cloud size={14} className="text-amber-900" />
-                <span>AWS Cedar Invariants</span>
-              </button>
             </div>
 
             {/* Quick Metrics Bar */}
@@ -660,17 +631,11 @@ export default function App() {
                 activity={displayState.activity}
               />
             </div>
-
-            {/* AWS Open Source Water Storage Mapping & Telemetry Inspector */}
-            <WaterStorageAwsMapping
-              systemState={displayState}
-              onInspectTank={handleInspectStorageTank}
-            />
           </div>
         )}
 
         {/* =========================================================================
-            PAGE 4: ANALYTICS (Charts, Savings, Efficiency, OpenSearch, CSV Export)
+            PAGE 4: ANALYTICS (Charts, Savings, Efficiency, Reports)
         ========================================================================= */}
         {currentTab === "analytics" && (
           <div className="space-y-5 animate-fadeIn">
@@ -683,21 +648,13 @@ export default function App() {
                 <div>
                   <div className="flex items-center gap-2">
                     <span className="text-xs font-semibold text-indigo-300 uppercase tracking-widest">Water Analytics &amp; Conservation</span>
-                    <span className="text-[10px] bg-indigo-500/20 text-indigo-200 border border-indigo-500/30 px-2 py-0.5 rounded-full font-mono">OpenSearch Index</span>
+                    <span className="text-[10px] bg-indigo-500/20 text-indigo-200 border border-indigo-500/30 px-2 py-0.5 rounded-full font-mono">Telemetry Analytics</span>
                   </div>
                   <p className="text-sm font-medium text-indigo-200 mt-0.5">
                     7-day recycling trend, telemetry aggregations, cost savings analysis, and exportable reports.
                   </p>
                 </div>
               </div>
-              <button
-                type="button"
-                onClick={() => setShowAwsModal(true)}
-                className="self-start sm:self-auto flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold bg-amber-400 hover:bg-amber-300 text-amber-950 transition-all shadow-xs shrink-0 cursor-pointer"
-              >
-                <Cloud size={14} className="text-amber-900" />
-                <span>OpenSearch DSL</span>
-              </button>
             </div>
 
             {/* Quick Metrics Bar */}
@@ -750,21 +707,6 @@ export default function App() {
 
       </main>
       )}
-
-      {/* AWS Cloud Architecture & Open Source Modal */}
-      <AwsCloudCenterModal
-        isOpen={showAwsModal}
-        onClose={() => setShowAwsModal(false)}
-        systemState={displayState}
-      />
-
-      {/* AWS Open Source Water Storage Inspector Modal */}
-      <AwsStorageInspectorModal
-        isOpen={showStorageModal}
-        onClose={() => setShowStorageModal(false)}
-        systemState={displayState}
-        initialTank={storageModalTank}
-      />
 
       <HardwareConnectionModal
         isOpen={showHardwareModal}

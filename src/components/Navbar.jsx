@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Cloud, Droplets, LayoutDashboard, LogOut, Settings, Menu, X, Cpu, Activity, BarChart3 } from "lucide-react";
+import { Droplets, LayoutDashboard, LogOut, Settings, Menu, X, Cpu, Activity, BarChart3 } from "lucide-react";
 import ModeToggle from "./ModeToggle";
 import { useAuth } from "../context/AuthContext";
 
@@ -9,7 +9,6 @@ export default function Navbar({
   error,
   onToggleMode,
   onOpenAdmin,
-  onOpenAwsCenter,
   onNavigate,
   view,
 }) {
@@ -70,18 +69,6 @@ export default function Navbar({
 
         {/* Right Action Tools */}
         <div className="flex items-center gap-1.5 sm:gap-2">
-          {/* AWS Open Source & Cloud Center Trigger */}
-          <button
-            type="button"
-            onClick={onOpenAwsCenter}
-            className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-full text-xs font-bold bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-300 transition-all shadow-2xs hover:scale-102 cursor-pointer"
-            title="Open AWS Open Source & Cloud Architecture Center"
-          >
-            <Cloud size={13} className="text-amber-600" />
-            <span className="hidden sm:inline">AWS Cloud</span>
-            <span className="sm:hidden">AWS</span>
-          </button>
-
           <ModeToggle
             liveMode={liveMode}
             connected={connected}
