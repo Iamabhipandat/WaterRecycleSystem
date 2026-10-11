@@ -15,8 +15,8 @@ const LED_PHASE_CONFIG = {
 
 export default function HardwareLeds({ liveMode, connected, leds, onConnect }) {
   return (
-    <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-5">
-      <div className="flex items-start justify-between gap-3 mb-4">
+    <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-3.5 sm:p-5">
+      <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-2.5 sm:gap-3 mb-4">
         <div>
           <h2 className="text-sm font-bold text-gray-700 uppercase tracking-wider">Hardware LED Indicators</h2>
           <p className="text-xs text-gray-400 mt-0.5">
@@ -27,7 +27,7 @@ export default function HardwareLeds({ liveMode, connected, leds, onConnect }) {
               : "Connect a physical ESP32 to see live LED and sensor states."}
           </p>
         </div>
-        <span className={`text-xs font-semibold px-2.5 py-1 rounded-full border ${
+        <span className={`self-start sm:self-auto shrink-0 whitespace-nowrap text-xs font-semibold px-2.5 py-1 rounded-full border ${
           connected
             ? "bg-blue-50 text-blue-700 border-blue-200"
             : liveMode

@@ -483,13 +483,13 @@ export default function App() {
         {currentTab === "virtual-hardware" && (
           <div className="space-y-5 animate-fadeIn">
             {/* Header Banner */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-slate-900 text-white rounded-2xl px-6 py-4 shadow-sm border border-slate-800">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-slate-900 text-white rounded-2xl px-4 py-3.5 sm:px-6 sm:py-4 shadow-sm border border-slate-800">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-blue-600/30 border border-blue-500/40 flex items-center justify-center shrink-0">
                   <Cpu size={22} className="text-blue-400" />
                 </div>
                 <div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex flex-wrap items-center gap-2">
                     <span className="text-xs font-semibold text-blue-400 uppercase tracking-widest">ESP32 Digital Twin Workbench</span>
                     <span className="text-[10px] bg-blue-500/20 text-blue-300 border border-blue-500/30 px-2 py-0.5 rounded-full font-mono">115200 Baud</span>
                   </div>

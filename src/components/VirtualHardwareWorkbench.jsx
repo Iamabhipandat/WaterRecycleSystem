@@ -108,34 +108,34 @@ export default function VirtualHardwareWorkbench({
   }
 
   return (
-    <div id="virtual-hardware" className="bg-white rounded-3xl border border-gray-200 shadow-sm p-5 space-y-4">
+    <div id="virtual-hardware" className="bg-white rounded-2xl sm:rounded-3xl border border-gray-200 shadow-sm p-3.5 sm:p-5 space-y-4">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-gray-100">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-2xl bg-cyan-50 border border-cyan-200 flex items-center justify-center text-cyan-700 shadow-2xs">
+          <div className="w-10 h-10 rounded-2xl bg-cyan-50 border border-cyan-200 flex items-center justify-center text-cyan-700 shadow-2xs shrink-0">
             <Cpu size={22} className="text-cyan-700" />
           </div>
-          <div>
-            <div className="flex items-center gap-2">
+          <div className="min-w-0">
+            <div className="flex flex-wrap items-center gap-2">
               <h2 className="text-base font-bold text-gray-900 leading-tight">
                 Virtual Hardware Workbench &amp; ESP32 Simulation
               </h2>
-              <span className="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full bg-cyan-100 text-cyan-800 border border-cyan-300">
+              <span className="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full bg-cyan-100 text-cyan-800 border border-cyan-300 whitespace-nowrap">
                 Digital Twin
               </span>
             </div>
-            <p className="text-xs text-gray-500">
+            <p className="text-xs text-gray-500 mt-0.5">
               Interactive ESP32 circuit with virtual ultrasonic sonars, turbidity potentiometer, pump switch &amp; LEDs
             </p>
           </div>
         </div>
 
         {/* View Switcher Tabs */}
-        <div className="flex items-center gap-1 bg-gray-100 p-1 rounded-xl">
+        <div className="flex items-center gap-1 bg-gray-100 p-1 rounded-xl w-full sm:w-auto overflow-x-auto shrink-0">
           <button
             type="button"
             onClick={() => setActiveTab("board")}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+            className={`flex-1 sm:flex-none text-center px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all ${
               activeTab === "board" ? "bg-white text-gray-900 shadow-2xs" : "text-gray-500 hover:text-gray-800"
             }`}
           >
@@ -144,7 +144,7 @@ export default function VirtualHardwareWorkbench({
           <button
             type="button"
             onClick={() => setActiveTab("terminal")}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 ${
+            className={`flex-1 sm:flex-none text-center px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all flex items-center justify-center gap-1.5 ${
               activeTab === "terminal" ? "bg-white text-gray-900 shadow-2xs" : "text-gray-500 hover:text-gray-800"
             }`}
           >
@@ -154,12 +154,12 @@ export default function VirtualHardwareWorkbench({
           <button
             type="button"
             onClick={() => setActiveTab("wokwi")}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 ${
+            className={`flex-1 sm:flex-none text-center px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all flex items-center justify-center gap-1.5 ${
               activeTab === "wokwi" ? "bg-white text-gray-900 shadow-2xs" : "text-gray-500 hover:text-gray-800"
             }`}
           >
             <ExternalLink size={12} />
-            Wokwi Diagram
+            Wokwi
           </button>
         </div>
       </div>
@@ -168,40 +168,40 @@ export default function VirtualHardwareWorkbench({
       {activeTab === "board" && (
         <div className="space-y-4">
           {/* Top Info Banner */}
-          <div className="p-3.5 rounded-2xl bg-gradient-to-r from-cyan-50/70 via-sky-50/50 to-blue-50/70 border border-cyan-200/80 flex flex-wrap items-center justify-between gap-3 text-xs">
-            <div className="flex items-center gap-2.5">
-              <span className={`w-3 h-3 rounded-full ${systemLedBlink ? "bg-emerald-500 shadow-[0_0_8px_#10b981]" : "bg-gray-300"}`} />
+          <div className="p-3 sm:p-3.5 rounded-2xl bg-gradient-to-r from-cyan-50/70 via-sky-50/50 to-blue-50/70 border border-cyan-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 text-xs">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className={`w-2.5 h-2.5 rounded-full shrink-0 ${systemLedBlink ? "bg-emerald-500 shadow-[0_0_8px_#10b981]" : "bg-gray-300"}`} />
               <span className="font-bold text-gray-800">
                 ESP32 DevKit v1: <span className="text-emerald-700">ONLINE</span>
               </span>
-              <span className="text-gray-400">·</span>
-              <span className="text-gray-600">Firmware: <code className="font-mono font-bold text-cyan-800">v2.0.0 (FreeRTOS)</code></span>
+              <span className="text-gray-300 hidden sm:inline">·</span>
+              <span className="text-gray-600 text-[11px] sm:text-xs">Firmware: <code className="font-mono font-bold text-cyan-800">v2.0.0 (FreeRTOS)</code></span>
             </div>
-            <div className="flex items-center gap-2">
-              <span className="text-[11px] text-gray-500">Move sliders below to simulate ultrasonic water levels &amp; turbidity</span>
+            <div className="text-[11px] text-gray-500">
+              Move sliders below to simulate ultrasonic water levels &amp; turbidity
             </div>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
             {/* LEFT: SENSORS & PHYSICAL INPUTS (7 Columns) */}
             <div className="lg:col-span-7 space-y-3">
-              <div className="p-4 rounded-2xl border border-gray-200 bg-gray-50/60 space-y-4">
-                <div className="flex items-center justify-between">
+              <div className="p-3.5 sm:p-4 rounded-2xl border border-gray-200 bg-gray-50/60 space-y-4">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
                   <h3 className="text-xs font-bold text-gray-800 uppercase tracking-wider flex items-center gap-2">
-                    <Sliders size={14} className="text-cyan-700" />
-                    Virtual Ultrasonic Sonar &amp; Analog Sensors
+                    <Sliders size={14} className="text-cyan-700 shrink-0" />
+                    <span>Virtual Ultrasonic Sonar &amp; Analog Sensors</span>
                   </h3>
                   <span className="text-[10px] font-mono text-gray-400">GPIO Pins: 5, 18, 19, 21, 34</span>
                 </div>
 
                 {/* Sensor 1: HC-SR04 Collection Tank */}
                 <div className="p-3 bg-white rounded-xl border border-gray-200 shadow-2xs space-y-2">
-                  <div className="flex items-center justify-between text-xs">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 text-xs">
                     <div className="flex items-center gap-2 font-bold text-gray-800">
-                      <Radio size={14} className="text-blue-600" />
+                      <Radio size={14} className="text-blue-600 shrink-0" />
                       <span>HC-SR04 Sonar 1 (Collection Tank)</span>
                     </div>
-                    <span className="font-mono font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-md border border-blue-200">
+                    <span className="self-start sm:self-auto font-mono font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-md border border-blue-200 shrink-0 whitespace-nowrap">
                       {collectionDistance} cm ({Math.round(displayState.collectionLiters || 0)} L)
                     </span>
                   </div>
@@ -214,16 +214,16 @@ export default function VirtualHardwareWorkbench({
                     onChange={handleCollectionSonarChange}
                     className="w-full accent-blue-600"
                   />
-                  <div className="flex justify-between text-[10px] text-gray-400">
-                    <span>2 cm (Tank 100% Full)</span>
-                    <span>Distance to water surface</span>
-                    <span>30 cm (Tank Empty)</span>
+                  <div className="flex justify-between items-center text-[10px] text-gray-400">
+                    <span>2 cm (Full)</span>
+                    <span className="hidden sm:inline">Distance to water surface</span>
+                    <span>30 cm (Empty)</span>
                   </div>
-                  <div className="pt-1.5 border-t border-gray-100 flex items-center justify-between text-[10px] font-mono text-gray-500">
-                    <span className="flex items-center gap-1 text-blue-700 font-bold">
-                      <span>⚡ AWS DynamoDB:</span> JalLoopWaterMetrics
+                  <div className="pt-2 border-t border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-1 text-[10px] font-mono">
+                    <span className="flex items-center gap-1 text-blue-700 font-semibold break-all">
+                      <span>⚡ DynamoDB:</span> JalLoopWaterMetrics
                     </span>
-                    <span className="text-amber-700 font-bold">
+                    <span className="flex items-center gap-1 text-amber-700 font-semibold break-all">
                       <span>🔍 OpenSearch:</span> jalloop-water-telemetry
                     </span>
                   </div>
@@ -231,12 +231,12 @@ export default function VirtualHardwareWorkbench({
 
                 {/* Sensor 2: HC-SR04 Recycled Tank */}
                 <div className="p-3 bg-white rounded-xl border border-gray-200 shadow-2xs space-y-2">
-                  <div className="flex items-center justify-between text-xs">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 text-xs">
                     <div className="flex items-center gap-2 font-bold text-gray-800">
-                      <Radio size={14} className="text-sky-600" />
+                      <Radio size={14} className="text-sky-600 shrink-0" />
                       <span>HC-SR04 Sonar 2 (Recycled Storage Tank)</span>
                     </div>
-                    <span className="font-mono font-bold text-sky-700 bg-sky-50 px-2 py-0.5 rounded-md border border-sky-200">
+                    <span className="self-start sm:self-auto font-mono font-bold text-sky-700 bg-sky-50 px-2 py-0.5 rounded-md border border-sky-200 shrink-0 whitespace-nowrap">
                       {recycledDistance} cm ({Math.round(displayState.recycledLiters || 0)} L)
                     </span>
                   </div>
@@ -249,16 +249,16 @@ export default function VirtualHardwareWorkbench({
                     onChange={handleRecycledSonarChange}
                     className="w-full accent-sky-600"
                   />
-                  <div className="flex justify-between text-[10px] text-gray-400">
-                    <span>2 cm (Tank 100% Full)</span>
-                    <span>Distance to water surface</span>
-                    <span>60 cm (Tank Empty)</span>
+                  <div className="flex justify-between items-center text-[10px] text-gray-400">
+                    <span>2 cm (Full)</span>
+                    <span className="hidden sm:inline">Distance to water surface</span>
+                    <span>60 cm (Empty)</span>
                   </div>
-                  <div className="pt-1.5 border-t border-gray-100 flex items-center justify-between text-[10px] font-mono text-gray-500">
-                    <span className="flex items-center gap-1 text-emerald-700 font-bold">
-                      <span>⚡ AWS DynamoDB:</span> JalLoopWaterMetrics
+                  <div className="pt-2 border-t border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-1 text-[10px] font-mono">
+                    <span className="flex items-center gap-1 text-emerald-700 font-semibold break-all">
+                      <span>⚡ DynamoDB:</span> JalLoopWaterMetrics
                     </span>
-                    <span className="text-green-700 font-bold">
+                    <span className="flex items-center gap-1 text-green-700 font-semibold break-all">
                       <span>🪣 S3:</span> jalloop-water-archive
                     </span>
                   </div>
@@ -266,12 +266,12 @@ export default function VirtualHardwareWorkbench({
 
                 {/* Sensor 3: Turbidity Potentiometer */}
                 <div className="p-3 bg-white rounded-xl border border-gray-200 shadow-2xs space-y-2">
-                  <div className="flex items-center justify-between text-xs">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 text-xs">
                     <div className="flex items-center gap-2 font-bold text-gray-800">
-                      <Activity size={14} className="text-amber-600" />
+                      <Activity size={14} className="text-amber-600 shrink-0" />
                       <span>Analog Turbidity Potentiometer (GPIO 34 ADC)</span>
                     </div>
-                    <span className={`font-mono font-bold px-2 py-0.5 rounded-md border text-xs ${
+                    <span className={`self-start sm:self-auto font-mono font-bold px-2 py-0.5 rounded-md border text-xs shrink-0 whitespace-nowrap ${
                       turbidityVal > 60
                         ? "bg-red-50 text-red-700 border-red-200"
                         : turbidityVal > 35
@@ -289,15 +289,15 @@ export default function VirtualHardwareWorkbench({
                     onChange={handleTurbidityChange}
                     className="w-full accent-amber-600"
                   />
-                  <div className="flex justify-between text-[10px] text-gray-400">
-                    <span>10 NTU (Crystal Clear)</span>
-                    <span>WHO Non-potable Limit: 40 NTU</span>
-                    <span>95 NTU (Heavy Sediment)</span>
+                  <div className="flex justify-between items-center text-[10px] text-gray-400">
+                    <span>10 NTU (Clear)</span>
+                    <span className="hidden sm:inline">WHO Limit: 40 NTU</span>
+                    <span>95 NTU (Sediment)</span>
                   </div>
                 </div>
 
                 {/* Tactile Microswitch Button: BTN_PUMP on GPIO 0 */}
-                <div className="p-3 bg-white rounded-xl border border-gray-200 shadow-2xs flex items-center justify-between">
+                <div className="p-3 bg-white rounded-xl border border-gray-200 shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                   <div>
                     <span className="font-bold text-xs text-gray-800 block">
                       Physical Push Button: <code className="font-mono text-cyan-800">BTN_PUMP (GPIO 0)</code>
@@ -307,7 +307,7 @@ export default function VirtualHardwareWorkbench({
                   <button
                     type="button"
                     onClick={onTogglePump}
-                    className={`px-4 py-2 rounded-xl text-xs font-bold transition-all shadow-xs flex items-center gap-2 cursor-pointer ${
+                    className={`w-full sm:w-auto justify-center px-4 py-2.5 rounded-xl text-xs font-bold transition-all shadow-xs flex items-center gap-2 cursor-pointer shrink-0 ${
                       displayState.pumpRunning
                         ? "bg-red-600 hover:bg-red-700 text-white animate-pulse"
                         : "bg-emerald-600 hover:bg-emerald-700 text-white"
@@ -322,78 +322,78 @@ export default function VirtualHardwareWorkbench({
 
             {/* RIGHT: VIRTUAL BREADBOARD LEDS (5 Columns) */}
             <div className="lg:col-span-5 space-y-3">
-              <div className="p-4 rounded-2xl border border-gray-200 bg-gray-50/60 space-y-3 h-full">
+              <div className="p-3.5 sm:p-4 rounded-2xl border border-gray-200 bg-gray-50/60 space-y-3 h-full">
                 <div className="flex items-center justify-between">
                   <h3 className="text-xs font-bold text-gray-800 uppercase tracking-wider flex items-center gap-2">
-                    <Zap size={14} className="text-amber-500" />
-                    Virtual ESP32 GPIO LEDs
+                    <Zap size={14} className="text-amber-500 shrink-0" />
+                    <span>Virtual ESP32 GPIO LEDs</span>
                   </h3>
-                  <span className="text-[10px] font-mono text-gray-400">Realtime Pin Status</span>
+                  <span className="text-[10px] font-mono text-gray-400">Pin Status</span>
                 </div>
 
                 <div className="grid grid-cols-2 gap-2 text-xs">
                   {/* System Heartbeat */}
                   <div className={`p-2.5 rounded-xl border transition-all ${systemLedBlink ? "bg-emerald-50 border-emerald-300" : "bg-white border-gray-200"}`}>
-                    <div className="flex items-center gap-2">
-                      <span className={`w-3.5 h-3.5 rounded-full ${systemLedBlink ? "bg-emerald-500 shadow-[0_0_10px_#10b981]" : "bg-gray-300"}`} />
-                      <div>
-                        <span className="font-bold text-gray-900 block text-[11px]">LED_SYSTEM</span>
-                        <span className="text-[10px] text-gray-400 font-mono">GPIO 25 (Blinking)</span>
+                    <div className="flex items-center gap-2 min-w-0">
+                      <span className={`w-3.5 h-3.5 rounded-full shrink-0 ${systemLedBlink ? "bg-emerald-500 shadow-[0_0_10px_#10b981]" : "bg-gray-300"}`} />
+                      <div className="min-w-0 flex-1">
+                        <span className="font-bold text-gray-900 block text-[11px] truncate">LED_SYSTEM</span>
+                        <span className="text-[10px] text-gray-400 font-mono block truncate">GPIO 25 (Blink)</span>
                       </div>
                     </div>
                   </div>
 
                   {/* Pump LED */}
                   <div className={`p-2.5 rounded-xl border transition-all ${displayState.pumpRunning ? "bg-red-50 border-red-300" : "bg-white border-gray-200"}`}>
-                    <div className="flex items-center gap-2">
-                      <span className={`w-3.5 h-3.5 rounded-full ${displayState.pumpRunning ? "bg-red-500 shadow-[0_0_10px_#ef4444] animate-pulse" : "bg-gray-300"}`} />
-                      <div>
-                        <span className="font-bold text-gray-900 block text-[11px]">LED_PUMP</span>
-                        <span className="text-[10px] text-gray-400 font-mono">GPIO 32 (Relay)</span>
+                    <div className="flex items-center gap-2 min-w-0">
+                      <span className={`w-3.5 h-3.5 rounded-full shrink-0 ${displayState.pumpRunning ? "bg-red-500 shadow-[0_0_10px_#ef4444] animate-pulse" : "bg-gray-300"}`} />
+                      <div className="min-w-0 flex-1">
+                        <span className="font-bold text-gray-900 block text-[11px] truncate">LED_PUMP</span>
+                        <span className="text-[10px] text-gray-400 font-mono block truncate">GPIO 32 (Relay)</span>
                       </div>
                     </div>
                   </div>
 
                   {/* RO LED */}
                   <div className={`p-2.5 rounded-xl border transition-all ${leds?.ro ? "bg-blue-50 border-blue-300" : "bg-white border-gray-200"}`}>
-                    <div className="flex items-center gap-2">
-                      <span className={`w-3.5 h-3.5 rounded-full ${leds?.ro ? "bg-blue-500 shadow-[0_0_8px_#3b82f6]" : "bg-gray-300"}`} />
-                      <div>
-                        <span className="font-bold text-gray-900 block text-[11px]">LED_RO</span>
-                        <span className="text-[10px] text-gray-400 font-mono">GPIO 4 (RO Inflow)</span>
+                    <div className="flex items-center gap-2 min-w-0">
+                      <span className={`w-3.5 h-3.5 rounded-full shrink-0 ${leds?.ro ? "bg-blue-500 shadow-[0_0_8px_#3b82f6]" : "bg-gray-300"}`} />
+                      <div className="min-w-0 flex-1">
+                        <span className="font-bold text-gray-900 block text-[11px] truncate">LED_RO</span>
+                        <span className="text-[10px] text-gray-400 font-mono block truncate">GPIO 4 (Inflow)</span>
                       </div>
                     </div>
                   </div>
 
                   {/* Washing LED */}
                   <div className={`p-2.5 rounded-xl border transition-all ${leds?.washing ? "bg-cyan-50 border-cyan-300" : "bg-white border-gray-200"}`}>
-                    <div className="flex items-center gap-2">
-                      <span className={`w-3.5 h-3.5 rounded-full ${leds?.washing ? "bg-cyan-500 shadow-[0_0_8px_#06b6d4]" : "bg-gray-300"}`} />
-                      <div>
-                        <span className="font-bold text-gray-900 block text-[11px]">LED_WASHING</span>
-                        <span className="text-[10px] text-gray-400 font-mono">GPIO 12 (Washer)</span>
+                    <div className="flex items-center gap-2 min-w-0">
+                      <span className={`w-3.5 h-3.5 rounded-full shrink-0 ${leds?.washing ? "bg-cyan-500 shadow-[0_0_8px_#06b6d4]" : "bg-gray-300"}`} />
+                      <div className="min-w-0 flex-1">
+                        <span className="font-bold text-gray-900 block text-[11px] truncate">LED_WASHING</span>
+                        <span className="text-[10px] text-gray-400 font-mono block truncate">GPIO 12 (Washer)</span>
                       </div>
                     </div>
                   </div>
 
                   {/* Rain LED */}
                   <div className={`p-2.5 rounded-xl border transition-all ${leds?.rain ? "bg-sky-50 border-sky-300" : "bg-white border-gray-200"}`}>
-                    <div className="flex items-center gap-2">
-                      <span className={`w-3.5 h-3.5 rounded-full ${leds?.rain ? "bg-sky-400 shadow-[0_0_8px_#38bdf8]" : "bg-gray-300"}`} />
-                      <div>
-                        <span className="font-bold text-gray-900 block text-[11px]">LED_RAIN</span>
-                        <span className="text-[10px] text-gray-400 font-mono">GPIO 14 (Rainwater)</span>
+                    <div className="flex items-center gap-2 min-w-0">
+                      <span className={`w-3.5 h-3.5 rounded-full shrink-0 ${leds?.rain ? "bg-sky-400 shadow-[0_0_8px_#38bdf8]" : "bg-gray-300"}`} />
+                      <div className="min-w-0 flex-1">
+                        <span className="font-bold text-gray-900 block text-[11px] truncate">LED_RAIN</span>
+                        <span className="text-[10px] text-gray-400 font-mono block truncate">GPIO 14 (Rain)</span>
                       </div>
                     </div>
                   </div>
 
                   {/* Filtration Stages */}
                   <div className={`p-2.5 rounded-xl border transition-all ${displayState.filtrationStage > 0 ? "bg-emerald-50 border-emerald-300" : "bg-white border-gray-200"}`}>
-                    <div className="flex items-center gap-2">
-                      <span className={`w-3.5 h-3.5 rounded-full ${displayState.filtrationStage > 0 ? "bg-emerald-500 shadow-[0_0_8px_#10b981]" : "bg-gray-300"}`} />
-                      <div>
-                        <span className="font-bold text-gray-900 block text-[11px]">LED_FILTER</span>
-                        <span className="text-[10px] text-gray-400 font-mono">GPIO 26/16/33 (F{displayState.filtrationStage})</span>
+                    <div className="flex items-center gap-2 min-w-0">
+                      <span className={`w-3.5 h-3.5 rounded-full shrink-0 ${displayState.filtrationStage > 0 ? "bg-emerald-500 shadow-[0_0_8px_#10b981]" : "bg-gray-300"}`} />
+                      <div className="min-w-0 flex-1">
+                        <span className="font-bold text-gray-900 block text-[11px] truncate">LED_FILTER</span>
+                        <span className="text-[10px] text-gray-400 font-mono block truncate">Stage {displayState.filtrationStage} (26/16/33)</span>
                       </div>
                     </div>
                   </div>
@@ -411,23 +411,23 @@ export default function VirtualHardwareWorkbench({
                       ? "bg-sky-50 border-sky-300 shadow-xs ring-2 ring-sky-200"
                       : "bg-white border-gray-200"
                   }`}>
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2.5">
-                        <span className={`w-4 h-4 rounded-full ${
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        <span className={`w-4 h-4 rounded-full shrink-0 ${
                           leds?.recycled
                             ? "bg-sky-500 shadow-[0_0_12px_#0284c7] ring-2 ring-sky-300 animate-pulse"
                             : "bg-gray-300"
                         }`} />
-                        <div>
+                        <div className="min-w-0">
                           <span className="font-bold text-gray-900 text-xs block">
                             LED 1: Recycled Storing Light
                           </span>
-                          <span className="text-[10px] font-mono text-sky-800 font-semibold">
+                          <span className="text-[10px] font-mono text-sky-800 font-semibold block">
                             Pin: GPIO 15 (LED_RECYCLED)
                           </span>
                         </div>
                       </div>
-                      <span className={`text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full ${
+                      <span className={`self-start sm:self-auto text-[10px] font-extrabold uppercase px-2.5 py-1 rounded-full whitespace-nowrap ${
                         leds?.recycled ? "bg-sky-100 text-sky-800" : "bg-gray-100 text-gray-500"
                       }`}>
                         {leds?.recycled ? "STORING / STORED" : "EMPTY"}
@@ -441,18 +441,18 @@ export default function VirtualHardwareWorkbench({
                       ? "bg-emerald-50 border-emerald-300 shadow-xs ring-2 ring-emerald-200"
                       : "bg-white border-gray-200"
                   }`}>
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2.5">
-                        <span className={`w-4 h-4 rounded-full ${
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        <span className={`w-4 h-4 rounded-full shrink-0 ${
                           leds?.reuse
                             ? "bg-emerald-500 shadow-[0_0_12px_#10b981] ring-2 ring-emerald-300 animate-pulse"
                             : "bg-gray-300"
                         }`} />
-                        <div>
+                        <div className="min-w-0">
                           <span className="font-bold text-gray-900 text-xs block">
                             LED 2: Reused Water Distribution Light
                           </span>
-                          <span className="text-[10px] font-mono text-emerald-800 font-semibold">
+                          <span className="text-[10px] font-mono text-emerald-800 font-semibold block">
                             Pins: GPIO 2, 17, 13 (Sol Valves)
                           </span>
                         </div>
@@ -460,7 +460,7 @@ export default function VirtualHardwareWorkbench({
                       <button
                         type="button"
                         onClick={onToggleReuse}
-                        className={`text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full transition-colors ${
+                        className={`self-start sm:self-auto text-[10px] font-extrabold uppercase px-3 py-1 rounded-full transition-colors whitespace-nowrap cursor-pointer ${
                           leds?.reuse
                             ? "bg-emerald-200 text-emerald-900 hover:bg-emerald-300"
                             : "bg-gray-100 text-gray-600 hover:bg-gray-200"
@@ -480,10 +480,10 @@ export default function VirtualHardwareWorkbench({
       {/* TAB 2: VIRTUAL SERIAL MONITOR TERMINAL */}
       {activeTab === "terminal" && (
         <div className="space-y-3">
-          <div className="flex items-center justify-between text-xs">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 text-xs">
             <div className="flex items-center gap-2">
-              <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
-              <span className="font-mono font-bold text-gray-800">COM3 (Virtual ESP32 Serial @ 115200 Baud)</span>
+              <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse shrink-0" />
+              <span className="font-mono font-bold text-gray-800">COM3 (ESP32 Serial @ 115200)</span>
             </div>
             <div className="flex items-center gap-2">
               <button
@@ -505,7 +505,7 @@ export default function VirtualHardwareWorkbench({
             </div>
           </div>
 
-          <div className="bg-gray-950 text-gray-200 font-mono text-[11px] p-4 rounded-2xl h-72 overflow-y-auto space-y-1 shadow-inner border border-gray-800">
+          <div className="bg-gray-950 text-gray-200 font-mono text-[11px] p-4 rounded-2xl h-72 overflow-y-auto space-y-1 shadow-inner border border-gray-800 break-all sm:break-normal">
             <p className="text-gray-500">// JalLoop ESP32 Virtual Hardware Serial Terminal Stream (Wokwi / Realtime)</p>
             <p className="text-emerald-400">[BOOT] ESP32-WROOM-32 initialized. CPU: 240MHz. Flash: 4MB.</p>
             <p className="text-cyan-400">[WIFI] Connected to SSID: Wokwi-GUEST. Assigned IP: 192.168.1.105</p>
@@ -523,7 +523,7 @@ export default function VirtualHardwareWorkbench({
       {/* TAB 3: WOKWI SIMULATOR FILES & DIAGRAM */}
       {activeTab === "wokwi" && (
         <div className="p-4 rounded-2xl border border-gray-200 bg-gray-50/70 space-y-3 text-xs">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
               <h3 className="font-bold text-gray-900 text-sm">Wokwi Full Circuit Simulation Spec</h3>
               <p className="text-xs text-gray-500">
@@ -534,7 +534,7 @@ export default function VirtualHardwareWorkbench({
               href="https://wokwi.com"
               target="_blank"
               rel="noreferrer"
-              className="px-3.5 py-1.5 bg-cyan-700 hover:bg-cyan-800 text-white rounded-xl font-semibold text-xs flex items-center gap-1.5 shadow-2xs"
+              className="self-start sm:self-auto px-3.5 py-1.5 bg-cyan-700 hover:bg-cyan-800 text-white rounded-xl font-semibold text-xs flex items-center gap-1.5 shadow-2xs"
             >
               Open wokwi.com
               <ExternalLink size={12} />
