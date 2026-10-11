@@ -9,7 +9,7 @@ import HardwareLeds from "./components/HardwareLeds";
 import VirtualHardwareWorkbench from "./components/VirtualHardwareWorkbench";
 import SmartWaterAdvisor from "./components/SmartWaterAdvisor";
 import HardwareConnectionModal from "./components/HardwareConnectionModal";
-import WaterCrisisPreview from "./components/WaterCrisisPreview";
+import LandingPage from "./components/LandingPage";
 import AuthPage from "./pages/AuthPage";
 import AdminDashboard from "./pages/AdminDashboard";
 import { evaluateCedarPolicy } from "./services/cedarPolicy";
@@ -364,10 +364,18 @@ export default function App() {
     return <AuthPage onBackToHome={() => setView("preview")} />;
   }
 
+  if (view === "preview") {
+    return (
+      <LandingPage
+        onLaunchSimulator={() => setView("flow")}
+        onGoToAuth={() => setView("auth")}
+      />
+    );
+  }
+
   const currentTab = view === "dashboard" ? "flow" : view;
 
   const NAV_TABS = [
-    { id: "preview", label: "Frontpage & Mission", icon: Leaf, badge: "Crisis & Tech" },
     { id: "flow", label: "Live Flow Simulator", icon: Droplets, badge: "Glass Pipes" },
     { id: "virtual-hardware", label: "Virtual Hardware", icon: Cpu, badge: "ESP32 Twin" },
     { id: "status", label: "System Status", icon: Activity, badge: "Live Logs" },
@@ -772,19 +780,6 @@ export default function App() {
                 <p className="text-xs text-gray-500 font-medium mt-1">Per 100 litres recycled</p>
               </div>
             </div>
-          </div>
-        )}
-
-        {/* =========================================================================
-            PAGE 5: CRISIS & MISSION PREVIEW (2-3 page deep story of water wastage in India)
-        ========================================================================= */}
-        {currentTab === "preview" && (
-          <div className="space-y-5 animate-fadeIn">
-            <WaterCrisisPreview
-              onLaunchSimulator={() => setView("flow")}
-              onGoToAuth={() => setView("auth")}
-              isInsideApp={true}
-            />
           </div>
         )}
 
