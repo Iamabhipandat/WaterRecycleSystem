@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Check, Droplets, Lock, Mail, Shield, User, MailCheck, KeyRound } from "lucide-react";
+import { Check, Droplets, Lock, Mail, Shield, User, MailCheck } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 
 function mapAuthError(err) {
@@ -19,7 +19,7 @@ function mapAuthError(err) {
 }
 
 export default function AuthPage() {
-  const { login, signup, verifySignupOtp, resendVerificationEmail } = useAuth();
+  const { login, signup, resendVerificationEmail } = useAuth();
   const [mode, setMode] = useState("login"); // "login" | "signup"
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -29,8 +29,6 @@ export default function AuthPage() {
   const [successMsg, setSuccessMsg] = useState("");
   const [busy, setBusy] = useState(false);
   const [showVerifyBanner, setShowVerifyBanner] = useState(false);
-  const [verificationPending, setVerificationPending] = useState(false);
-  const [otp, setOtp] = useState("");
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -43,8 +41,8 @@ export default function AuthPage() {
         if (!name.trim()) throw new Error("Please enter your name.");
         const res = await signup({ name, email, password, inviteCode });
         if (res?.requireVerification) {
-          setVerificationPending(true);
-          setSuccessMsg(res.message || "We sent a one-time code to your email.");
+          setShowVerifyBanner(true);
+          setSuccessMsg(res.message || "Account created. Check your email for a verification link.");
         }
       } else {
         await login({ email, password });
@@ -57,24 +55,6 @@ export default function AuthPage() {
       ) {
         setShowVerifyBanner(true);
       }
-    } finally {
-      setBusy(false);
-    }
-  }
-
-  async function handleVerifySignup(e) {
-    e.preventDefault();
-    setError("");
-    setSuccessMsg("");
-    setBusy(true);
-
-    try {
-      await verifySignupOtp(email, otp);
-      setVerificationPending(false);
-      setOtp("");
-      setSuccessMsg("Registration complete. Your email has been verified.");
-    } catch (err) {
-      setError(mapAuthError(err));
     } finally {
       setBusy(false);
     }
@@ -115,7 +95,6 @@ export default function AuthPage() {
               type="button"
               onClick={() => {
                 setMode("login");
-                setVerificationPending(false);
                 setError("");
                 setSuccessMsg("");
               }}
@@ -129,7 +108,6 @@ export default function AuthPage() {
               type="button"
               onClick={() => {
                 setMode("signup");
-                setVerificationPending(false);
                 setError("");
                 setSuccessMsg("");
               }}
@@ -182,57 +160,6 @@ export default function AuthPage() {
             </div>
           )}
 
-          {verificationPending ? (
-            <form onSubmit={handleVerifySignup} className="space-y-3">
-              <div className="text-center space-y-2 pb-2">
-                <div className="mx-auto w-11 h-11 rounded-xl bg-sky-50 border border-sky-200 flex items-center justify-center">
-                  <KeyRound size={20} className="text-sky-600" />
-                </div>
-                <h2 className="text-base font-bold text-gray-900">Verify your email</h2>
-                <p className="text-xs text-gray-500">
-                  Enter the one-time code sent to <strong>{email}</strong>.
-                </p>
-              </div>
-
-              <label className="block">
-                <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
-                  Verification code
-                </span>
-                <div className="mt-1 flex items-center gap-2 border border-gray-200 rounded-xl px-3 py-2.5 focus-within:border-green-600">
-                  <KeyRound size={15} className="text-gray-400" />
-                  <input
-                    className="w-full text-sm tracking-[0.35em] outline-none"
-                    value={otp}
-                    onChange={(e) => setOtp(e.target.value.replace(/\D/g, "").slice(0, 6))}
-                    placeholder="123456"
-                    inputMode="numeric"
-                    autoComplete="one-time-code"
-                    maxLength={6}
-                    required
-                    autoFocus
-                  />
-                </div>
-              </label>
-
-              <button
-                type="submit"
-                disabled={busy || otp.length < 6}
-                className="w-full mt-2 bg-green-700 hover:bg-green-800 disabled:opacity-60 text-white text-sm font-semibold rounded-xl py-2.5 transition-colors shadow-xs"
-              >
-                {busy ? "Verifying…" : "Verify email"}
-              </button>
-
-              <button
-                type="button"
-                onClick={handleResendVerification}
-                disabled={busy}
-                className="w-full text-xs font-semibold text-sky-700 hover:text-sky-900 disabled:opacity-50"
-              >
-                Resend code
-              </button>
-            </form>
-          ) : (
-          /* Form */
           <form onSubmit={handleSubmit} className="space-y-3">
             {mode === "signup" && (
               <label className="block">
@@ -321,7 +248,6 @@ export default function AuthPage() {
               {busy ? "Please wait…" : mode === "signup" ? "Create Account" : "Log in"}
             </button>
           </form>
-          )}
         </div>
       </div>
     </div>
