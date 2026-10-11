@@ -25,12 +25,12 @@ export default function VirtualHardwareWorkbench({
   onToggleReuse,
 }) {
   const [activeTab, setActiveTab] = useState("board"); // "board" | "terminal" | "wokwi"
-  const [turbidityVal, setTurbidityVal] = useState(displayState.turbidity || 24);
-  const [collectionDistance, setCollectionDistance] = useState(15); // cm (30cm tank, 15cm = 50%)
-  const [recycledDistance, setRecycledDistance] = useState(42); // cm (60cm tank, 42cm = 30%)
+  const [turbidityVal, setTurbidityVal] = useState(displayState.turbidity || 0);
+  const [collectionDistance, setCollectionDistance] = useState(30); // Empty collection tank
+  const [recycledDistance, setRecycledDistance] = useState(60); // Empty recycled tank
   const [terminalLogs, setTerminalLogs] = useState([]);
-  const [autoStream, setAutoStream] = useState(true);
-  const [systemLedBlink, setSystemLedBlink] = useState(true);
+  const [autoStream, setAutoStream] = useState(false);
+  const [systemLedBlink, setSystemLedBlink] = useState(false);
   const terminalEndRef = useRef(null);
 
   // System heartbeat LED blink (matches GPIO 25 in sketch.ino)

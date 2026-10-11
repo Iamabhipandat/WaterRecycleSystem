@@ -47,31 +47,32 @@ export function getActivePhase(s) {
 export function ledsFromState(s) {
   const stage = Number(s?.filtrationStage) || 0;
   const reuse = !!s?.reuseActive;
-  const sources = !!(s?.roActive || s?.washingActive || s?.rainActive);
-  const recycled = (Number(s?.recycledLiters) || 0) > 0 || (Number(s?.recycledPct) || 0) > 0 || !!s?.pumpRunning;
+  const hasCollectionSpace = (Number(s?.collectionLiters) || 0) < (Number(s?.collectionCapacity) || 0);
+  const hasCollectionWater = (Number(s?.collectionLiters) || 0) > 0;
+  const hasRecycledWater = (Number(s?.recycledLiters) || 0) > 0;
+  const sources = !!(s?.roActive || s?.washingActive || s?.rainActive) && hasCollectionSpace;
+  const recycling = (Boolean(s?.pumpRunning) || stage > 0) && hasCollectionWater;
+  const distribution = reuse && hasRecycledWater;
 
   return {
-    ro: !!s?.roActive,
-    washing: !!s?.washingActive,
-    rain: !!s?.rainActive,
+    ro: false,
+    washing: false,
+    rain: false,
     collection: sources,
     filter1: stage >= 1,
     filter2: stage >= 2,
     filter3: stage >= 3,
-    pump: !!s?.pumpRunning,
-    recycled,
-    reuse,
-    reuseToilet: reuse,
-    reuseGarden: reuse,
-    reuseCleaning: reuse,
+    pump: recycling,
+    recycled: recycling,
+    reuse: distribution,
+    reuseToilet: distribution,
+    reuseGarden: distribution,
+    reuseCleaning: distribution,
   };
 }
 
 export const LED_LABELS = [
-  { key: "ro", label: "RO Wastewater" },
-  { key: "washing", label: "Washing Machine" },
-  { key: "rain", label: "Rainwater" },
-  { key: "pump", label: "Filtration Pump" },
-  { key: "recycled", label: "Recycled Water Storing (LED)" },
-  { key: "reuse", label: "Reused Water Distribution (LED)" },
+  { key: "collection", label: "Water Collection" },
+  { key: "recycled", label: "Water Recycling" },
+  { key: "reuse", label: "Water Reuse" },
 ];
