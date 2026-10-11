@@ -13,6 +13,8 @@ import {
   AlertTriangle,
   ExternalLink,
   RotateCcw,
+  Copy,
+  Check,
 } from "lucide-react";
 
 export default function VirtualHardwareWorkbench({
@@ -31,6 +33,7 @@ export default function VirtualHardwareWorkbench({
   const [terminalLogs, setTerminalLogs] = useState([]);
   const [autoStream, setAutoStream] = useState(false);
   const [systemLedBlink, setSystemLedBlink] = useState(false);
+  const [copiedJson, setCopiedJson] = useState(false);
   const terminalEndRef = useRef(null);
 
   // System heartbeat LED blink (matches GPIO 25 in sketch.ino)
@@ -504,39 +507,283 @@ export default function VirtualHardwareWorkbench({
         </div>
       )}
 
-      {/* TAB 3: WOKWI SIMULATOR FILES & DIAGRAM */}
+      {/* TAB 3: CLEAN WOKWI CIRCUIT SIMULATION & SCHEMATIC */}
       {activeTab === "wokwi" && (
-        <div className="p-4 rounded-2xl border border-gray-200 bg-gray-50/70 space-y-3 text-xs">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div className="p-4 sm:p-5 rounded-2xl border border-gray-200 bg-gray-50/70 space-y-4 text-xs animate-fadeIn">
+          {/* Header */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-gray-200">
             <div>
-              <h3 className="font-bold text-gray-900 text-sm">Wokwi Full Circuit Simulation Spec</h3>
-              <p className="text-xs text-gray-500">
-                You can run this exact circuit in Wokwi Simulator or copy to wokwi.com with one click.
+              <div className="flex items-center gap-2">
+                <h3 className="font-bold text-gray-900 text-sm">Clean ESP32 Circuit Schematic</h3>
+                <span className="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300">
+                  Clean Wiring v2.0
+                </span>
+              </div>
+              <p className="text-xs text-gray-500 mt-0.5">
+                Streamlined, low-wire architecture: Dual HC-SR04 sonars, turbidity ADC, pump switch, and 4 dedicated status actuators.
               </p>
             </div>
-            <a
-              href="https://wokwi.com"
-              target="_blank"
-              rel="noreferrer"
-              className="self-start sm:self-auto px-3.5 py-1.5 bg-cyan-700 hover:bg-cyan-800 text-white rounded-xl font-semibold text-xs flex items-center gap-1.5 shadow-2xs"
-            >
-              Open wokwi.com
-              <ExternalLink size={12} />
-            </a>
+            <div className="flex items-center gap-2 self-start sm:self-auto">
+              <button
+                type="button"
+                onClick={() => {
+                  const cleanJson = JSON.stringify({
+                    version: 1,
+                    author: "JalLoop - Clean ESP32 Circuit",
+                    editor: "wokwi",
+                    parts: [
+                      { type: "wokwi-esp32-devkit-v1", id: "esp", top: 120, left: 0 },
+                      { type: "wokwi-hc-sr04", id: "sonar_col", top: -80, left: -260, attrs: { distance: "15" } },
+                      { type: "wokwi-hc-sr04", id: "sonar_rec", top: 120, left: -260, attrs: { distance: "35" } },
+                      { type: "wokwi-potentiometer", id: "pot_turbidity", top: 320, left: -240, attrs: { value: "0.35" } },
+                      { type: "wokwi-pushbutton", id: "btn_pump", top: 440, left: -220, attrs: { label: "PUMP", color: "red" } },
+                      { type: "wokwi-resistor", id: "res_sys", top: 100, left: 220, attrs: { value: "220" } },
+                      { type: "wokwi-led", id: "led_sys", top: 90, left: 300, attrs: { color: "green", label: "HEARTBEAT" } },
+                      { type: "wokwi-resistor", id: "res_pump", top: 170, left: 220, attrs: { value: "220" } },
+                      { type: "wokwi-led", id: "led_pump", top: 160, left: 300, attrs: { color: "red", label: "PUMP_RELAY" } },
+                      { type: "wokwi-resistor", id: "res_rec", top: 240, left: 220, attrs: { value: "220" } },
+                      { type: "wokwi-led", id: "led_rec", top: 230, left: 300, attrs: { color: "blue", label: "RECYCLED_STORED" } },
+                      { type: "wokwi-resistor", id: "res_reuse", top: 310, left: 220, attrs: { value: "220" } },
+                      { type: "wokwi-led", id: "led_reuse", top: 300, left: 300, attrs: { color: "yellow", label: "REUSE_VALVE" } }
+                    ],
+                    connections: [
+                      ["sonar_col:VCC", "esp:3V3", "red", []],
+                      ["sonar_col:GND", "esp:GND.1", "black", []],
+                      ["sonar_col:TRIG", "esp:D5", "orange", []],
+                      ["sonar_col:ECHO", "esp:D18", "gold", []],
+                      ["sonar_rec:VCC", "esp:3V3", "red", []],
+                      ["sonar_rec:GND", "esp:GND.1", "black", []],
+                      ["sonar_rec:TRIG", "esp:D19", "orange", []],
+                      ["sonar_rec:ECHO", "esp:D21", "gold", []],
+                      ["pot_turbidity:VCC", "esp:3V3", "red", []],
+                      ["pot_turbidity:GND", "esp:GND.1", "black", []],
+                      ["pot_turbidity:SIG", "esp:D34", "purple", []],
+                      ["btn_pump:1.l", "esp:D0", "gray", []],
+                      ["btn_pump:2.l", "esp:GND.1", "black", []],
+                      ["esp:D25", "res_sys:1", "green", []],
+                      ["res_sys:2", "led_sys:A", "green", []],
+                      ["led_sys:C", "esp:GND.2", "black", []],
+                      ["esp:D32", "res_pump:1", "red", []],
+                      ["res_pump:2", "led_pump:A", "red", []],
+                      ["led_pump:C", "esp:GND.2", "black", []],
+                      ["esp:D15", "res_rec:1", "blue", []],
+                      ["res_rec:2", "led_rec:A", "blue", []],
+                      ["led_rec:C", "esp:GND.2", "black", []],
+                      ["esp:D2", "res_reuse:1", "orange", []],
+                      ["res_reuse:2", "led_reuse:A", "orange", []],
+                      ["led_reuse:C", "esp:GND.2", "black", []]
+                    ]
+                  }, null, 2);
+                  navigator.clipboard.writeText(cleanJson);
+                  setCopiedJson(true);
+                  setTimeout(() => setCopiedJson(false), 2000);
+                }}
+                className="px-3 py-1.5 bg-white hover:bg-gray-100 border border-gray-300 text-gray-700 rounded-xl font-semibold text-xs flex items-center gap-1.5 cursor-pointer shadow-2xs"
+              >
+                {copiedJson ? <Check size={12} className="text-emerald-600" /> : <Copy size={12} />}
+                <span>{copiedJson ? "Copied!" : "Copy diagram.json"}</span>
+              </button>
+              <a
+                href="https://wokwi.com"
+                target="_blank"
+                rel="noreferrer"
+                className="px-3.5 py-1.5 bg-cyan-700 hover:bg-cyan-800 text-white rounded-xl font-semibold text-xs flex items-center gap-1.5 shadow-2xs"
+              >
+                Open wokwi.com
+                <ExternalLink size={12} />
+              </a>
+            </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div className="bg-white p-3 rounded-xl border border-gray-200">
-              <span className="font-bold text-gray-800 block mb-1">wokwi/diagram.json</span>
-              <p className="text-gray-500 text-[11px]">
-                Defines the ESP32 DevKit, 3× HC-SR04 sonars, potentiometer, resistors, and LED connections.
-              </p>
+          {/* Clean Visual Circuit Schematic SVG */}
+          <div className="w-full overflow-x-auto rounded-xl border border-gray-200 bg-white p-3 shadow-inner">
+            <svg viewBox="0 0 880 340" className="w-full min-w-[720px] h-auto select-none font-sans">
+              {/* Background grid */}
+              <defs>
+                <pattern id="cleanGrid" width="20" height="20" patternUnits="userSpaceOnUse">
+                  <circle cx="2" cy="2" r="1" fill="#F1F5F9" />
+                </pattern>
+              </defs>
+              <rect width="880" height="340" fill="#FAFAFA" rx="8" />
+              <rect width="880" height="340" fill="url(#cleanGrid)" />
+
+              {/* Column Banners */}
+              <rect x="20" y="10" width="240" height="26" rx="6" fill="#EFF6FF" stroke="#BFDBFE" />
+              <text x="140" y="27" textAnchor="middle" fontSize="11" fontWeight="700" fill="#1D4ED8">INPUT SENSORS (3.3V)</text>
+
+              <rect x="320" y="10" width="240" height="26" rx="6" fill="#F0FDF4" stroke="#BBF7D0" />
+              <text x="440" y="27" textAnchor="middle" fontSize="11" fontWeight="700" fill="#15803D">ESP32 MICROCONTROLLER</text>
+
+              <rect x="620" y="10" width="240" height="26" rx="6" fill="#FEF3C7" stroke="#FDE68A" />
+              <text x="740" y="27" textAnchor="middle" fontSize="11" fontWeight="700" fill="#B45309">ACTUATORS &amp; OUTPUTS</text>
+
+              {/* ── LEFT COLUMN: SENSORS ── */}
+              {/* Sensor 1: HC-SR04 Collection */}
+              <rect x="25" y="55" width="230" height="58" rx="8" fill="#FFFFFF" stroke="#93C5FD" strokeWidth="1.5" />
+              <circle cx="45" cy="84" r="12" fill="#DBEAFE" />
+              <text x="45" y="88" textAnchor="middle" fontSize="12">📡</text>
+              <text x="68" y="76" fontSize="11" fontWeight="700" fill="#1E3A8A">HC-SR04 Sonar 1 (Collection)</text>
+              <text x="68" y="93" fontSize="9.5" font-family="monospace" fill="#2563EB">TRIG → GPIO 5 | ECHO → GPIO 18</text>
+
+              {/* Sensor 2: HC-SR04 Recycled */}
+              <rect x="25" y="125" width="230" height="58" rx="8" fill="#FFFFFF" stroke="#93C5FD" strokeWidth="1.5" />
+              <circle cx="45" cy="154" r="12" fill="#DBEAFE" />
+              <text x="45" y="158" textAnchor="middle" fontSize="12">📡</text>
+              <text x="68" y="146" fontSize="11" fontWeight="700" fill="#1E3A8A">HC-SR04 Sonar 2 (Recycled)</text>
+              <text x="68" y="163" fontSize="9.5" font-family="monospace" fill="#2563EB">TRIG → GPIO 19 | ECHO → GPIO 21</text>
+
+              {/* Sensor 3: Turbidity Potentiometer */}
+              <rect x="25" y="195" width="230" height="58" rx="8" fill="#FFFFFF" stroke="#FCD34D" strokeWidth="1.5" />
+              <circle cx="45" cy="224" r="12" fill="#FEF3C7" />
+              <text x="45" y="228" textAnchor="middle" fontSize="12">🎛️</text>
+              <text x="68" y="216" fontSize="11" fontWeight="700" fill="#78350F">Turbidity Potentiometer (ADC)</text>
+              <text x="68" y="233" fontSize="9.5" font-family="monospace" fill="#D97706">SIG → GPIO 34 (Analog In)</text>
+
+              {/* Sensor 4: Pushbutton */}
+              <rect x="25" y="265" width="230" height="58" rx="8" fill="#FFFFFF" stroke="#E2E8F0" strokeWidth="1.5" />
+              <circle cx="45" cy="294" r="12" fill="#F1F5F9" />
+              <text x="45" y="298" textAnchor="middle" fontSize="12">🔘</text>
+              <text x="68" y="286" fontSize="11" fontWeight="700" fill="#334155">Manual Pump Button</text>
+              <text x="68" y="303" fontSize="9.5" font-family="monospace" fill="#64748B">BTN → GPIO 0 (Interrupt to GND)</text>
+
+              {/* ── CENTER COLUMN: ESP32 DEVKIT ── */}
+              <rect x="330" y="55" width="220" height="268" rx="12" fill="#1E293B" stroke="#0F172A" strokeWidth="2" />
+              <rect x="345" y="70" width="190" height="40" rx="6" fill="#334155" />
+              <text x="440" y="87" textAnchor="middle" fontSize="12" fontWeight="800" fill="#38BDF8">ESP32-WROOM-32</text>
+              <text x="440" y="101" textAnchor="middle" fontSize="9" font-family="monospace" fill="#94A3B8">Dual Core • 240MHz • FreeRTOS</text>
+
+              {/* Left Pin Headers */}
+              {["3V3 (Power)", "GND (Ground)", "GPIO 5 (TRIG 1)", "GPIO 18 (ECHO 1)", "GPIO 19 (TRIG 2)", "GPIO 21 (ECHO 2)", "GPIO 34 (ADC)", "GPIO 0 (BTN)"].map((pin, i) => (
+                <g key={pin}>
+                  <rect x="335" y={120 + i * 24} width="85" height="18" rx="3" fill="#0F172A" />
+                  <text x="340" y={133 + i * 24} fontSize="8" font-family="monospace" fill="#38BDF8">{pin}</text>
+                </g>
+              ))}
+
+              {/* Right Pin Headers */}
+              {["GPIO 25 (Heartbeat)", "GPIO 32 (Pump Relay)", "GPIO 15 (Recycled)", "GPIO 2 (Reuse Valve)", "GND.2 (Ground)", "5V / VIN"].map((pin, i) => (
+                <g key={pin}>
+                  <rect x="455" y={120 + i * 24} width="90" height="18" rx="3" fill="#0F172A" />
+                  <text x="540" y={133 + i * 24} textAnchor="end" fontSize="8" font-family="monospace" fill="#4ADE80">{pin}</text>
+                </g>
+              ))}
+
+              {/* ── CLEAN DIRECT BUS WIRES (No Crisscrossing) ── */}
+              {/* Wiring Left to ESP32 */}
+              <path d="M 255 84 H 335" stroke="#3B82F6" strokeWidth="2.5" strokeLinecap="round" />
+              <path d="M 255 154 H 335" stroke="#3B82F6" strokeWidth="2.5" strokeLinecap="round" />
+              <path d="M 255 224 H 335" stroke="#F59E0B" strokeWidth="2.5" strokeLinecap="round" />
+              <path d="M 255 294 H 335" stroke="#64748B" strokeWidth="2.5" strokeLinecap="round" />
+
+              {/* Wiring ESP32 to Right */}
+              <path d="M 550 128 H 625" stroke="#10B981" strokeWidth="2.5" strokeLinecap="round" />
+              <path d="M 550 152 H 625" stroke="#EF4444" strokeWidth="2.5" strokeLinecap="round" />
+              <path d="M 550 176 H 625" stroke="#0284C7" strokeWidth="2.5" strokeLinecap="round" />
+              <path d="M 550 200 H 625" stroke="#F59E0B" strokeWidth="2.5" strokeLinecap="round" />
+
+              {/* ── RIGHT COLUMN: OUTPUTS & ACTUATORS ── */}
+              {/* Output 1: System Heartbeat LED */}
+              <rect x="625" y="100" width="230" height="48" rx="8" fill="#FFFFFF" stroke="#86EFAC" strokeWidth="1.5" />
+              <circle cx="645" cy="124" r="8" fill="#22C55E" />
+              <text x="662" y="119" fontSize="10.5" fontWeight="700" fill="#14532D">System Heartbeat LED</text>
+              <text x="662" y="134" fontSize="9" font-family="monospace" fill="#16A34A">GPIO 25 → 220Ω → Green LED</text>
+
+              {/* Output 2: Pump Relay LED */}
+              <rect x="625" y="155" width="230" height="48" rx="8" fill="#FFFFFF" stroke="#FCA5A5" strokeWidth="1.5" />
+              <circle cx="645" cy="179" r="8" fill="#EF4444" />
+              <text x="662" y="174" fontSize="10.5" fontWeight="700" fill="#7F1D1D">Pump / Relay Actuator</text>
+              <text x="662" y="189" fontSize="9" font-family="monospace" fill="#DC2626">GPIO 32 → 220Ω → Red LED</text>
+
+              {/* Output 3: Recycled Storing LED */}
+              <rect x="625" y="210" width="230" height="48" rx="8" fill="#FFFFFF" stroke="#7DD3FC" strokeWidth="1.5" />
+              <circle cx="645" cy="234" r="8" fill="#0284C7" />
+              <text x="662" y="229" fontSize="10.5" fontWeight="700" fill="#0C4A6E">Recycled Storing Light</text>
+              <text x="662" y="244" fontSize="9" font-family="monospace" fill="#0369A1">GPIO 15 → 220Ω → Blue LED</text>
+
+              {/* Output 4: Reuse Distribution Valve */}
+              <rect x="625" y="265" width="230" height="48" rx="8" fill="#FFFFFF" stroke="#FDE68A" strokeWidth="1.5" />
+              <circle cx="645" cy="289" r="8" fill="#EAB308" />
+              <text x="662" y="284" fontSize="10.5" fontWeight="700" fill="#713F12">Distribution Valve Light</text>
+              <text x="662" y="299" fontSize="9" font-family="monospace" fill="#CA8A04">GPIO 2 → 220Ω → Yellow LED</text>
+            </svg>
+          </div>
+
+          {/* Clean Component & Pinout Table */}
+          <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+            <div className="px-4 py-2.5 bg-gray-100/70 border-b border-gray-200 flex items-center justify-between">
+              <span className="font-bold text-gray-800 text-xs">Streamlined Pinout Map</span>
+              <span className="text-[10px] text-gray-500 font-mono">4 Inputs • 4 Outputs • 3.3V Logic</span>
             </div>
-            <div className="bg-white p-3 rounded-xl border border-gray-200">
-              <span className="font-bold text-gray-800 block mb-1">wokwi/sketch.ino</span>
-              <p className="text-gray-500 text-[11px]">
-                Arduino C++ firmware that samples distance sensors, analog turbidity, and toggles hardware pins.
-              </p>
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-xs">
+                <thead className="bg-gray-50 text-[10px] font-bold text-gray-500 uppercase">
+                  <tr>
+                    <th className="py-2 px-3">Device / Part</th>
+                    <th className="py-2 px-3">Type</th>
+                    <th className="py-2 px-3">ESP32 Pin(s)</th>
+                    <th className="py-2 px-3">Wire Color</th>
+                    <th className="py-2 px-3">Functional Role</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100 text-[11px]">
+                  <tr>
+                    <td className="py-2 px-3 font-bold text-gray-800">HC-SR04 Sonar 1</td>
+                    <td className="py-2 px-3 text-blue-700 font-semibold">Sensor In</td>
+                    <td className="py-2 px-3 font-mono">GPIO 5 (TRIG), GPIO 18 (ECHO)</td>
+                    <td className="py-2 px-3 font-mono text-orange-600">Orange / Gold</td>
+                    <td className="py-2 px-3 text-gray-600">Measures Collection Tank water level (cm)</td>
+                  </tr>
+                  <tr>
+                    <td className="py-2 px-3 font-bold text-gray-800">HC-SR04 Sonar 2</td>
+                    <td className="py-2 px-3 text-blue-700 font-semibold">Sensor In</td>
+                    <td className="py-2 px-3 font-mono">GPIO 19 (TRIG), GPIO 21 (ECHO)</td>
+                    <td className="py-2 px-3 font-mono text-orange-600">Orange / Gold</td>
+                    <td className="py-2 px-3 text-gray-600">Measures Recycled Storage Tank volume</td>
+                  </tr>
+                  <tr>
+                    <td className="py-2 px-3 font-bold text-gray-800">Potentiometer</td>
+                    <td className="py-2 px-3 text-amber-700 font-semibold">Analog In</td>
+                    <td className="py-2 px-3 font-mono">GPIO 34 (ADC1 Channel 6)</td>
+                    <td className="py-2 px-3 font-mono text-purple-700">Purple</td>
+                    <td className="py-2 px-3 text-gray-600">Analog Turbidity water quality (0–100 NTU)</td>
+                  </tr>
+                  <tr>
+                    <td className="py-2 px-3 font-bold text-gray-800">Tactile Switch</td>
+                    <td className="py-2 px-3 text-slate-700 font-semibold">Digital In</td>
+                    <td className="py-2 px-3 font-mono">GPIO 0 (Active Low / Pullup)</td>
+                    <td className="py-2 px-3 font-mono text-slate-500">Gray</td>
+                    <td className="py-2 px-3 text-gray-600">Hardware interrupt for filtration pump toggle</td>
+                  </tr>
+                  <tr>
+                    <td className="py-2 px-3 font-bold text-gray-800">Pump Relay LED</td>
+                    <td className="py-2 px-3 text-red-700 font-semibold">Actuator Out</td>
+                    <td className="py-2 px-3 font-mono">GPIO 32 (Active High)</td>
+                    <td className="py-2 px-3 font-mono text-red-600">Red</td>
+                    <td className="py-2 px-3 text-gray-600">Drives 12V filtration pump relay switch</td>
+                  </tr>
+                  <tr>
+                    <td className="py-2 px-3 font-bold text-gray-800">Recycled LED</td>
+                    <td className="py-2 px-3 text-sky-700 font-semibold">Status Out</td>
+                    <td className="py-2 px-3 font-mono">GPIO 15 (Active High)</td>
+                    <td className="py-2 px-3 font-mono text-blue-600">Blue</td>
+                    <td className="py-2 px-3 text-gray-600">Illuminates when treated water is stored</td>
+                  </tr>
+                  <tr>
+                    <td className="py-2 px-3 font-bold text-gray-800">Reuse Valve LED</td>
+                    <td className="py-2 px-3 text-yellow-700 font-semibold">Actuator Out</td>
+                    <td className="py-2 px-3 font-mono">GPIO 2 (Active High)</td>
+                    <td className="py-2 px-3 font-mono text-amber-600">Orange</td>
+                    <td className="py-2 px-3 text-gray-600">Opens solenoid valve for toilet / garden reuse</td>
+                  </tr>
+                  <tr>
+                    <td className="py-2 px-3 font-bold text-gray-800">Heartbeat LED</td>
+                    <td className="py-2 px-3 text-emerald-700 font-semibold">System Out</td>
+                    <td className="py-2 px-3 font-mono">GPIO 25 (0.5Hz Blinking)</td>
+                    <td className="py-2 px-3 font-mono text-emerald-600">Green</td>
+                    <td className="py-2 px-3 text-gray-600">FreeRTOS RTOS task loop watchdog pulse</td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </div>
         </div>
