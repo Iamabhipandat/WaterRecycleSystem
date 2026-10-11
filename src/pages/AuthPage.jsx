@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Check, Droplets, Lock, Mail, Shield, User, MailCheck } from "lucide-react";
+import { Check, Droplets, Lock, Mail, Shield, User, MailCheck, Sparkles, Play, ArrowRight, Leaf } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 
 function mapAuthError(err) {
@@ -18,7 +18,7 @@ function mapAuthError(err) {
   return msg || "Something went wrong. Try again.";
 }
 
-export default function AuthPage() {
+export default function AuthPage({ onOpenPreview, onExploreAsGuest }) {
   const { login, signup, resendVerificationEmail, verificationNotice } = useAuth();
   const [mode, setMode] = useState("login"); // "login" | "signup"
   const [name, setName] = useState("");
@@ -254,11 +254,52 @@ export default function AuthPage() {
             <button
               type="submit"
               disabled={busy}
-              className="w-full mt-2 bg-green-700 hover:bg-green-800 disabled:opacity-60 text-white text-sm font-semibold rounded-xl py-2.5 transition-colors shadow-xs"
+              className="w-full mt-2 bg-green-700 hover:bg-green-800 disabled:opacity-60 text-white text-sm font-semibold rounded-xl py-2.5 transition-colors shadow-xs cursor-pointer"
             >
               {busy ? "Please wait…" : mode === "signup" ? "Create Account" : "Log in"}
             </button>
           </form>
+
+          {/* Guest / Public Preview Section for visitors who want to explore first */}
+          <div className="mt-6 pt-5 border-t border-gray-100 space-y-3">
+            <div className="text-center">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-gray-400">
+                Want to explore without logging in?
+              </span>
+            </div>
+
+            {onOpenPreview && (
+              <button
+                type="button"
+                onClick={onOpenPreview}
+                className="w-full flex items-center justify-between p-3 rounded-xl border border-emerald-200 bg-emerald-50/70 hover:bg-emerald-100/70 text-emerald-900 transition-colors text-xs font-bold group cursor-pointer"
+              >
+                <div className="flex items-center gap-2.5 text-left">
+                  <div className="w-8 h-8 rounded-lg bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-xs">
+                    <Leaf size={15} />
+                  </div>
+                  <div>
+                    <div className="text-emerald-950 font-bold">🌱 Public Preview: India's Water Crisis</div>
+                    <div className="text-[11px] text-emerald-700 font-normal">
+                      Learn how water is wasted &amp; how JalLoop saves it
+                    </div>
+                  </div>
+                </div>
+                <ArrowRight size={14} className="text-emerald-600 group-hover:translate-x-0.5 transition-transform shrink-0" />
+              </button>
+            )}
+
+            {onExploreAsGuest && (
+              <button
+                type="button"
+                onClick={onExploreAsGuest}
+                className="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-xl border border-gray-200 hover:bg-gray-50 text-gray-700 text-xs font-semibold transition-colors cursor-pointer"
+              >
+                <Play size={13} className="text-green-700 fill-green-700" />
+                <span>Test Interactive Live Simulator (Guest Mode)</span>
+              </button>
+            )}
+          </div>
         </div>
       </div>
     </div>

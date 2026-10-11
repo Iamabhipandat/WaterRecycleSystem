@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Droplets, LayoutDashboard, LogOut, Settings, Menu, X, Cpu, Activity, BarChart3 } from "lucide-react";
+import { Droplets, LayoutDashboard, LogOut, Settings, Menu, X, Cpu, Activity, BarChart3, Leaf, UserCheck } from "lucide-react";
 import ModeToggle from "./ModeToggle";
 import { useAuth } from "../context/AuthContext";
 
@@ -11,6 +11,8 @@ export default function Navbar({
   onOpenAdmin,
   onNavigate,
   view,
+  isGuest = false,
+  onExitGuest,
 }) {
   const { profile, isAdmin, logout } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -20,6 +22,7 @@ export default function Navbar({
     { id: "virtual-hardware", label: "Virtual Hardware", icon: Cpu },
     { id: "status", label: "System Status", icon: Activity },
     { id: "analytics", label: "Analytics", icon: BarChart3 },
+    { id: "preview", label: "Crisis & Mission", icon: Leaf },
   ];
 
   const handleSelectPage = (id) => {
@@ -90,18 +93,36 @@ export default function Navbar({
             </button>
           )}
 
-          <div className="hidden sm:flex flex-col items-end leading-tight pl-1 border-l border-gray-200">
-            <span className="text-xs font-semibold text-gray-800">{profile?.name || "User"}</span>
-            <span className="text-[10px] text-gray-400 capitalize">{profile?.role || "user"}</span>
-          </div>
+          {isGuest ? (
+            <div className="flex items-center gap-2">
+              <span className="hidden sm:inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 text-[11px] font-bold">
+                <Leaf size={11} /> Guest Explorer
+              </span>
+              <button
+                type="button"
+                onClick={onExitGuest}
+                className="px-2.5 py-1.5 rounded-lg border border-gray-200 hover:bg-gray-100 text-xs font-bold text-gray-700 transition-colors cursor-pointer"
+                title="Log In or Create Account"
+              >
+                Sign In
+              </button>
+            </div>
+          ) : (
+            <>
+              <div className="hidden sm:flex flex-col items-end leading-tight pl-1 border-l border-gray-200">
+                <span className="text-xs font-semibold text-gray-800">{profile?.name || "User"}</span>
+                <span className="text-[10px] text-gray-400 capitalize">{profile?.role || "user"}</span>
+              </div>
 
-          <button
-            onClick={logout}
-            title="Log out"
-            className="p-1.5 sm:p-2 rounded-lg text-gray-400 hover:bg-gray-100 hover:text-gray-700 transition-colors cursor-pointer"
-          >
-            <LogOut size={16} />
-          </button>
+              <button
+                onClick={logout}
+                title="Log out"
+                className="p-1.5 sm:p-2 rounded-lg text-gray-400 hover:bg-gray-100 hover:text-gray-700 transition-colors cursor-pointer"
+              >
+                <LogOut size={16} />
+              </button>
+            </>
+          )}
 
           {/* Mobile Menu Toggle Button */}
           <button
